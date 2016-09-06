@@ -10,18 +10,19 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IEnergyProvider, ITickable {
 
-    protected EnergyStorage storage = new EnergyStorage(300000);
+	protected EnergyStorage storage = new EnergyStorage(300000);
 
-    @Override
-    public void update() {
-        Chunk chunk = worldObj.getChunkFromBlockCoords(getPos());
-        /*ChunkProviderOverworld chunkProviderOverworld = new ChunkProviderOverworld(worldObj, worldObj.getSeed(), true, "");
+	@Override
+	public void update() {
+		Chunk chunk = worldObj.getChunkFromBlockCoords(getPos());
+	    /*ChunkProviderOverworld chunkProviderOverworld = new ChunkProviderOverworld(worldObj, worldObj.getSeed(), true, "");
         WorldProviderSurface providerSurface = new WorldProviderSurface();
         //providerSurface.registerWorld(worldObj);
         //providerSurface.createChunkGenerator().populate(chunk.xPosition, chunk.zPosition);
@@ -38,74 +39,70 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
                     worldObj.setBlockState(new BlockPos(16 * chunk.xPosition + i, k, 16 * chunk.zPosition + j), chunk.getBlockState(i, k, j));
         //new WorldGenMinable().generate()*/
 
-        generateChunk(worldObj.getMinecraftServer(), chunk.xPosition, chunk.zPosition, 0);
-    }
-    public static void generateChunks(MinecraftServer server, int x, int z, int width, int height, int dimensionID) {
+		ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
+		cps.provideChunk(chunk.xPosition, chunk.zPosition);
+	}
 
-        ChunkProviderServer cps = server.worldServerForDimension(dimensionID).getChunkProvider();
+	public static void generateChunks(MinecraftServer server, int x, int z, int width, int height, int dimensionID) {
+		ChunkProviderServer cps = server.worldServerForDimension(dimensionID).getChunkProvider();
 
-        List<Chunk> chunks = new ArrayList<Chunk>(width*height);
-        for(int i = (x - width/2); i < (x + width/2); i++) {
-            for(int j = (z - height/2); j < (z + height/2); j++) {
-                generateChunk(server, i, j, dimensionID);
-            }
-        }
-        for(Chunk c : chunks) {
-            cps.unloadAllChunks();
-        }
-    }
-    public static void generateChunk(MinecraftServer server, int x, int z, int dimensionID) {
-        ChunkProviderServer cps = server.worldServerForDimension(dimensionID).getChunkProvider();
-        cps.loadChunk(x, z);
-        cps.loadChunk(x, z+1);
-        cps.loadChunk(x+1, z);
-        cps.loadChunk(x+1, z+1);
+		List<Chunk> chunks = new ArrayList<Chunk>(width * height);
+		for (int i = (x - width / 2); i < (x + width / 2); i++) {
+			for (int j = (z - height / 2); j < (z + height / 2); j++) {
+				generateChunk(server, i, j, dimensionID);
+			}
+		}
+		for (Chunk c : chunks) {
+			cps.unloadAllChunks();
+		}
+	}
 
-            //Reference.logger.info(String.format("Loaded Chunk at %s, %s (%s) ", x, z, DimensionManager.getProviderType(dimensionID) != null ? DimensionManager.getProviderType(dimensionID).getName() : dimensionID));
+	public static void generateChunk(MinecraftServer server, int x, int z, int dimensionID) {
+		//Reference.logger.info(String.format("Loaded Chunk at %s, %s (%s) ", x, z, DimensionManager.getProviderType(dimensionID) != null ? DimensionManager.getProviderType(dimensionID).getName() : dimensionID));
 
-    }
+	}
 
-    @Override
-    public void readFromNBT(NBTTagCompound nbt) {
+	@Override
+	public void readFromNBT(NBTTagCompound nbt) {
 
-        super.readFromNBT(nbt);
-        storage.readFromNBT(nbt);
-    }
+		super.readFromNBT(nbt);
+		storage.readFromNBT(nbt);
+	}
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 
-        super.writeToNBT(nbt);
-        storage.writeToNBT(nbt);
-        return nbt;
-    }
+		super.writeToNBT(nbt);
+		storage.writeToNBT(nbt);
+		return nbt;
+	}
 
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
-    }
+	@Override
+	public boolean canConnectEnergy(EnumFacing from) {
+		return true;
+	}
 
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        return storage.receiveEnergy(maxReceive, simulate);
-    }
+	@Override
+	public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+		return storage.receiveEnergy(maxReceive, simulate);
+	}
 
-    @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        return storage.extractEnergy(maxExtract, simulate);
-    }
+	@Override
+	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
+		return storage.extractEnergy(maxExtract, simulate);
+	}
 
-    /* IEnergyHandler */
-    @Override
-    public int getEnergyStored(EnumFacing from) {
+	/* IEnergyHandler */
+	@Override
+	public int getEnergyStored(EnumFacing from) {
 
-        return storage.getEnergyStored();
-    }
+		return storage.getEnergyStored();
+	}
 
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
+	@Override
+	public int getMaxEnergyStored(EnumFacing from) {
 
-        return storage.getMaxEnergyStored();
-    }
+		return storage.getMaxEnergyStored();
+	}
 
 }

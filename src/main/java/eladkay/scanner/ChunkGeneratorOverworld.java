@@ -37,8 +37,6 @@ public class ChunkGeneratorOverworld implements IChunkGenerator {
         this.heightMap = new double[825];
     }
 
-
-
     private void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
         setBlocksInChunk(chunkX, chunkZ, primer);
     }
