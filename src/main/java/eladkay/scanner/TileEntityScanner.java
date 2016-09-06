@@ -4,13 +4,15 @@ import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderOverworld;
+import net.minecraft.world.gen.ChunkProviderServer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IEnergyProvider, ITickable {
 
@@ -19,7 +21,7 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
     @Override
     public void update() {
         Chunk chunk = worldObj.getChunkFromBlockCoords(getPos());
-        ChunkProviderOverworld chunkProviderOverworld = new ChunkProviderOverworld(worldObj, worldObj.getSeed(), true, "");
+        /*ChunkProviderOverworld chunkProviderOverworld = new ChunkProviderOverworld(worldObj, worldObj.getSeed(), true, "");
         WorldProviderSurface providerSurface = new WorldProviderSurface();
         //providerSurface.registerWorld(worldObj);
         //providerSurface.createChunkGenerator().populate(chunk.xPosition, chunk.zPosition);
@@ -35,6 +37,32 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
                 for(int k = 0; k < 256; k++)
                     worldObj.setBlockState(new BlockPos(16 * chunk.xPosition + i, k, 16 * chunk.zPosition + j), chunk.getBlockState(i, k, j));
         //new WorldGenMinable().generate()*/
+
+        generateChunk(worldObj.getMinecraftServer(), chunk.xPosition, chunk.zPosition, 0);
+    }
+    public static void generateChunks(MinecraftServer server, int x, int z, int width, int height, int dimensionID) {
+
+        ChunkProviderServer cps = server.worldServerForDimension(dimensionID).getChunkProvider();
+
+        List<Chunk> chunks = new ArrayList<Chunk>(width*height);
+        for(int i = (x - width/2); i < (x + width/2); i++) {
+            for(int j = (z - height/2); j < (z + height/2); j++) {
+                generateChunk(server, i, j, dimensionID);
+            }
+        }
+        for(Chunk c : chunks) {
+            cps.unloadAllChunks();
+        }
+    }
+    public static void generateChunk(MinecraftServer server, int x, int z, int dimensionID) {
+        ChunkProviderServer cps = server.worldServerForDimension(dimensionID).getChunkProvider();
+        cps.loadChunk(x, z);
+        cps.loadChunk(x, z+1);
+        cps.loadChunk(x+1, z);
+        cps.loadChunk(x+1, z+1);
+
+            //Reference.logger.info(String.format("Loaded Chunk at %s, %s (%s) ", x, z, DimensionManager.getProviderType(dimensionID) != null ? DimensionManager.getProviderType(dimensionID).getName() : dimensionID));
+
     }
 
     @Override
