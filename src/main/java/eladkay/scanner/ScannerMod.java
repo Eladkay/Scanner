@@ -15,6 +15,7 @@ public class ScannerMod {
     public static CommonProxy proxy;
 
     public static ScannerBlock scanner;
+
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
         GameRegistry.register(scanner = new ScannerBlock());
@@ -22,5 +23,7 @@ public class ScannerMod {
         GameRegistry.registerTileEntity(TileEntityScanner.class, "scanner");
         FMLInterModComms.sendMessage("Waila", "register", "eladkay.scanner.Waila.onWailaCall");
         proxy.init();
+
+        Config.initConfig(event.getSuggestedConfigurationFile());
     }
 }
