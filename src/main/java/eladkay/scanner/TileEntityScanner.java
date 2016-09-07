@@ -3,11 +3,13 @@ package eladkay.scanner;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -21,7 +23,7 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
 
 	@Override
 	public void update() {
-		Chunk chunk = worldObj.getChunkFromBlockCoords(getPos());
+		//Chunk chunk = worldObj.getChunkFromBlockCoords(getPos());
 	    /*ChunkProviderOverworld chunkProviderOverworld = new ChunkProviderOverworld(worldObj, worldObj.getSeed(), true, "");
         WorldProviderSurface providerSurface = new WorldProviderSurface();
         //providerSurface.registerWorld(worldObj);
@@ -32,15 +34,33 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
         for(BlockPos pos : BlockPos.getAllInBox(new BlockPos(chunk.xPosition * 16, 0, chunk.zPosition + 16), new BlockPos(chunk.xPosition * 16 + 15, 256, chunk.zPosition * 16 + 15))) {
             worldObj.setBlockState(pos, chunk.getBlockState(pos));
             //System.out.println(chunk.getBlockState(pos).getBlock() + ""+ pos);
-        }
-        for(int i = 0; i < 16; i++)
+        }*/
+        /*for(int i = 0; i < 16; i++)
             for(int j = 0; j < 16; j++)
                 for(int k = 0; k < 256; k++)
                     worldObj.setBlockState(new BlockPos(16 * chunk.xPosition + i, k, 16 * chunk.zPosition + j), chunk.getBlockState(i, k, j));
-        //new WorldGenMinable().generate()*/
+        //new WorldGenMinable().generate()
 
 		ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
-		cps.provideChunk(chunk.xPosition, chunk.zPosition);
+		cps.chunkGenerator.populate(chunk.xPosition, chunk.zPosition);
+        ChunkPrimer primer = new ChunkPrimer();
+        Biome.getBiome(1).generateBiomeTerrain(worldObj, worldObj.rand, primer, chunk.xPosition, chunk.zPosition, 25.6);
+        for(int i = 0; i < 16; i++)
+            for(int j = 0; j < 16; j++)
+                for(int k = 0; k < 256; k++)
+                    worldObj.setBlockState(new BlockPos(16 * chunk.xPosition + i, k, 16 * chunk.zPosition + j), primer.getBlockState(i, k, j));*/
+        ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
+        Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
+        for(int x = 0; x < 16; x++){
+            for(int z = 0; z < 16; z++){
+                for(int y = 0; y < 256; y++){
+                    IBlockState block = chunk.getBlockState(x, y, z);
+                    worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
+                }
+            }
+        }
+
+
 	}
 
 	public static void generateChunks(MinecraftServer server, int x, int z, int width, int height, int dimensionID) {
