@@ -1,10 +1,10 @@
 package eladkay.scanner;
 
-import cofh.api.energy.EnergyStorage;
-import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -14,12 +14,14 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IEnergyProvider, ITickable {
+public class TileEntityScanner extends TileEntity implements IEnergyReceiver, ITickable {
 
-	protected EnergyStorage storage = new EnergyStorage(300000);
+	public int energy;
+    public static final int MAX = 300000;
 
 	@Override
 	public void update() {
@@ -51,15 +53,15 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
                     worldObj.setBlockState(new BlockPos(16 * chunk.xPosition + i, k, 16 * chunk.zPosition + j), primer.getBlockState(i, k, j));*/
         ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
         Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
-        for(int x = 0; x < 16; x++){
-            for(int z = 0; z < 16; z++){
-                for(int y = 0; y < 256; y++){
-                    IBlockState block = chunk.getBlockState(x, y, z);
-                    worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
-                }
-            }
-        }
-
+        for(int x = 0; x < 16; x++)
+            for(int z = 0; z < 16; z++)
+                for(int y = 0; y < 256; y++)
+                    if(worldObj.getBlockState(new BlockPos(x, y, z)).getBlock() == Blocks.AIR)  //i know this can be compacted
+                        if(energy >= 100000) {
+                            energy -= 100000;
+                            IBlockState block = chunk.getBlockState(x, y, z);
+                            worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
+                        } //else System.out.println(energy);
 
 	}
 
@@ -84,16 +86,15 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-
 		super.readFromNBT(nbt);
-		storage.readFromNBT(nbt);
+		energy = nbt.getInteger("energy");
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 
 		super.writeToNBT(nbt);
-		storage.writeToNBT(nbt);
+		nbt.setInteger("energy", energy);
 		return nbt;
 	}
 
@@ -104,25 +105,30 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IE
 
 	@Override
 	public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-		return storage.receiveEnergy(maxReceive, simulate);
-	}
-
-	@Override
-	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-		return storage.extractEnergy(maxExtract, simulate);
+        int energyReceived = Math.min(MAX - energy, maxReceive);
+        if (!simulate) {
+            energy += energyReceived;
+        }
+        return energyReceived;
 	}
 
 	/* IEnergyHandler */
 	@Override
 	public int getEnergyStored(EnumFacing from) {
-
-		return storage.getEnergyStored();
+		return energy;
 	}
 
 	@Override
 	public int getMaxEnergyStored(EnumFacing from) {
-
-		return storage.getMaxEnergyStored();
+		return MAX;
 	}
 
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        writeToNBT(nbt);
+        SPacketUpdateTileEntity packer = new SPacketUpdateTileEntity(getPos(), 0, nbt);
+        return packer;
+    }
 }

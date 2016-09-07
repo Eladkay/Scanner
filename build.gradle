@@ -44,9 +44,17 @@ repositories {
         url 'http://maven.epoxide.xyz'
     }
 }
+repositories {
+    maven {
+        url "http://mobiusstrip.eu/maven"
+    }
+    maven {
+        url "http://chickenbones.net/maven/"
+    }
+}
 
 dependencies {
-
+    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
     compile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
 }
 
