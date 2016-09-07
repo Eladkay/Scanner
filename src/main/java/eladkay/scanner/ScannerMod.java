@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = ScannerMod.MODID)
+@Mod(modid = ScannerMod.MODID, name = "Scanner")
 public class ScannerMod {
     public static final String MODID = "scanner";
 
