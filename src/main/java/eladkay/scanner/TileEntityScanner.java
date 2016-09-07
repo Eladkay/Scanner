@@ -1,6 +1,6 @@
 package eladkay.scanner;
 
-import cofh.api.energy.IEnergyReceiver;
+import api.cofh.energy.IEnergyReceiver;
 import net.darkhax.tesla.api.BaseTeslaContainer;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.block.state.IBlockState;
@@ -23,6 +23,12 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
     int x = -1;
     int y = -1;
     int z = -1;
+	//Tesla
+	private BaseTeslaContainer container;
+
+	public TileEntityScanner() {
+		this.container = new BaseTeslaContainer(MAX, MAX, MAX);
+	}
 
     public void onBlockActivated() {
         x = 0;
@@ -119,13 +125,6 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
         SPacketUpdateTileEntity packer = new SPacketUpdateTileEntity(getPos(), 0, nbt);
         return packer;
     }
-    //Tesla
-    private BaseTeslaContainer container;
-
-    public TileEntityScanner() {
-        this.container = new BaseTeslaContainer(MAX, MAX, MAX);
-    }
-
 
     @Override
     @SuppressWarnings("unchecked")
