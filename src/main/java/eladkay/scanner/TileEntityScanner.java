@@ -4,18 +4,22 @@ import cofh.api.energy.IEnergyReceiver;
 import net.darkhax.tesla.api.BaseTeslaContainer;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 public class TileEntityScanner extends TileEntity implements IEnergyReceiver, ITickable {
 
@@ -38,18 +42,29 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
 
 	@Override
 	public void update() {
-        ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
-        Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
+		if (y >= 256) {
+			x = -1;
+			y = -1;
+			z = -1;
+		}
 
-        if(x < 0 || y < 0 || z < 0 || container.getStoredPower() < 10) return;
-        x++;
+        ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
+		Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
+
+		if (x < 0 || y < 0 || z < 0 || container.getStoredPower() < 10) return;
+		x++;
         container.takePower(Config.energyPerBlock, false);
         markDirty();
         IBlockState block = chunk.getBlockState(x, y, z);
-        if (Config.alignChunks)
-            worldObj.setBlockState(new BlockPos(chunk.xPosition * x, y, chunk.zPosition * z), block, 2);
-        else worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
-        if(x >= 16) {
+		BlockPos finalPos;
+		if (Config.alignChunks)
+	        worldObj.setBlockState(finalPos = new BlockPos(chunk.xPosition * x, y, chunk.zPosition * z), block, 2);
+		else worldObj.setBlockState(finalPos = new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
+
+		WorldGenMinable minable = new WorldGenMinable(Blocks.DIAMOND_ORE.getDefaultState(), 3);
+		minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+
+		if (x >= 16) {
             z++;
             x = 0;
         }
