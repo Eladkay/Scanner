@@ -1,4 +1,4 @@
-package api.cofh.energy;
+package cofh.energy;
 
 /**
  * An energy storage is the unit of interaction with Energy inventories.<br>

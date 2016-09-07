@@ -1,6 +1,6 @@
 package eladkay.scanner;
 
-import api.cofh.energy.IEnergyReceiver;
+import cofh.energy.IEnergyReceiver;
 import net.darkhax.tesla.api.BaseTeslaContainer;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.block.state.IBlockState;
@@ -41,19 +41,19 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
         ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
         Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
 
-        if(x < 0 || y < 0 || z < 0) return;
+        if(x < 0 || y < 0 || z < 0 || container.getStoredPower() < 10) return;
         x++;
-        container.takePower(100000, false);
+        container.takePower(100, false);
         markDirty();
         IBlockState block = chunk.getBlockState(x, y, z);
         worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
         if(x >= 16) {
-            y++;
+            z++;
             x = 0;
         }
-        if(y >= 80) {
-            z++;
-            y = 0;
+        if(z >= 80) {
+            y++;
+            z = 0;
         }
 
         /*for(int x = 0; x < 16; x++)
