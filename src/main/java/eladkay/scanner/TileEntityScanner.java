@@ -1,6 +1,6 @@
 package eladkay.scanner;
 
-import cofh.api.energy.IEnergyReceiver;
+import api.cofh.energy.IEnergyReceiver;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,8 +17,8 @@ import javax.annotation.Nullable;
 
 public class TileEntityScanner extends TileEntity implements IEnergyReceiver, ITickable {
 
-	public int energy;
     public static final int MAX = 300000;
+	public int energy;
 
 	@Override
 	public void update() {
