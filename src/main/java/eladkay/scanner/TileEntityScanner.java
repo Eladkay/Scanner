@@ -61,16 +61,43 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
 	        worldObj.setBlockState(finalPos = new BlockPos(chunk.xPosition * x, y, chunk.zPosition * z), block, 2);
 		else worldObj.setBlockState(finalPos = new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
 
-		WorldGenMinable minable = new WorldGenMinable(Blocks.DIAMOND_ORE.getDefaultState(), 3);
-		minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+        if(y < 16 && y > 8) {
+            WorldGenMinable minable = new WorldGenMinable(Blocks.DIAMOND_ORE.getDefaultState(), 8);
+            minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+        }
+        if(y < 64 && y > 10) {
+            WorldGenMinable minable = new WorldGenMinable(Blocks.IRON_ORE.getDefaultState(), 9);
+            minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+        }
+        if(y > 10) {
+            WorldGenMinable minable = new WorldGenMinable(Blocks.COAL_ORE.getDefaultState(), 17);
+            minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+        }
+        if(y < 16 && y > 8) {
+            WorldGenMinable minable = new WorldGenMinable(Blocks.LAPIS_ORE.getDefaultState(), 7);
+            minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+        }
+        if(y < 16 && y > 8) {
+            WorldGenMinable minable = new WorldGenMinable(Blocks.REDSTONE_ORE.getDefaultState(), 8);
+            minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+        }
+        if(y < 16 && y > 8) {
+            WorldGenMinable minable = new WorldGenMinable(Blocks.GOLD_ORE.getDefaultState(), 8);
+            minable.generate(worldObj, new Random(), finalPos.subtract(new Vec3i(8, 0, 8)));
+        }
 
-		if (x >= 16) {
+        if (x >= 16) {
             z++;
             x = 0;
         }
         if(z >= 16) {
             y++;
             z = 0;
+        }
+        if(y >= 256) {
+            x = -1;
+            y = -1;
+            z = -1;
         }
 
 
