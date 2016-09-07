@@ -1,6 +1,6 @@
 package eladkay.scanner;
 
-import cofh.energy.IEnergyReceiver;
+import cofh.api.energy.IEnergyReceiver;
 import net.darkhax.tesla.api.BaseTeslaContainer;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.block.state.IBlockState;
@@ -51,10 +51,11 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
             z++;
             x = 0;
         }
-        if(z >= 80) {
+        if(z >= 16) {
             y++;
             z = 0;
         }
+
 
         /*for(int x = 0; x < 16; x++)
             for(int z = 0; z < 16; z++)
