@@ -40,7 +40,6 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
 	public void update() {
         ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0).getChunkProvider();
         Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
-
         if(x < 0 || y < 0 || z < 0 || container.getStoredPower() < 10) return;
         x++;
         container.takePower(Config.energyPerBlock, false);
@@ -56,6 +55,11 @@ public class TileEntityScanner extends TileEntity implements IEnergyReceiver, IT
         if(z >= 16) {
             y++;
             z = 0;
+        }
+        if(y >= 256) {
+            x = -1;
+            y = -1;
+            z = -1;
         }
 
 
