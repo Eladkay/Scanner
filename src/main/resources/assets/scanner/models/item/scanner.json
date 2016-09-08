@@ -1,6 +1,3 @@
 {
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "scanner:blocks/scanner"
-  }
+  "parent": "scanner:block/scanner"
 }

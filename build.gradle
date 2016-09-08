@@ -21,8 +21,8 @@ plugins {
 }
 */
 version = "1.0"
-group= "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "modid"
+group= "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "scanner"
 
 minecraft {
     version = "1.10.2-12.18.1.2011"
@@ -56,6 +56,11 @@ repositories {
 dependencies {
     compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
     compile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
+}
+apply plugin: 'java'
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 }
 
 dependencies {
