@@ -21,8 +21,8 @@ plugins {
 }
 */
 version = "1.0"
-group= "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "scanner"
+group= "eladkay.terrainScanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "terrainScanner"
 
 minecraft {
     version = "1.10.2-12.18.1.2011"

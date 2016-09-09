@@ -1,5 +1,11 @@
 package eladkay.scanner;
 
+import eladkay.scanner.biome.BlockBiomeScanner;
+import eladkay.scanner.biome.TileEntityBiomeScanner;
+import eladkay.scanner.compat.MineTweaker;
+import eladkay.scanner.proxy.CommonProxy;
+import eladkay.scanner.terrain.BlockTerrainScanner;
+import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
@@ -16,24 +22,34 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class ScannerMod {
     public static final String MODID = "scanner";
 
-    @SidedProxy(serverSide = "eladkay.scanner.CommonProxy", clientSide = "eladkay.scanner.ClientProxy")
+    @SidedProxy(serverSide = "eladkay.scanner.proxy.CommonProxy", clientSide = "eladkay.scanner.proxy.ClientProxy")
     public static CommonProxy proxy;
 
     public static DimensionType dim;
-    public static ScannerBlock scanner;
+    public static BlockTerrainScanner terrainScanner;
+    public static BlockBiomeScanner biomeScanner;
+    @Mod.Instance(MODID)
+    public static ScannerMod instance;
 
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
-        GameRegistry.register(scanner = new ScannerBlock());
-        GameRegistry.register(new ItemBlock(scanner).setRegistryName(MODID + ":scanner"));
-        GameRegistry.registerTileEntity(TileEntityScanner.class, "scanner");
-        FMLInterModComms.sendMessage("Waila", "register", "eladkay.scanner.Waila.onWailaCall");
+        instance = this;
+        GameRegistry.register(terrainScanner = new BlockTerrainScanner());
+        GameRegistry.register(new ItemBlock(terrainScanner).setRegistryName(MODID + ":terrainScanner"));
+        GameRegistry.registerTileEntity(TileEntityTerrainScanner.class, "terrainScanner");
+
+        GameRegistry.register(biomeScanner = new BlockBiomeScanner());
+        GameRegistry.register(new ItemBlock(biomeScanner).setRegistryName(MODID + ":biomeScanner"));
+        GameRegistry.registerTileEntity(TileEntityBiomeScanner.class, "biomeScanner");
+
+        FMLInterModComms.sendMessage("Waila", "register", "eladkay.scanner.compat.Waila.onWailaCall");
         MineTweaker.init();
         proxy.init();
         Config.initConfig(event.getSuggestedConfigurationFile());
         dim = DimensionType.register("fakeoverworld", "", Config.dimid, WorldProviderOverworld.class, true);
         DimensionManager.registerDimension(Config.dimid, dim);
     }
+
     public static class WorldProviderOverworld extends WorldProvider {
 
         @Override
@@ -43,7 +59,8 @@ public class ScannerMod {
 
         @Override
         public IChunkGenerator createChunkGenerator() {
-            return new ChunkProviderOverworld(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), TileEntityScanner.PRESET);
+            return new ChunkProviderOverworld(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), TileEntityTerrainScanner.PRESET);
         }
     }
 }
+

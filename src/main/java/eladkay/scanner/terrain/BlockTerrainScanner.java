@@ -1,5 +1,6 @@
-package eladkay.scanner;
+package eladkay.scanner.terrain;
 
+import eladkay.scanner.ScannerMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -14,21 +15,21 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class ScannerBlock extends Block implements ITileEntityProvider {
-    public ScannerBlock() {
+public class BlockTerrainScanner extends Block implements ITileEntityProvider {
+    public BlockTerrainScanner() {
         super(Material.IRON);
-        setRegistryName(ScannerMod.MODID + ":scanner");
-        setUnlocalizedName("scanner");
+        setRegistryName(ScannerMod.MODID + ":terrainScanner");
+        setUnlocalizedName("terrainScanner");
     }
 
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
-        return new TileEntityScanner();
+        return new TileEntityTerrainScanner();
     }
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ((TileEntityScanner) worldIn.getTileEntity(pos)).onBlockActivated();
+        ((TileEntityTerrainScanner) worldIn.getTileEntity(pos)).onBlockActivated();
         return super.onBlockActivated(worldIn, pos, state, playerIn, hand, heldItem, side, hitX, hitY, hitZ);
     }
 }

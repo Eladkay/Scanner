@@ -1,4 +1,4 @@
-package eladkay.scanner;
+package eladkay.scanner.compat;
 
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IItemStack;

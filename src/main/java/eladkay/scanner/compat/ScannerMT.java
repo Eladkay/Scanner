@@ -1,4 +1,4 @@
-package eladkay.scanner;
+package eladkay.scanner.compat;
 
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-@ZenClass("mods.scanner.Scanner")
+@ZenClass("mods.terrainScanner.Scanner")
 public class ScannerMT {
     @ZenMethod
     public static void addRecipe(IItemStack stack, int rarity, int minY, int maxY) {

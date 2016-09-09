@@ -1,4 +1,4 @@
-package eladkay.scanner;
+package eladkay.scanner.compat;
 
 import com.google.common.collect.Lists;
 import net.minecraft.block.state.IBlockState;
@@ -46,10 +46,10 @@ public class Oregistry {
                     ", minY=" + minY +
                     '}';
         }
-        IBlockState ore;
-        int rarity;
-        int maxY;
-        int minY;
+        public IBlockState ore;
+        public int rarity;
+        public int maxY;
+        public int minY;
     }
 
 }

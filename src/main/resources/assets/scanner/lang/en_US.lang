@@ -1,1 +1,2 @@
-tile.scanner.name=Scanner
+tile.terrainScanner.name=Terrain Scanner
+tile.biomeScanner.name=Biome Scanner
