@@ -1,7 +1,8 @@
 package eladkay.scanner.compat;
 
+import eladkay.scanner.biome.BlockBiomeScanner;
+import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.terrain.BlockTerrainScanner;
-import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -19,6 +20,9 @@ public class Waila {
     public static void onWailaCall(IWailaRegistrar registrar) {
         registrar.registerBodyProvider(new Scanner(), BlockTerrainScanner.class);
         registrar.registerNBTProvider(new Scanner(), BlockTerrainScanner.class);
+
+        registrar.registerBodyProvider(new Scanner(), BlockBiomeScanner.class);
+        registrar.registerNBTProvider(new Scanner(), BlockBiomeScanner.class);
     }
 
     public static class Scanner implements IWailaDataProvider {
@@ -36,7 +40,7 @@ public class Waila {
         @Override
         public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
             TileEntity tileEntity = accessor.getTileEntity();
-            if (!(tileEntity instanceof TileEntityTerrainScanner)) return currenttip;
+            if (!(tileEntity instanceof BaseTE)) return currenttip;
                 /*int energy = ((TileEntityTerrainScanner) tileEntity).getEnergyStored(accessor.getSide());
                 int max = ((TileEntityTerrainScanner) tileEntity).getMaxEnergyStored(accessor.getSide());*/
             int energy = accessor.getNBTData().getInteger("energy");
@@ -52,7 +56,7 @@ public class Waila {
 
         @Override
         public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
-            TileEntityTerrainScanner scanner = (TileEntityTerrainScanner) te;
+            BaseTE scanner = (BaseTE) te;
             tag.setInteger("energy", scanner.getEnergyStored(null));
             tag.setInteger("max", scanner.getMaxEnergyStored(null));
             return tag;

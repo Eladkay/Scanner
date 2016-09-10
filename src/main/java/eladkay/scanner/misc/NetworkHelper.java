@@ -1,18 +1,22 @@
 package eladkay.scanner.misc;
 
 import eladkay.scanner.ScannerMod;
+import eladkay.scanner.biome.MessageUpdateMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class NetworkHelper {
     public static SimpleNetworkWrapper instance;
 
+    private static int id = 0;
     public static void init() {
         instance = new SimpleNetworkWrapper(ScannerMod.MODID);
         try {
-            //instance.registerMessage();
+            instance.registerMessage(MessageUpdateMap.class, MessageUpdateMap.class, ++id, Side.SERVER);
+            instance.registerMessage(MessageUpdateEnergy.class, MessageUpdateEnergy.class, ++id, Side.CLIENT);
         } catch (NoClassDefFoundError server) {
             server.printStackTrace();
         }

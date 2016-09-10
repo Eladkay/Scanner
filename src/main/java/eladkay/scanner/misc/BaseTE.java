@@ -1,7 +1,6 @@
 package eladkay.scanner.misc;
 
 import cofh.api.energy.IEnergyReceiver;
-import net.darkhax.tesla.api.BaseTeslaContainer;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -50,6 +49,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
         if (!simulate) {
             container.givePower(energyReceived, simulate);
             markDirty();
+            NetworkHelper.tellEveryone(new MessageUpdateEnergy(pos.getX(), pos.getY(), pos.getZ(), container.getStoredPower()));
         }
         return energyReceived;
     }

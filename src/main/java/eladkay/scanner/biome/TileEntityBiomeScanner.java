@@ -3,10 +3,12 @@ package eladkay.scanner.biome;
 import com.google.gson.Gson;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.BaseTE;
+import eladkay.scanner.misc.BaseTeslaContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.ChunkPos;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +19,9 @@ public class TileEntityBiomeScanner extends BaseTE {
         super(Config.maxEnergyBufferBiome);
     }
 
+    BaseTeslaContainer container() {
+        return container;
+    }
     public void onBlockActivated(EntityPlayer player) {
         if(worldObj.isRemote)
             new GuiBiomeScanner(0, pos).openGui();
@@ -46,6 +51,7 @@ public class TileEntityBiomeScanner extends BaseTE {
         return tag;
     }
 
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
@@ -65,5 +71,12 @@ public class TileEntityBiomeScanner extends BaseTE {
         for(Map.Entry<String, String> entry : ret.entrySet())
             mapping.put(deserialize(entry.getKey()), entry.getValue());
         super.readFromNBT(compound);
+    }
+
+    @Nullable
+    public String getMapping(int chunkX, int chunkY) {
+        for(Map.Entry<ChunkPos, String> entry : mapping.entrySet())
+            if(entry.getKey().chunkXPos == chunkX && entry.getKey().chunkZPos == chunkY) return entry.getValue();
+        return null;
     }
 }
