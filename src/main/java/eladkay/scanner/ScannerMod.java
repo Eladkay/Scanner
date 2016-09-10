@@ -3,6 +3,7 @@ package eladkay.scanner;
 import eladkay.scanner.biome.BlockBiomeScanner;
 import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.MineTweaker;
+import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.proxy.CommonProxy;
 import eladkay.scanner.terrain.BlockTerrainScanner;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
@@ -48,6 +49,7 @@ public class ScannerMod {
         Config.initConfig(event.getSuggestedConfigurationFile());
         dim = DimensionType.register("fakeoverworld", "", Config.dimid, WorldProviderOverworld.class, true);
         DimensionManager.registerDimension(Config.dimid, dim);
+        NetworkHelper.init();
     }
 
     public static class WorldProviderOverworld extends WorldProvider {

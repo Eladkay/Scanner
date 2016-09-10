@@ -1,5 +1,13 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
 package eladkay.scanner.biome;
 
+import com.feed_the_beast.ftbl.api.ForgePlayerSPSelf;
+import com.feed_the_beast.ftbl.api.ForgeTeam;
+import com.feed_the_beast.ftbl.api.ForgeWorldSP;
 import com.feed_the_beast.ftbl.api.MouseButton;
 import com.feed_the_beast.ftbl.api.client.FTBLibClient;
 import com.feed_the_beast.ftbl.api.client.gui.GuiIcons;
@@ -7,368 +15,240 @@ import com.feed_the_beast.ftbl.api.client.gui.GuiLM;
 import com.feed_the_beast.ftbl.api.client.gui.GuiLang;
 import com.feed_the_beast.ftbl.api.client.gui.widgets.ButtonLM;
 import com.feed_the_beast.ftbl.api.client.gui.widgets.PanelLM;
+import com.feed_the_beast.ftbl.net.MessageRequestSelfUpdate;
 import com.feed_the_beast.ftbl.util.ChunkDimPos;
 import com.feed_the_beast.ftbl.util.TextureCoords;
-import com.feed_the_beast.ftbu.FTBUFinals;
-import com.feed_the_beast.ftbu.FTBULang;
 import com.feed_the_beast.ftbu.net.MessageAreaRequest;
+import com.feed_the_beast.ftbu.world.chunks.ClaimedChunk;
+import com.feed_the_beast.ftbu.world.data.FTBUWorldDataSP;
+import com.google.gson.Gson;
 import com.latmod.lib.math.MathHelperLM;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
 
-import static org.lwjgl.opengl.Display.getHeight;
-import static org.lwjgl.opengl.Display.getWidth;
-
 @SideOnly(Side.CLIENT)
-public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback // implements IClientActionGui
-{
-    static final int TILES_TEX = 16;
-    static final int TILES_GUI = 15;
-    private static final double UV = (double) TILES_GUI / (double) TILES_TEX;
-    private static final ResourceLocation TEX_ENTITY = new ResourceLocation(FTBUFinals.MOD_ID, "textures/gui/entity.png");
-    private static final ResourceLocation TEX_CHUNK_CLAIMING = new ResourceLocation(FTBUFinals.MOD_ID, "textures/gui/chunk_claiming.png");
-    private static final TextureCoords TEX_FILLED = TextureCoords.fromUV(TEX_CHUNK_CLAIMING, 0D, 0D, 0.5D, 1D);
-    private static final TextureCoords TEX_BORDER = TextureCoords.fromUV(TEX_CHUNK_CLAIMING, 0.5D, 0D, 1D, 1D);
-    static ByteBuffer pixelBuffer = null;
-    private static int textureID = -1;
-
-    private class MapButton extends ButtonLM
-    {
-        private final ChunkDimPos chunkPos;
-        private final CachedClientData.ChunkData chunkData;
-
-        private MapButton(int x, int y, int i)
-        {
-            super(x, y, 16, 16);
-            posX += (i % TILES_GUI) * getWidth();
-            posY += (i / TILES_GUI) * getHeight();
-            chunkPos = new ChunkDimPos(startX + (i % TILES_GUI), startZ + (i / TILES_GUI), currentDim);
-            chunkData = CachedClientData.CHUNKS.get(chunkPos);
-        }
-
-
-        @Override
-        public void addMouseOverText(IGui gui, List<String> l)
-        {
-            if(chunkData != null)
-            {
-                if(chunkData.team != null)
-                {
-                    l.add(chunkData.team.formattedName);
-
-                    l.add(TextFormatting.GREEN + FTBULang.label_cchunks_count.translate());
-
-                    /*if(team.getStatus(ForgeWorldSP.inst.clientPlayer).isAlly())
-                    {
-                        l.add(chunk.owner.getProfile().getName());
-                        if(chunk.loaded)
-                        {
-                            l.add(TextFormatting.RED + ClaimedChunk.LANG_LOADED.translate());
-                        }
-                    }*/
-                }
-            }
-            else
-            {
-                l.add(TextFormatting.DARK_GREEN + FTBULang.CHUNKTYPE_WILDERNESS.translate());
-            }
-        }
-
-        @Override
-        public void renderWidget(IGui gui)
-        {
-            int ax = (int) getAX();
-            int ay = (int) getAY();
-
-            if(chunkData != null)
-            {
-                FTBLibClient.setTexture(TEX_CHUNK_CLAIMING);
-
-                if(chunkData.team != null)
-                {
-                    FTBLibClient.setGLColor(chunkData.team.color.getColor(), 180);
-                }
-                else
-                {
-                    GlStateManager.color(0F, 0F, 0F, 180F / 255F);
-                }
-
-                GuiHelper.drawTexturedRect(ax, ay, 16, 16, TEX_FILLED.getMinU(), TEX_FILLED.getMinV(), TEX_FILLED.getMaxU(), TEX_FILLED.getMaxV());
-
-                //GlStateManager.color((chunk.loaded && team != null && team.getStatus(ForgeWorldSP.inst.clientPlayer).isAlly()) ? 1F : 0F, chunk.isChunkOwner(ForgeWorldSP.inst.clientPlayer) ? 0.27F : 0F, 0F, 0.78F);
-                GuiHelper.drawTexturedRect(ax, ay, 16, 16, TEX_BORDER.getMinU(), TEX_BORDER.getMinV(), TEX_BORDER.getMaxU(), TEX_BORDER.getMaxV());
-            }
-
-            if(gui.isMouseOver(this))
-            {
-                GlStateManager.color(1F, 1F, 1F, 0.27F);
-                GuiHelper.drawBlankRect(ax, ay, 16, 16);
-                GlStateManager.color(1F, 1F, 1F, 1F);
-            }
-        }
-
-        @Override
-        public void onClicked(@Nonnull GuiLM gui, @Nonnull MouseButton button) {
-            if(gui.isMouseOver(panelButtons))
-            {
-                return;
-            }
-
-            if(button.isLeft())
-            {
-                if(GuiScreen.isShiftKeyDown())
-                {
-                    FTBLibClient.execClientCommand("/ftb chunks load " + chunkPos + ' ' + chunkPos.posZ, false);
-                }
-                else
-                {
-                    FTBLibClient.execClientCommand("/ftb chunks claim " + chunkPos.posX + ' ' + chunkPos.posZ, false);
-                }
-            }
-            else if(button.isRight())
-            {
-                if(GuiScreen.isShiftKeyDown())
-                {
-                    FTBLibClient.execClientCommand("/ftb chunks unload " + chunkPos.posX + ' ' + chunkPos.posZ, false);
-                }
-                else
-                {
-                    FTBLibClient.execClientCommand("/ftb chunks unclaim " + chunkPos.posX + ' ' + chunkPos.posZ, false);
-                }
-            }
-
-            GuiHelper.playClickSound();
-        }
-    }
-
-    final int startX, startZ;
-    private final int currentDim;
-    private final ButtonLM buttonRefresh, buttonClose, buttonUnclaimAll;
-    private final MapButton mapButtons[];
-    private final PanelLM panelButtons;
+public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
+    public static final int tiles_tex = 16;
+    public static final int tiles_gui = 15;
+    public static final double UV = 0.9375D;
+    public static final ResourceLocation TEX_ENTITY = new ResourceLocation("ftbu", "textures/gui/entity.png");
+    public static final ResourceLocation TEX_CHUNK_CLAIMING = new ResourceLocation("ftbu", "textures/gui/chunk_claiming.png");
+    public static final TextureCoords TEX_FILLED;
+    public static final TextureCoords TEX_BORDER;
+    public static int textureID;
+    public static ByteBuffer pixelBuffer;
+    public final ForgePlayerSPSelf playerLM;
+    public final int startX;
+    public final int startZ;
+    public final int currentDim;
+    public final ButtonLM buttonRefresh;
+    public final ButtonLM buttonClose;
+    public final GuiBiomeScanner.MapButton[] mapButtons;
+    public final PanelLM panelButtons;
     public ThreadReloadArea thread = null;
-    private String currentDimName;
+    public String currentDimName;
+    private BlockPos pos;
 
-    public GuiClaimChunks()
-    {
-        super(TILES_GUI * 16, TILES_GUI * 16);
-
-        startX = MathHelperLM.chunk(mc.thePlayer.posX) - (int) (TILES_GUI * 0.5D);
-        startZ = MathHelperLM.chunk(mc.thePlayer.posZ) - (int) (TILES_GUI * 0.5D);
-        currentDim = FTBLibClient.getDim();
-
-        currentDimName = mc.theWorld.provider.getDimensionType().getName();
-
-        buttonClose = new ButtonLM(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate())
-        {
-            @Override
-            public void onClicked(IGui gui, IMouseButton button)
-            {
-                GuiHelper.playClickSound();
-                closeGui();
+    public GuiBiomeScanner(long token, BlockPos pos) {
+        this.pos = pos;
+        this.width = this.height = 240.0D;
+        this.playerLM = ForgeWorldSP.inst.clientPlayer;
+        this.startX = MathHelperLM.chunk(this.mc.thePlayer.posX) - 7;
+        this.startZ = MathHelperLM.chunk(this.mc.thePlayer.posZ) - 7;
+        this.currentDim = FTBLibClient.getDim();
+        this.currentDimName = this.mc.theWorld.provider.getDimensionType().getName();
+        this.buttonClose = new ButtonLM(0.0D, 16.0D, 16, 16, GuiLang.button_close.translate()) {
+            public void onClicked(@Nonnull GuiLM gui, @Nonnull MouseButton button) {
+                GuiLM.playClickSound();
+                GuiBiomeScanner.this.closeGui();
             }
         };
-
-        buttonRefresh = new ButtonLM(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate())
-        {
-            @Override
-            public void onClicked(IGui gui, IMouseButton button)
-            {
-                thread = new ThreadReloadArea(mc.theWorld, GuiClaimChunks.this);
-                thread.start();
-                new MessageAreaRequest(startX, startZ, TILES_GUI, TILES_GUI).sendToServer();
-                GuiHelper.playClickSound();
+        this.buttonRefresh = new ButtonLM(0.0D, 32, 16, 16, GuiLang.button_refresh.translate()) {
+            public void onClicked(@Nonnull GuiLM gui, @Nonnull MouseButton button) {
+                GuiBiomeScanner.this.thread = new ThreadReloadArea(GuiBiomeScanner.this.mc.theWorld, GuiBiomeScanner.this);
+                GuiBiomeScanner.this.thread.run();
+                (new MessageAreaRequest(GuiBiomeScanner.this.startX, GuiBiomeScanner.this.startZ, 15, 15)).sendToServer();
+                (new MessageRequestSelfUpdate()).sendToServer();
+                GuiLM.playClickSound();
             }
         };
-
-        buttonUnclaimAll = new ButtonLM(0, 32, 16, 16)
-        {
-            @Override
-            public void onClicked(IGui gui, IMouseButton button)
-            {
-                GuiHelper.playClickSound();
-                String s = GuiScreen.isShiftKeyDown() ? FTBULang.BUTTON_CLAIMS_UNCLAIM_ALL_Q.translate() : FTBULang.BUTTON_CLAIMS_UNCLAIM_ALL_DIM_Q.translate(currentDimName);
-                Minecraft.getMinecraft().displayGuiScreen(new GuiYesNo(GuiClaimChunks.this, s, "", GuiScreen.isShiftKeyDown() ? 1 : 0));
+        this.panelButtons = new PanelLM(0, 0, 16, 0) {
+            public void addWidgets() {
+                this.add(GuiBiomeScanner.this.buttonClose);
+                this.add(GuiBiomeScanner.this.buttonRefresh);
+                this.height = (double)(this.widgets.size() * 16);
             }
 
-            @Override
-            public void addMouseOverText(IGui gui, List<String> l)
-            {
-                l.add(GuiScreen.isShiftKeyDown() ? FTBULang.BUTTON_CLAIMS_UNCLAIM_ALL.translate() : FTBULang.BUTTON_CLAIMS_UNCLAIM_ALL_DIM.translate(currentDimName));
+            public double getAX() {
+                return GuiBiomeScanner.this.screen.getScaledWidth_double() - 16.0D;
+            }
+
+            public double getAY() {
+                return 0.0D;
             }
         };
+        this.mapButtons = new GuiBiomeScanner.MapButton[225];
 
-        panelButtons = new PanelLM(0, 0, 16, 0)
-        {
-            @Override
-            public void addWidgets()
-            {
-                add(buttonClose);
-                add(buttonRefresh);
-                add(buttonUnclaimAll);
-
-                setHeight(widgets.size() * 16);
-            }
-
-            @Override
-            public int getAX()
-            {
-                return getScreenWidth() - 16;
-            }
-
-            @Override
-            public int getAY()
-            {
-                return 0;
-            }
-        };
-
-        mapButtons = new MapButton[TILES_GUI * TILES_GUI];
-        for(int i = 0; i < mapButtons.length; i++)
-        {
-            mapButtons[i] = new MapButton(0, 0, i);
-        }
-    }
-
-    @Override
-    public void onInit()
-    {
-        buttonRefresh.onClicked(this, MouseButton.LEFT);
-    }
-
-    @Override
-    public void addWidgets()
-    {
-        for(MapButton b : mapButtons)
-        {
-            add(b);
+        for(int i = 0; i < this.mapButtons.length; ++i) {
+            this.mapButtons[i] = new GuiBiomeScanner.MapButton(0, 0, i);
         }
 
-        add(panelButtons);
     }
 
-    @Override
-    public void drawBackground()
-    {
+    public void onInit() {
+        this.buttonRefresh.onClicked(this, MouseButton.LEFT);
+    }
+
+    public void addWidgets() {
+        GuiBiomeScanner.MapButton[] var1 = this.mapButtons;
+        int var2 = var1.length;
+
+        for (MapButton b : var1)
+            this.add(b);
+
+        this.add(this.panelButtons);
+    }
+
+    public void drawBackground() {
         super.drawBackground();
-
-        if(textureID == -1)
-        {
+        if(textureID == -1) {
             textureID = TextureUtil.glGenTextures();
-            new MessageAreaRequest(startX, startZ, TILES_GUI, TILES_GUI).sendToServer();
+            (new MessageAreaRequest(this.startX, this.startZ, 15, 15)).sendToServer();
         }
 
-        if(pixelBuffer != null)
-        {
-            //boolean hasBlur = false;
-            //int filter = hasBlur ? GL11.GL_LINEAR : GL11.GL_NEAREST;
+        if(pixelBuffer != null) {
             GlStateManager.bindTexture(textureID);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, TILES_TEX * 16, TILES_TEX * 16, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixelBuffer);
-            pixelBuffer = null;
-            thread = null;
+            GL11.glTexParameteri(3553, 10241, 9728);
+            GL11.glTexParameteri(3553, 10240, 9728);
+            GL11.glTexParameteri(3553, 10242, '脯');
+            GL11.glTexParameteri(3553, 10243, '脯');
+            GL11.glTexImage2D(3553, 0, '聘', 256, 256, 0, 6408, 5121, pixelBuffer);
+           /* pixelBuffer = null;
+            this.thread = null;*/
         }
 
-        GlStateManager.color(0F, 0F, 0F, 1F);
-        GuiHelper.drawBlankRect(posX - 2, posY - 2, getWidth() + 4, getHeight() + 4);
-        //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
-        GlStateManager.color(1F, 1F, 1F, 1F);
-
-        if(thread == null)
-        {
+        GlStateManager.color(0.0F, 0.0F, 0.0F, 1.0F);
+        drawBlankRect(this.posX - 2.0D, this.posY - 2.0D, this.width + 4.0D, this.height + 4.0D);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        if(this.thread == null) {
             GlStateManager.bindTexture(textureID);
-            GuiHelper.drawTexturedRect(posX, posY, TILES_GUI * 16, TILES_GUI * 16, 0D, 0D, UV, UV);
+            drawTexturedRect(this.posX, this.posY, 240.0D, 240.0D, 0.0D, 0.0D, 0.9375D, 0.9375D);
         }
 
-        GlStateManager.color(1F, 1F, 1F, 1F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableTexture2D();
         FTBLibClient.setTexture(TEX_CHUNK_CLAIMING);
+        GuiBiomeScanner.MapButton[] cx = this.mapButtons;
+        int cy = cx.length;
 
-        for(MapButton mapButton : mapButtons)
-        {
+        for(int x = 0; x < cy; ++x) {
+            GuiBiomeScanner.MapButton mapButton = cx[x];
             mapButton.renderWidget(this);
         }
 
-        int cx = MathHelperLM.chunk(mc.thePlayer.posX);
-        int cy = MathHelperLM.chunk(mc.thePlayer.posZ);
-
-        if(cx >= startX && cy >= startZ && cx < startX + TILES_GUI && cy < startZ + TILES_GUI)
-        {
-            double x = ((cx - startX) * 16D + MathHelperLM.wrap(mc.thePlayer.posX, 16D));
-            double y = ((cy - startZ) * 16D + MathHelperLM.wrap(mc.thePlayer.posZ, 16D));
-
+        int var7 = MathHelperLM.chunk(this.mc.thePlayer.posX);
+        cy = MathHelperLM.chunk(this.mc.thePlayer.posZ);
+        if(var7 >= this.startX && cy >= this.startZ && var7 < this.startX + 15 && cy < this.startZ + 15) {
+            double var8 = (double)(var7 - this.startX) * 16.0D + MathHelperLM.wrap(this.mc.thePlayer.posX, 16.0D);
+            double y = (double)(cy - this.startZ) * 16.0D + MathHelperLM.wrap(this.mc.thePlayer.posZ, 16.0D);
             GlStateManager.pushMatrix();
-            GlStateManager.translate(posX + x, posY + y, 0D);
+            GlStateManager.translate(this.posX + var8, this.posY + y, 0.0D);
             GlStateManager.pushMatrix();
-            //GlStateManager.rotate((int)((ep.rotationYaw + 180F) / (180F / 8F)) * (180F / 8F), 0F, 0F, 1F);
-            GlStateManager.rotate(mc.thePlayer.rotationYaw + 180F, 0F, 0F, 1F);
+            GlStateManager.rotate(this.mc.thePlayer.rotationYaw + 180.0F, 0.0F, 0.0F, 1.0F);
             FTBLibClient.setTexture(TEX_ENTITY);
-            GlStateManager.color(1F, 1F, 1F, mc.thePlayer.isSneaking() ? 0.4F : 0.7F);
-            GuiHelper.drawTexturedRect(-8, -8, 16, 16, 0D, 0D, 1D, 1D);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, this.mc.thePlayer.isSneaking()?0.4F:0.7F);
+            drawTexturedRect(-8.0D, -8.0D, 16.0D, 16.0D, 0.0D, 0.0D, 1.0D, 1.0D);
             GlStateManager.popMatrix();
-            GuiHelper.drawPlayerHead(mc.thePlayer.getName(), -2, -2, 4, 4);
+            drawPlayerHead(this.mc.thePlayer.getName(), -2.0D, -2.0D, 4.0D, 4.0D);
             GlStateManager.popMatrix();
         }
 
-        GlStateManager.color(1F, 1F, 1F, 1F);
-
-        buttonRefresh.render(GuiIcons.REFRESH);
-        buttonClose.render(GuiIcons.ACCEPT);
-        buttonUnclaimAll.render(GuiIcons.REMOVE);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        this.buttonRefresh.render(GuiIcons.refresh);
+        this.buttonClose.render(GuiIcons.accept);
     }
 
     @Override
-    public void drawForeground()
-    {
-        /*
-        if(ForgeWorldSP.inst != null && ForgeWorldSP.inst.clientPlayer != null)
-        {
-            FTBUPlayerDataSP d = FTBUPlayerData.get(ForgeWorldSP.inst.clientPlayer).toSP();
-            String s = FTBULang.label_cchunks_count.translateFormatted(d.claimedChunks, d.maxClaimedChunks);
-            font.drawString(s, screen.getScaledWidth() - font.getStringWidth(s) - 4, screen.getScaledHeight() - 12, 0xFFFFFFFF);
-            s = FTBULang.label_lchunks_count.translateFormatted(d.loadedChunks, d.maxLoadedChunks);
-            font.drawString(s, screen.getScaledWidth() - font.getStringWidth(s) - 4, screen.getScaledHeight() - 24, 0xFFFFFFFF);
-        }
-        */
-
-        super.drawForeground();
+    public void confirmClicked(boolean set, int id) {
+        this.openGui();
+        this.refreshWidgets();
     }
 
-    @Override
-    public void confirmClicked(boolean set, int id)
-    {
-        if(set)
-        {
-            if(id == 1)
-            {
-                FTBLibClient.execClientCommand("/ftb chunks unclaim_all true", false);
-            }
-            else
-            {
-                FTBLibClient.execClientCommand("/ftb chunks unclaim_all false", false);
-            }
+    static {
+        TEX_FILLED = new TextureCoords(TEX_CHUNK_CLAIMING, 0.0D, 0.0D, 0.5D, 1.0D);
+        TEX_BORDER = new TextureCoords(TEX_CHUNK_CLAIMING, 0.5D, 0.0D, 1.0D, 1.0D);
+        textureID = -1;
+        pixelBuffer = null;
+    }
 
-            new MessageAreaRequest(startX, startZ, TILES_GUI, TILES_GUI).sendToServer();
+    public class MapButton extends ButtonLM {
+        public final ChunkDimPos chunkPos;
+
+        public MapButton(int x, int y, int i) {
+            super((double)x, (double)y, 16.0D, 16.0D);
+            this.posX += (double)(i % 15) * this.width;
+            this.posY += (double)(i / 15) * this.height;
+            this.chunkPos = new ChunkDimPos(GuiBiomeScanner.this.currentDim, GuiBiomeScanner.this.startX + i % 15, GuiBiomeScanner.this.startZ + i / 15);
         }
 
-        openGui();
-        refreshWidgets();
+        public void onClicked(@Nonnull GuiLM gui, @Nonnull MouseButton button) {
+            if(!gui.isMouseOver(GuiBiomeScanner.this.panelButtons)) {
+                if(button.isLeft()) {
+                    //todo scan the chunk
+                }
+                GuiLM.playClickSound();
+            }
+        }
+
+        public void addMouseOverText(GuiLM gui, List<String> l) {
+            TileEntityBiomeScanner te = (TileEntityBiomeScanner) mc.theWorld.getTileEntity(pos);
+            if (te == null) return;
+            Gson gson = new Gson();
+            HashMap<String, String> ret = gson.fromJson(te.toJson(), HashMap.class);
+
+
+            if (ret.get(chunkPos.chunkXPos + "/" + chunkPos.chunkZPos) != null)
+                l.add(ret.get(chunkPos.chunkXPos + "/" + chunkPos.chunkZPos));
+            l.add("{" + chunkPos.chunkXPos + ", " + chunkPos.chunkZPos + "}");
+            l.add(mc.theWorld.getBiomeForCoordsBody(new BlockPos(chunkPos.chunkXPos * 16 + 8, 0, chunkPos.chunkZPos * 16 + 8)).getBiomeName());
+
+        }
+
+        public void renderWidget(GuiLM gui) {
+            ClaimedChunk chunk = FTBUWorldDataSP.getChunk(this.chunkPos);
+            double ax = this.getAX();
+            double ay = this.getAY();
+            if(chunk != null) {
+                FTBLibClient.setTexture(GuiBiomeScanner.TEX_CHUNK_CLAIMING);
+                ForgeTeam team = chunk.owner.getTeam();
+                if(team != null) {
+                    FTBLibClient.setGLColor(team.getColor().color, 180);
+                } else {
+                    GlStateManager.color(0.0F, 0.0F, 0.0F, 0.7058824F);
+                }
+
+                GuiLM.drawTexturedRect(ax, ay, 16.0D, 16.0D, GuiBiomeScanner.TEX_FILLED.minU, GuiBiomeScanner.TEX_FILLED.minV, GuiBiomeScanner.TEX_FILLED.maxU, GuiBiomeScanner.TEX_FILLED.maxV);
+                GlStateManager.color(chunk.loaded && team != null && team.getStatus(ForgeWorldSP.inst.clientPlayer).isAlly()?1.0F:0.0F, chunk.isChunkOwner(ForgeWorldSP.inst.clientPlayer)?0.27F:0.0F, 0.0F, 0.78F);
+                GuiLM.drawTexturedRect(ax, ay, 16.0D, 16.0D, GuiBiomeScanner.TEX_BORDER.minU, GuiBiomeScanner.TEX_BORDER.minV, GuiBiomeScanner.TEX_BORDER.maxU, GuiBiomeScanner.TEX_BORDER.maxV);
+            }
+
+            if(gui.isMouseOver(this)) {
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 0.27F);
+                GuiLM.drawBlankRect(ax, ay, 16.0D, 16.0D);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            }
+
+        }
     }
 }

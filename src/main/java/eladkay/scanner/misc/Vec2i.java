@@ -38,4 +38,9 @@ public class Vec2i {
     public Vec2i subtract(int x, int y) {
         return new Vec2i(this.x - x, this.y - y);
     }
+
+    @Override
+    public int hashCode() {
+        return x * 41234475 + y * 412237852;
+    }
 }
