@@ -36,7 +36,7 @@ public class ThreadReloadArea extends Thread
 
     public ThreadReloadArea(World w, GuiBiomeScanner m)
     {
-        super("MapReloader");
+        super("LM_MapReloader");
         setDaemon(true);
         worldObj = w;
         gui = m;
