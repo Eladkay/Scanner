@@ -1,6 +1,5 @@
 package eladkay.scanner.biome;
 
-import eladkay.scanner.ScannerMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -15,11 +14,28 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
+import static eladkay.scanner.ScannerMod.tab;
+
 public class BlockBiomeScanner extends Block implements ITileEntityProvider {
-    public BlockBiomeScanner() {
+    int type;
+    public BlockBiomeScanner(int i) {
         super(Material.IRON);
-        setRegistryName(ScannerMod.MODID + ":biomeScanner");
-        setUnlocalizedName("biomeScanner");
+        type = i;
+        switch(type) {
+            case 0:
+            default:
+                setUnlocalizedName("biomeScannerBasic");
+                break;
+            case 1:
+                setUnlocalizedName("biomeScannerAdv");
+                break;
+            case 2:
+                setUnlocalizedName("biomeScannerElite");
+                break;
+            case 3:
+                setUnlocalizedName("biomeScannerUltimate");
+        }
+        setCreativeTab(tab);
     }
 
     @Override

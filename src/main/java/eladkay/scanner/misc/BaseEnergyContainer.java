@@ -1,10 +1,11 @@
 package eladkay.scanner.misc;
 
 
-import net.darkhax.tesla.api.ITeslaConsumer;
-import net.darkhax.tesla.api.ITeslaHolder;
-import net.darkhax.tesla.api.ITeslaProducer;
+import cofh.api.energy.IEnergyProvider;
+import cofh.api.energy.IEnergyReceiver;
+import cofh.api.energy.IEnergyStorage;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.INBTSerializable;
 
 /**
@@ -12,7 +13,7 @@ import net.minecraftforge.common.util.INBTSerializable;
  * implementations do not need to use all three. The INBTSerializable interface is also
  * optional.
  */
-public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITeslaHolder, INBTSerializable<NBTTagCompound> {
+public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IEnergyStorage, INBTSerializable<NBTTagCompound> {
 
     /**
      * The amount of stored Tesla power.
@@ -39,7 +40,7 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      * will not set the amount of stored power. These values are arbitrary and should not be
      * taken as a base line for balancing.
      */
-    public BaseTeslaContainer() {
+    public BaseEnergyContainer() {
 
         this(5000, 50, 50);
     }
@@ -51,7 +52,7 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      * @param input The maximum rate of power that can be accepted at a time.
      * @param output The maximum rate of power that can be extracted at a time.
      */
-    public BaseTeslaContainer(long capacity, long input, long output) {
+    public BaseEnergyContainer(long capacity, long input, long output) {
         this(0, capacity, input, output);
     }
 
@@ -63,7 +64,7 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      * @param input The maximum rate of power that can be accepted at a time.
      * @param output The maximum rate of power that can be extracted at a time.
      */
-    public BaseTeslaContainer(long power, long capacity, long input, long output) {
+    public BaseEnergyContainer(long power, long capacity, long input, long output) {
 
         this.stored = power;
         this.capacity = capacity;
@@ -79,48 +80,17 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      *
      * @param dataTag The NBTCompoundTag to read the important data from.
      */
-    public BaseTeslaContainer(NBTTagCompound dataTag) {
+    public BaseEnergyContainer(NBTTagCompound dataTag) {
 
         this.deserializeNBT(dataTag);
     }
 
-    @Override
-    public long getStoredPower () {
-
-        return this.stored;
-    }
 
     public void setStored(long stored) {
         this.stored = stored;
     }
 
-    @Override
-    public long givePower (long Tesla, boolean simulated) {
 
-
-        final long acceptedTesla = Math.min(this.capacity - this.stored, Math.min(this.inputRate, Tesla));
-
-        if (!simulated)
-            this.stored += acceptedTesla;
-
-        return acceptedTesla;
-    }
-
-    @Override
-    public long takePower (long Tesla, boolean simulated) {
-
-        final long removedPower = Math.min(this.stored, Math.min(this.outputRate, Tesla));
-
-        if (!simulated)
-            this.stored -= removedPower;
-        return removedPower;
-    }
-
-    @Override
-    public long getCapacity () {
-
-        return this.capacity;
-    }
 
     @Override
     public NBTTagCompound serializeNBT () {
@@ -158,7 +128,7 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      * @param capacity The new capacity for the container.
      * @return The instance of the container being updated.
      */
-    public BaseTeslaContainer setCapacity (long capacity) {
+    public BaseEnergyContainer setCapacity (long capacity) {
 
         this.capacity = capacity;
 
@@ -184,7 +154,7 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      * @param rate The amount of Tesla power to accept at a time.
      * @return The instance of the container being updated.
      */
-    public BaseTeslaContainer setInputRate (long rate) {
+    public BaseEnergyContainer setInputRate (long rate) {
 
         this.inputRate = rate;
         return this;
@@ -206,7 +176,7 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      * @param rate The amount of Tesla power that can be extracted.
      * @return The instance of the container being updated.
      */
-    public BaseTeslaContainer setOutputRate (long rate) {
+    public BaseEnergyContainer setOutputRate (long rate) {
 
         this.outputRate = rate;
         return this;
@@ -219,10 +189,65 @@ public class BaseTeslaContainer implements ITeslaConsumer, ITeslaProducer, ITesl
      * @param rate The input/output rate for the Tesla container.
      * @return The instance of the container being updated.
      */
-    public BaseTeslaContainer setTransferRate (long rate) {
+    public BaseEnergyContainer setTransferRate (long rate) {
 
         this.setInputRate(rate);
         this.setOutputRate(rate);
         return this;
+    }
+
+    @Override
+    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
+        final long removedPower = Math.min(this.stored, Math.min(this.outputRate, maxExtract));
+
+        if (!simulate)
+            this.stored -= removedPower;
+        return maxExtract;
+    }
+
+    @Override
+    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+
+        final long acceptedTesla = Math.min(this.capacity - this.stored, Math.min(this.inputRate, maxReceive));
+
+        if (!simulate)
+            this.stored += acceptedTesla;
+
+        return maxReceive;
+    }
+
+    @Override
+    public int getEnergyStored(EnumFacing from) {
+        return (int) this.stored;
+    }
+
+    @Override
+    public int getMaxEnergyStored(EnumFacing from) {
+        return (int) capacity;
+    }
+
+    @Override
+    public boolean canConnectEnergy(EnumFacing from) {
+        return true;
+    }
+
+    @Override
+    public int receiveEnergy(int maxReceive, boolean simulate) {
+        return receiveEnergy(null, maxReceive, simulate);
+    }
+
+    @Override
+    public int extractEnergy(int maxExtract, boolean simulate) {
+        return extractEnergy(null, maxExtract, simulate);
+    }
+
+    @Override
+    public int getEnergyStored() {
+        return (int) stored;
+    }
+
+    @Override
+    public int getMaxEnergyStored() {
+        return (int) capacity;
     }
 }

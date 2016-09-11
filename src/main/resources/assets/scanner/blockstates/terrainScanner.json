@@ -1,5 +1,6 @@
 {
   "variants": {
-    "normal": { "model": "scanner:terrainScanner" }
+    "state=on": { "model": "scanner:terrainScanner" },
+    "state=off": { "model": "scanner:offTerrainScanner" }
   }
 }

@@ -2,29 +2,33 @@ package eladkay.scanner.biome;
 
 import com.google.gson.Gson;
 import eladkay.scanner.Config;
+import eladkay.scanner.ScannerMod;
+import eladkay.scanner.misc.BaseEnergyContainer;
 import eladkay.scanner.misc.BaseTE;
-import eladkay.scanner.misc.BaseTeslaContainer;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.ChunkPos;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TileEntityBiomeScanner extends BaseTE {
+public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public HashMap<ChunkPos, String> mapping = new HashMap<>();
+    public int type;
     public TileEntityBiomeScanner() {
         super(Config.maxEnergyBufferBiome);
     }
 
-    BaseTeslaContainer container() {
+    BaseEnergyContainer container() {
         return container;
     }
     public void onBlockActivated(EntityPlayer player) {
         if(worldObj.isRemote)
-            new GuiBiomeScanner(0, pos).openGui();
+            new GuiBiomeScanner(0, pos, type).openGui();
     }
 
     public String toJson() {
@@ -61,6 +65,7 @@ public class TileEntityBiomeScanner extends BaseTE {
             ret.put(serialize(entry.getKey()), entry.getValue());
         String json = gson.toJson(ret);
         compound.setString("json", json);
+        compound.setInteger("type", type);
         return compound;
     }
 
@@ -70,6 +75,7 @@ public class TileEntityBiomeScanner extends BaseTE {
         HashMap<String, String> ret = gson.fromJson(compound.getString("json"), HashMap.class);
         for(Map.Entry<String, String> entry : ret.entrySet())
             mapping.put(deserialize(entry.getKey()), entry.getValue());
+        type = compound.getInteger("type");
         super.readFromNBT(compound);
     }
 
@@ -78,5 +84,11 @@ public class TileEntityBiomeScanner extends BaseTE {
         for(Map.Entry<ChunkPos, String> entry : mapping.entrySet())
             if(entry.getKey().chunkXPos == chunkX && entry.getKey().chunkZPos == chunkY) return entry.getValue();
         return null;
+    }
+
+    @Override
+    public void update() {
+        Block block = worldObj.getBlockState(pos).getBlock();
+        this.type = block == ScannerMod.biomeScannerBasic ? 0 : block == ScannerMod.biomeScannerAdv ? 1 : block == ScannerMod.biomeScannerElite ? 2 : 3;
     }
 }

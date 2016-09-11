@@ -21,6 +21,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     int x = -1;
     int y = -1;
     int z = -1;
+    boolean on;
 
     public TileEntityTerrainScanner() {
         super(MAX);
@@ -32,6 +33,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             x = 0;
             y = 0;
             z = 0;
+            on = true;
         }
     }
 
@@ -42,12 +44,14 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         x = pos.getX();
         y = pos.getY();
         z = pos.getZ();
+        on = nbt.getBoolean("on");
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setLong("positions", new BlockPos(x, y, z).toLong());
+        nbt.setBoolean("on", on);
         return nbt;
 
     }
@@ -60,9 +64,12 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
         //Chunk chunk = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkFromBlockCoords(pos);
 
-        if (x < 0 || y < 0 || z < 0 || container.getStoredPower() < Config.energyPerBlockTerrainScanner) return;
+        if (x < 0 || y < 0 || z < 0 || container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
+            on = false;
+            return;
+        }
         x++;
-        container.takePower(Config.energyPerBlockTerrainScanner, false);
+        container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
         markDirty();
         IBlockState block = chunk.getBlockState(x, y, z);
         /*if (Config.alignChunks)
@@ -80,6 +87,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             x = -1;
             y = -1;
             z = -1;
+            on = false;
         }
 
         if(worldObj.getBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ())).getBlock() != Blocks.STONE) return;

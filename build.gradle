@@ -20,9 +20,9 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "1.0"
-group= "eladkay.terrainScanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "terrainScanner"
+version = "1.1"
+group= "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "scanner"
 
 minecraft {
     version = "1.10.2-12.18.1.2011"
@@ -55,7 +55,6 @@ repositories {
 
 dependencies {
     compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    compile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
 }
 apply plugin: 'java'
 compileJava {

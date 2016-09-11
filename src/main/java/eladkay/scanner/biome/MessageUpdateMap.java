@@ -55,7 +55,7 @@ public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
     @Override
     public void handleServerSide(MessageUpdateMap message, EntityPlayer player) {
         TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
-        bs.container().takePower(message.powerCost, false);
+        bs.container().extractEnergy(message.powerCost, false);
         bs.mapping.put(new ChunkPos(message.chunkX, message.chunkY), player.worldObj.getBiomeGenForCoords(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).getBiomeName());
         bs.markDirty();
     }

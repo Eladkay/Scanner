@@ -1,2 +1,7 @@
 tile.terrainScanner.name=Terrain Scanner
-tile.biomeScanner.name=Biome Scanner
+tile.biomeScannerBasic.name=Biome Scanner (Basic)
+tile.biomeScannerAdv.name=Biome Scanner (Advanced)
+tile.biomeScannerElite.name=Biome Scanner (Elite)
+tile.biomeScannerUltimate.name=Biome Scanner (Ultimate)
+
+itemGroup.scanner=Scanner

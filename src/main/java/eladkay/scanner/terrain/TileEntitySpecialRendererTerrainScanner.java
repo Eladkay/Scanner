@@ -22,7 +22,7 @@ public class TileEntitySpecialRendererTerrainScanner extends TileEntitySpecialRe
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         this.func_190053_a(true);
 
-        renderLine(tessellator, x + 1, y - 255, z, x + 17, (int)y + 255, z + 16, 255, 223, 127);
+        renderLine(x + 1, y - 255, z, x + 17, (int)y + 255, z + 16, 255, 223, 127);
         this.func_190053_a(false);
         GlStateManager.glLineWidth(1.0F);
         GlStateManager.enableLighting();
@@ -32,7 +32,8 @@ public class TileEntitySpecialRendererTerrainScanner extends TileEntitySpecialRe
         GlStateManager.enableFog();
 
     }
-    private static void renderLine(Tessellator tesselator, double x1, double y1, double z1, double x2, double y2, double z2, int idk1, int idk2, int idk3) {
+    public static void renderLine(double x1, double y1, double z1, double x2, double y2, double z2, int idk1, int idk2, int idk3) {
+        Tessellator tesselator = Tessellator.getInstance();
         GlStateManager.glLineWidth(2.0F);
         VertexBuffer vxb = tesselator.getBuffer();
         vxb.begin(3, DefaultVertexFormats.POSITION_COLOR);

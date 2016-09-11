@@ -1,21 +1,19 @@
 package eladkay.scanner.misc;
 
 import cofh.api.energy.IEnergyReceiver;
-import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
 
 public class BaseTE extends TileEntity implements IEnergyReceiver {
-    protected BaseTeslaContainer container;
+    protected BaseEnergyContainer container;
     private int max;
     public BaseTE(int max) {
         this.max = max;
-        this.container = new BaseTeslaContainer(max, max, max);
+        this.container = new BaseEnergyContainer(max, max, max);
     }
     @Override
     public NBTTagCompound getUpdateTag() {
@@ -27,7 +25,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        this.container = new BaseTeslaContainer(nbt.getCompoundTag("TeslaContainer"));
+        this.container = new BaseEnergyContainer(nbt.getCompoundTag("TeslaContainer"));
 
     }
 
@@ -45,18 +43,18 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        int energyReceived = Math.min(max - (int) container.getStoredPower(), maxReceive);
+        int energyReceived = Math.min(max - container.getEnergyStored(), maxReceive);
         if (!simulate) {
-            container.givePower(energyReceived, simulate);
+            container.receiveEnergy(energyReceived, simulate);
             markDirty();
-            NetworkHelper.tellEveryone(new MessageUpdateEnergy(pos.getX(), pos.getY(), pos.getZ(), container.getStoredPower()));
+            NetworkHelper.tellEveryone(new MessageUpdateEnergy(pos.getX(), pos.getY(), pos.getZ(), container.getEnergyStored()));
         }
         return energyReceived;
     }
 
     @Override
     public int getEnergyStored(EnumFacing from) {
-        return (int) container.getStoredPower();
+        return (int) container.getEnergyStored();
     }
 
     @Override
@@ -73,15 +71,4 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
         return packer;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        return capability == TeslaCapabilities.CAPABILITY_CONSUMER || capability == TeslaCapabilities.CAPABILITY_HOLDER ? (T) this.container : super.getCapability(capability, facing);
-
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == TeslaCapabilities.CAPABILITY_CONSUMER || capability == TeslaCapabilities.CAPABILITY_HOLDER || super.hasCapability(capability, facing);
-    }
 }
