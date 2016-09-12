@@ -5,6 +5,7 @@ import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.MineTweaker;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.proxy.CommonProxy;
+import eladkay.scanner.terrain.BlockAirey;
 import eladkay.scanner.terrain.BlockTerrainScanner;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.creativetab.CreativeTabs;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = ScannerMod.MODID, name = "Scanner", dependencies = "required-after:ftbl;required-after:ftbu;after:MineTweaker3;required-after:EnderIO")
+@Mod(modid = ScannerMod.MODID, name = "Scanner", dependencies = "required-after:ftbl;required-after:ftbu;after:MineTweaker3;required-after:EnderIO", version = "1.1.2")
 public class ScannerMod {
     public static final String MODID = "scanner";
 
@@ -37,6 +38,7 @@ public class ScannerMod {
     @Mod.Instance(MODID)
     public static ScannerMod instance;
     public static CreativeTabs tab;
+    public static BlockAirey air;
 
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
@@ -47,6 +49,8 @@ public class ScannerMod {
                 return Item.getItemFromBlock(terrainScanner);
             }
         };
+        GameRegistry.register(air = new BlockAirey());
+
         GameRegistry.register(terrainScanner = new BlockTerrainScanner());
         GameRegistry.register(new ItemBlock(terrainScanner).setRegistryName(MODID + ":terrainScanner").setCreativeTab(tab));
         GameRegistry.registerTileEntity(TileEntityTerrainScanner.class, "terrainScanner");

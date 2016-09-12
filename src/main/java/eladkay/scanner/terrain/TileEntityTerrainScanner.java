@@ -3,13 +3,12 @@ package eladkay.scanner.terrain;
 import eladkay.scanner.Config;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
+import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -56,25 +55,42 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
     }
 
+    Chunk chunk = null;
+
     @Override
     public void update() {
 
-        if(worldObj.isRemote) return;
-        ChunkProviderServer cps = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkProvider();
-        Chunk chunk = cps.provideChunk(pos.getX(), pos.getZ());
-        //Chunk chunk = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkFromBlockCoords(pos);
-
+        //ChunkProviderServer cps =
+        //FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkProvider();
         if (x < 0 || y < 0 || z < 0 || container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
             on = false;
             return;
         }
+
+        if(chunk == null)
+            chunk = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkFromBlockCoords(pos);//cps.provideChunk(pos.getX(), pos.getZ());
+
+        //Chunk chunk = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkFromBlockCoords(pos);
+
+
+        on = true;
+        if (y >= 256) {
+            x = -1;
+            y = -1;
+            z = -1;
+            on = false;
+        }
+
         x++;
-        container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
-        markDirty();
+
         IBlockState block = chunk.getBlockState(x, y, z);
-        /*if (Config.alignChunks)
-            worldObj.setBlockState(new BlockPos(chunk.xPosition * x, y, chunk.zPosition * z), block, 2);
-        else*/ worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
+        if(worldObj.getBlockState(new BlockPos(x + pos.getX() + 1, y, z + pos.getZ())).getBlock().isReplaceable(worldObj, new BlockPos(x + pos.getX() + 1, y, z + pos.getZ())) ||
+                worldObj.getBlockState(new BlockPos(x + pos.getX() + 1, y, z + pos.getZ())).getBlock() instanceof BlockAir) {
+            if(!worldObj.isRemote)
+                worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), block, 2);
+            if(!(block.getBlock() instanceof BlockAir))
+                container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
+        }
         if (x >= 16) {
             z++;
             x = 0;
@@ -88,9 +104,9 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             y = -1;
             z = -1;
             on = false;
-        }
-
-        if(worldObj.getBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ())).getBlock() != Blocks.STONE) return;
+        } else if(y >= 64) on = false;
+        if(worldObj.isRemote) return;
+       /* if(worldObj.getBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ())).getBlock() != Blocks.STONE) return;
         if(y > 8) {
             int i = ThreadLocalRandom.current().nextInt(25);
             if(i == 0)
@@ -113,13 +129,13 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             int i = ThreadLocalRandom.current().nextInt(45);
             if(i == 0)
                 worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), Blocks.GOLD_ORE.getDefaultState(), 2);
-        }
+        }*/
         Oregistry.getEntryList().stream().filter(entry -> y < entry.maxY && y > entry.minY).forEach(entry -> {
             int i = ThreadLocalRandom.current().nextInt(entry.rarity);
             if (i == 0) worldObj.setBlockState(new BlockPos(x + pos.getX(), y, z + pos.getZ()), entry.ore, 2);
         });
 
-
+        markDirty();
 
     }
 

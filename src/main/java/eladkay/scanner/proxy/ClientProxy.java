@@ -15,7 +15,7 @@ public class ClientProxy extends CommonProxy {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerElite), 0, new ModelResourceLocation("scanner:biomeScanner", "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerUltimate), 0, new ModelResourceLocation("scanner:biomeScanner", "inventory"));
 
-        /*if(Config.showOutline)
+       /* if(Config.showOutline)
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTerrainScanner.class, new TileEntitySpecialRendererTerrainScanner());*/
     }
 }
