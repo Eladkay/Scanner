@@ -46,25 +46,29 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
-        if(!Config.showOutline) return;
-        for(int x0 = 0; x0 < 16; x0++)
-            for(int y0 = 0; y0 < 256; y0++)
-                for(int z0 = 0; z0 < 16; z0++)
-                    if(worldIn.getBlockState(new BlockPos(x0 + pos.getX() + 1, y0, z0 + pos.getZ())).getBlock() == ScannerMod.air)
-                        worldIn.setBlockState(new BlockPos(pos.getX() + x0 + 1, y0, pos.getZ() + z0), Blocks.AIR.getDefaultState());
+    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn)
+    {   //We need to do this always in case the config has changed seince the block as added.
+        BlockPos start = pos.east().down(pos.getY());
+        for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15)))
+        {
+            IBlockState state = worldIn.getBlockState(pos);
+            if (state.getBlock() == ScannerMod.air)
+                worldIn.setBlockState(p, Blocks.AIR.getDefaultState());
+        }
     }
 
     @Override
     public IBlockState onBlockPlaced(World worldObj, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         if(Config.showOutline)
-            for(int x0 = 0; x0 < 16; x0++)
-                for(int y0 = 0; y0 < 256; y0++)
-                    for(int z0 = 0; z0 < 16; z0++)
-                        if(worldObj.getBlockState(new BlockPos(x0 + pos.getX() + 1, y0, z0 + pos.getZ())).getBlock()
-                                .isReplaceable(worldObj, new BlockPos(x0 + pos.getX() + 1, y0, z0 + pos.getZ())) ||
-                                worldObj.getBlockState(new BlockPos(x0 + pos.getX() + 1, y0, z0 + pos.getZ())).getBlock() instanceof BlockAir)
-                            worldObj.setBlockState(new BlockPos(pos.getX() + x0 + 1, y0, pos.getZ() + z0), ScannerMod.air.getDefaultState());
+        {
+            BlockPos start = pos.east().down(pos.getY());
+            for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15)))
+            {
+                IBlockState state = worldObj.getBlockState(pos);
+                if (state.getBlock().isReplaceable(worldObj, p) || state.getBlock().isAir(state, worldObj, p))
+                    worldObj.setBlockState(p, ScannerMod.air.getDefaultState());
+            }
+        }
         return super.onBlockPlaced(worldObj, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
 
