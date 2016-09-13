@@ -54,9 +54,11 @@ repositories {
 }
 
 dependencies {
-    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
+    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4" 
+    compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22"
 }
 apply plugin: 'java'
+sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
