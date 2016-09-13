@@ -62,20 +62,15 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
     @Override
     public void update() {
+        if (this.worldObj.isRemote)
+            return; //Dont do stuff client side else we get ghosts
 
-        //ChunkProviderServer cps =
-        //FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkProvider();
         if (current.getY() < 0 || container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
             on = false;
             return;
         }
 
-      //  if(chunk == null)
-           /* chunk = */
         WorldServer world = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);//cps.provideChunk(pos.getX(), pos.getZ());
-
-        //Chunk chunk = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid).getChunkFromBlockCoords(pos);
-
 
         on = true;
         if (current.getY() >= 256) {
@@ -93,41 +88,36 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                 container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
         }
 
-        if (!worldObj.isRemote)
+        if(Config.genVanillaOres && worldObj.getBlockState(current).getBlock() == Blocks.STONE)
         {
-            if(Config.genVanillaOres) {
-                if (worldObj.getBlockState(current).getBlock() != Blocks.STONE)
-                    return;
-
-                if (current.getY() > 8) {
-                    int i = ThreadLocalRandom.current().nextInt(25);
-                    if (i == 0)
-                        worldObj.setBlockState(current, Blocks.COAL_ORE.getDefaultState(), 2);
-                    else if (i == 1)
-                        worldObj.setBlockState(current, Blocks.IRON_ORE.getDefaultState(), 2);
-                }
-                if (current.getY() > 8 && current.getY() < 16) {
-                    int i = ThreadLocalRandom.current().nextInt(150);
-                    if (i == 0)
-                        worldObj.setBlockState(current, Blocks.DIAMOND_ORE.getDefaultState(), 2);
-                    else if (i == 1)
-                        worldObj.setBlockState(current, Blocks.EMERALD_ORE.getDefaultState(), 2);
-                    else if (i == 2)
-                        worldObj.setBlockState(current, Blocks.REDSTONE_ORE.getDefaultState(), 2);
-                    else if (i == 3)
-                        worldObj.setBlockState(current, Blocks.LAPIS_ORE.getDefaultState(), 2);
-                }
-                if (current.getY() > 8 && current.getY() < 32) {
-                    int i = ThreadLocalRandom.current().nextInt(45);
-                    if (i == 0)
-                        worldObj.setBlockState(current, Blocks.GOLD_ORE.getDefaultState(), 2);
-                }
+            if (current.getY() > 8) {
+                int i = ThreadLocalRandom.current().nextInt(25);
+                if (i == 0)
+                    worldObj.setBlockState(current, Blocks.COAL_ORE.getDefaultState(), 2);
+                else if (i == 1)
+                    worldObj.setBlockState(current, Blocks.IRON_ORE.getDefaultState(), 2);
             }
-            Oregistry.getEntryList().stream().filter(entry -> current.getY() < entry.maxY && current.getY()> entry.minY).forEach(entry -> {
-                int i = ThreadLocalRandom.current().nextInt(entry.rarity);
-                if (i == 0) worldObj.setBlockState(current, entry.ore, 2);
-            });
+            if (current.getY() > 8 && current.getY() < 16) {
+                int i = ThreadLocalRandom.current().nextInt(150);
+                if (i == 0)
+                    worldObj.setBlockState(current, Blocks.DIAMOND_ORE.getDefaultState(), 2);
+                else if (i == 1)
+                    worldObj.setBlockState(current, Blocks.EMERALD_ORE.getDefaultState(), 2);
+                else if (i == 2)
+                    worldObj.setBlockState(current, Blocks.REDSTONE_ORE.getDefaultState(), 2);
+                else if (i == 3)
+                    worldObj.setBlockState(current, Blocks.LAPIS_ORE.getDefaultState(), 2);
+            }
+            if (current.getY() > 8 && current.getY() < 32) {
+                int i = ThreadLocalRandom.current().nextInt(45);
+                if (i == 0)
+                    worldObj.setBlockState(current, Blocks.GOLD_ORE.getDefaultState(), 2);
+            }
         }
+        Oregistry.getEntryList().stream().filter(entry -> current.getY() < entry.maxY && current.getY()> entry.minY).forEach(entry -> {
+            int i = ThreadLocalRandom.current().nextInt(entry.rarity);
+            if (i == 0) worldObj.setBlockState(current, entry.ore, 2);
+        });
 
         //Movement needs to happen BELOW oregen else things get weird and desynced
         current.move(EnumFacing.EAST); //X++
