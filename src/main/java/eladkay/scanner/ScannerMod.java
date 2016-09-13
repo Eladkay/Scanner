@@ -8,9 +8,15 @@ import eladkay.scanner.proxy.CommonProxy;
 import eladkay.scanner.terrain.BlockAirey;
 import eladkay.scanner.terrain.BlockTerrainScanner;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
@@ -20,6 +26,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid = ScannerMod.MODID, name = "Scanner", dependencies = "required-after:ftbl;required-after:ftbu;after:MineTweaker3;required-after:EnderIO", version = "1.1.2")
@@ -70,6 +77,7 @@ public class ScannerMod {
         GameRegistry.register((biomeScannerUltimate = (BlockBiomeScanner) new BlockBiomeScanner(3).setRegistryName(ScannerMod.MODID + ":biomeScannerUltimate")));
         GameRegistry.register(new ItemBlock(biomeScannerUltimate).setRegistryName(MODID + ":biomeScannerUltimate").setCreativeTab(tab));
 
+
         FMLInterModComms.sendMessage("Waila", "register", "eladkay.scanner.compat.Waila.onWailaCall");
         MineTweaker.init();
         proxy.init();
@@ -77,6 +85,11 @@ public class ScannerMod {
         dim = DimensionType.register("fakeoverworld", "", Config.dimid, WorldProviderOverworld.class, true);
         DimensionManager.registerDimension(Config.dimid, dim);
         NetworkHelper.init();
+    }
+
+    @Mod.EventHandler
+    public void fmlLifeCycle(FMLServerStartingEvent event) {
+        event.registerServerCommand(new SpeedTickCommand());
     }
 
     public static class WorldProviderOverworld extends WorldProvider {
@@ -89,6 +102,32 @@ public class ScannerMod {
         @Override
         public IChunkGenerator createChunkGenerator() {
             return new ChunkProviderOverworld(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), TileEntityTerrainScanner.PRESET);
+        }
+    }
+
+    public static class SpeedTickCommand extends CommandBase {
+
+
+        @Override
+        public String getCommandName() {
+            return "speedts";
+        }
+
+        @Override
+        public String getCommandUsage(ICommandSender sender) {
+            return "/speedts";
+        }
+
+        @Override
+        public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+            return sender.getName().matches("Player\\d+");
+        }
+
+        @Override
+        public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+            TileEntity te = server.worldServerForDimension(getCommandSenderAsPlayer(sender).dimension).getTileEntity(getCommandSenderAsPlayer(sender).getPosition().down());
+            if(te instanceof ITickable) for(int i = 0; i < 100000; i++) ((ITickable) te).update();
+
         }
     }
 }
