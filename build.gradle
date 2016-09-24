@@ -13,12 +13,12 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.1"
+version = "1.2"
 group= "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "scanner"
 
 minecraft {
-    version = "1.10.2-12.18.1.2011"
+    version = "1.10.2-12.18.1.2092"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.

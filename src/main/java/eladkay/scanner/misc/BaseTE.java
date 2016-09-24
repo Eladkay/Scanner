@@ -5,6 +5,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nullable;
 
@@ -70,5 +72,17 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
         SPacketUpdateTileEntity packer = new SPacketUpdateTileEntity(getPos(), 0, nbt);
         return packer;
     }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
+    }
+
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        if(capability == CapabilityEnergy.ENERGY) return (T) container;
+        return super.getCapability(capability, facing);
+    }
+
 
 }

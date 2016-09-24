@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.INBTSerializable;
  * implementations do not need to use all three. The INBTSerializable interface is also
  * optional.
  */
-public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IEnergyStorage, INBTSerializable<NBTTagCompound> {
+public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IEnergyStorage, INBTSerializable<NBTTagCompound>, net.minecraftforge.energy.IEnergyStorage {
 
     /**
      * The amount of stored Tesla power.
@@ -249,5 +249,15 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
     @Override
     public int getMaxEnergyStored() {
         return (int) capacity;
+    }
+
+    @Override
+    public boolean canExtract() {
+        return getEnergyStored() > 0;
+    }
+
+    @Override
+    public boolean canReceive() {
+        return getEnergyStored() < getMaxEnergyStored();
     }
 }

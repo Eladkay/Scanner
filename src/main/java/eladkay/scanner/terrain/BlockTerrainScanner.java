@@ -3,10 +3,9 @@ package eladkay.scanner.terrain;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,7 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
@@ -32,6 +30,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         setRegistryName(ScannerMod.MODID + ":terrainScanner");
         setUnlocalizedName("terrainScanner");
         setCreativeTab(tab);
+        setHardness(1);
     }
 
     @Override
@@ -46,12 +45,25 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     }
 
     @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState bs) {
+        //We need to do this always in case the config has changed seince the block as added.
+        BlockPos start = pos.east().down(pos.getY());
+        for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15)))
+        {
+            IBlockState state = worldIn.getBlockState(p);
+            if (state.getBlock() == ScannerMod.air)
+                worldIn.setBlockState(p, Blocks.AIR.getDefaultState());
+        }
+        super.breakBlock(worldIn, pos, bs);
+    }
+
+    @Override
     public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn)
     {   //We need to do this always in case the config has changed seince the block as added.
         BlockPos start = pos.east().down(pos.getY());
         for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15)))
         {
-            IBlockState state = worldIn.getBlockState(pos);
+            IBlockState state = worldIn.getBlockState(p);
             if (state.getBlock() == ScannerMod.air)
                 worldIn.setBlockState(p, Blocks.AIR.getDefaultState());
         }
@@ -84,25 +96,11 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        return ((TileEntityTerrainScanner)worldIn.getTileEntity(pos)).on ? state.withProperty(ONOFF, EnumType.ON) : state.withProperty(ONOFF, EnumType.OFF);
+        return ((TileEntityTerrainScanner)worldIn.getTileEntity(pos)).on ? state.withProperty(ONOFF, true) : state.withProperty(ONOFF, false);
     }
 
-    public static PropertyEnum<EnumType> ONOFF = PropertyEnum.create("state", EnumType.class);
+    public static PropertyBool ONOFF = PropertyBool.create("state");
 
-    public enum EnumType implements IStringSerializable {
-        ON {
-            @Override
-            public String getName() {
-                return "on";
-            }
-        },
-        OFF {
-            @Override
-            public String getName() {
-                return "off";
-            }
-        };
-    }
 
     @Override
     public int getMetaFromState(IBlockState state) {
