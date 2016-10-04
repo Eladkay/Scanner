@@ -5,16 +5,14 @@
 
 package eladkay.scanner.biome;
 
-import com.feed_the_beast.ftbl.api.ForgePlayerSPSelf;
-import com.feed_the_beast.ftbl.api.ForgeWorldSP;
-import com.feed_the_beast.ftbl.api.MouseButton;
 import com.feed_the_beast.ftbl.api.client.FTBLibClient;
-import com.feed_the_beast.ftbl.api.client.gui.GuiLM;
-import com.feed_the_beast.ftbl.api.client.gui.widgets.ButtonLM;
-import com.feed_the_beast.ftbl.util.ChunkDimPos;
-import com.feed_the_beast.ftbl.util.TextureCoords;
-import com.feed_the_beast.ftbu.net.MessageAreaRequest;
-import com.latmod.lib.math.MathHelperLM;
+import com.feed_the_beast.ftbl.api.gui.IGui;
+import com.feed_the_beast.ftbl.api.gui.IMouseButton;
+import com.feed_the_beast.ftbl.lib.client.TextureCoords;
+import com.feed_the_beast.ftbl.lib.gui.ButtonLM;
+import com.feed_the_beast.ftbl.lib.gui.GuiLM;
+import com.feed_the_beast.ftbl.lib.math.ChunkDimPos;
+import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.GuiHelper;
 import eladkay.scanner.misc.NetworkHelper;
@@ -49,7 +47,6 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
     static final int TILES_GUI = 15;
     public static int textureID;
     public static ByteBuffer pixelBuffer;
-    public final ForgePlayerSPSelf playerLM;
     public final int startX;
     public final int startZ;
     public final int currentDim;
@@ -58,8 +55,8 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
     public String currentDimName;
 
     static {
-        TEX_FILLED = new TextureCoords(TEX_CHUNK_CLAIMING, 0.0D, 0.0D, 0.5D, 1.0D);
-        TEX_BORDER = new TextureCoords(TEX_CHUNK_CLAIMING, 0.5D, 0.0D, 1.0D, 1.0D);
+        TEX_FILLED = TextureCoords.fromUV(TEX_CHUNK_CLAIMING, 0.0D, 0.0D, 0.5D, 1.0D);
+        TEX_BORDER = TextureCoords.fromUV(TEX_CHUNK_CLAIMING, 0.5D, 0.0D, 1.0D, 1.0D);
         textureID = -1;
         pixelBuffer = null;
     }
@@ -73,11 +70,11 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         new ThreadReloadArea(mc.theWorld, this).start();
     }
 
+
     public GuiBiomeScanner(long token, BlockPos pos, int type) {
+        super(240, 240);
         this.pos = pos;
         this.type = type;
-        this.width = this.height = 240.0D;
-        this.playerLM = ForgeWorldSP.inst.clientPlayer;
         this.startX = MathHelperLM.chunk(this.mc.thePlayer.posX) - 7;
         this.startZ = MathHelperLM.chunk(this.mc.thePlayer.posZ) - 7;
         this.currentDim = FTBLibClient.getDim();
@@ -95,9 +92,9 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         return (double) MathHelper.sqrt_double(d0 * d0 + d1 * d1);
     }
 
+    @Override
     public void addWidgets() {
         GuiBiomeScanner.MapButton[] var1 = this.mapButtons;
-
         for (MapButton b : var1)
             this.add(b);
 
@@ -107,10 +104,9 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
     public void drawBackground() {
         super.drawBackground();
 
-        if (textureID == -1) {
+        if (textureID == -1)
             textureID = TextureUtil.glGenTextures();
-            new MessageAreaRequest(startX, startZ, TILES_GUI, TILES_GUI).sendToServer();
-        }
+
 
         if (pixelBuffer != null) {
             //boolean hasBlur = false;
@@ -126,7 +122,7 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         }
 
         GlStateManager.color(0F, 0F, 0F, 1F);
-        GuiHelper.drawBlankRect((int)posX - 2, (int)posY - 2, (int)width + 4, (int)height + 4);
+        GuiHelper.drawBlankRect(posX - 2, posY - 2, 240 + 4, 240 + 4);
         //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
@@ -212,42 +208,44 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         public final ChunkDimPos chunkPos;
 
         public MapButton(int x, int y, int i) {
-            super((double) x, (double) y, 16.0D, 16.0D);
-            this.posX += (double) (i % 15) * this.width;
-            this.posY += (double) (i / 15) * this.height;
+            super(x, y, 16, 16);
+            this.posX += (double) (i % 15) * 240;
+            this.posY += (double) (i / 15) * 240;
             this.chunkPos = new ChunkDimPos(GuiBiomeScanner.this.currentDim, GuiBiomeScanner.this.startX + i % 15, GuiBiomeScanner.this.startZ + i / 15);
         }
 
-        public void onClicked(@Nonnull GuiLM gui, @Nonnull MouseButton button) {
+        @Override
+        public void onClicked(@Nonnull IGui gui, @Nonnull IMouseButton button) {
             if (button.isLeft()) {
                 TileEntityBiomeScanner te = (TileEntityBiomeScanner) mc.theWorld.getTileEntity(pos);
                 if (te == null) return;
-                int distance = (int) (getDistanceMC(pos.getX(), chunkPos.chunkXPos * 16, pos.getZ(),
-                        chunkPos.chunkZPos * 16) / 16);
-                if (te.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null ||
+                int distance = (int) (getDistanceMC(pos.getX(), chunkPos.posX * 16, pos.getZ(),
+                        chunkPos.posZ * 16) / 16);
+                if (te.getMapping(chunkPos.posX, chunkPos.posZ) != null ||
                         te.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner *
                                 Config.increase * distance) return;
                 if(type == 0 && distance > 2) return;
                 else if(type == 1 && distance > 4) return;
                 else if(type == 2 && distance > 8) return;
                 te.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
-                te.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
+                te.mapping.put(new ChunkPos(chunkPos.posX, chunkPos.posZ), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.posX * 16, 64, chunkPos.posZ * 16)).getBiomeName());
                 te.markDirty();
                 NetworkHelper.instance.sendToServer(new MessageUpdateMap(pos.getX(), pos.getY(), pos.getZ(),
-                        chunkPos.chunkXPos, chunkPos.chunkZPos, Config.minEnergyPerChunkBiomeScanner * Config.increase * distance));
+                        chunkPos.posX, chunkPos.posZ, Config.minEnergyPerChunkBiomeScanner * Config.increase * distance));
             }
-            GuiLM.playClickSound();
+            GuiHelper.playClickSound();
 
         }
 
-
-        public void addMouseOverText(GuiLM gui, List<String> l) {
+        @Override
+        public void addMouseOverText(IGui gui, List<String> l) {
             TileEntityBiomeScanner te = (TileEntityBiomeScanner) mc.theWorld.getTileEntity(pos);
+
             if (te == null) return;
-            long distance = (long) (getDistanceMC(pos.getX(), chunkPos.chunkXPos * 16, pos.getZ(),
-                    chunkPos.chunkZPos * 16) / 16);
-            if (te.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null)
-                l.add(te.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos));
+            long distance = (long) (getDistanceMC(pos.getX(), chunkPos.posX * 16, pos.getZ(),
+                    chunkPos.posZ * 16) / 16);
+            if (te.getMapping(chunkPos.posX, chunkPos.posZ) != null)
+                l.add(te.getMapping(chunkPos.posX, chunkPos.posZ));
             else {
                 l.add("???");
                 l.add("Click to scan!");
@@ -258,10 +256,9 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
                 else if(type == 2 && distance > 8) l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
             }
 
-            l.add("{" + chunkPos.chunkXPos + ", " + chunkPos.chunkZPos + "}");
-
-
+            l.add("{" + chunkPos.posX + ", " + chunkPos.posZ + "}");
         }
+
 
 
     }

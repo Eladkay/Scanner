@@ -5,9 +5,8 @@
 
 package eladkay.scanner.biome;
 
-import com.feed_the_beast.ftbl.api.client.FTBLibClient;
-import com.latmod.lib.PixelBuffer;
-import com.latmod.lib.util.LMColorUtils;
+import com.feed_the_beast.ftbl.lib.client.PixelBuffer;
+import com.feed_the_beast.ftbl.lib.util.LMColorUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.MapColor;
@@ -149,7 +148,7 @@ public class ThreadReloadArea extends Thread
     @Override
     public void run()
     {
-        Arrays.fill(pixels.pixels, 0);
+        Arrays.fill(pixels.getPixels(), 0);
         Chunk chunk;
         int cx, cz, x, z, wx, wz, by, color;
 
@@ -190,7 +189,7 @@ public class ThreadReloadArea extends Thread
                         }
                     }
 
-                    GuiBiomeScanner.pixelBuffer = FTBLibClient.toByteBuffer(pixels.pixels, false);
+                    GuiBiomeScanner.pixelBuffer = LMColorUtils.toByteBuffer(pixels.getPixels(), false);
                 }
             }
         }
@@ -199,6 +198,6 @@ public class ThreadReloadArea extends Thread
             e.printStackTrace();
         }
 
-        GuiBiomeScanner.pixelBuffer = FTBLibClient.toByteBuffer(pixels.pixels, false);
+        GuiBiomeScanner.pixelBuffer = LMColorUtils.toByteBuffer(pixels.getPixels(), false);
     }
 }
