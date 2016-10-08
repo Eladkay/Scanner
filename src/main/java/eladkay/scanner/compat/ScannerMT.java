@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-@ZenClass("mods.terrainScanner.Scanner")
+@ZenClass("mods.scanner.Scanner")
 public class ScannerMT {
     @ZenMethod
     public static void addRecipe(IItemStack stack, int rarity, int minY, int maxY) {
