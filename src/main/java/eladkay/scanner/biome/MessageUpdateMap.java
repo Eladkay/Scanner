@@ -50,7 +50,8 @@ public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
     }
 
     @Override
-    public void handleClientSide(MessageUpdateMap message, EntityPlayer player) {} //noop
+    public void handleClientSide(MessageUpdateMap message, EntityPlayer player) {
+    } //noop
 
     @Override
     public void handleServerSide(MessageUpdateMap message, EntityPlayer player) {

@@ -46,6 +46,7 @@ public class Oregistry {
                     ", minY=" + minY +
                     '}';
         }
+
         public IBlockState ore;
         public int rarity;
         public int maxY;

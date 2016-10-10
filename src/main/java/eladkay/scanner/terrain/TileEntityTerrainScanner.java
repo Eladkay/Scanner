@@ -75,7 +75,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (this.worldObj.isRemote)
             return; //Dont do stuff client side else we get ghosts
 
-        if(container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
+        if (container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
             changeState(false);
             return;
         }

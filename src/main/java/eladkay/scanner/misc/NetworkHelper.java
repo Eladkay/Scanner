@@ -12,6 +12,7 @@ public class NetworkHelper {
     public static SimpleNetworkWrapper instance;
 
     private static int id = 0;
+
     public static void init() {
         instance = new SimpleNetworkWrapper(ScannerMod.MODID);
         try {

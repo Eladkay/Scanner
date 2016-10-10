@@ -19,6 +19,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public HashMap<ChunkPos, String> mapping = new HashMap<>();
     public int type;
+
     public TileEntityBiomeScanner() {
         super(Config.maxEnergyBufferBiome);
     }
@@ -26,15 +27,16 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     BaseEnergyContainer container() {
         return container;
     }
+
     public void onBlockActivated(EntityPlayer player) {
-        if(worldObj.isRemote)
+        if (worldObj.isRemote)
             new GuiBiomeScanner(0, pos, type).openGui();
     }
 
     public String toJson() {
         Gson gson = new Gson();
         HashMap<String, String> ret = new HashMap<>();
-        for(Map.Entry<ChunkPos, String> entry : mapping.entrySet())
+        for (Map.Entry<ChunkPos, String> entry : mapping.entrySet())
             ret.put(serialize(entry.getKey()), entry.getValue());
         return gson.toJson(ret);
     }
@@ -61,7 +63,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
         super.writeToNBT(compound);
         Gson gson = new Gson();
         HashMap<String, String> ret = new HashMap<>();
-        for(Map.Entry<ChunkPos, String> entry : mapping.entrySet())
+        for (Map.Entry<ChunkPos, String> entry : mapping.entrySet())
             ret.put(serialize(entry.getKey()), entry.getValue());
         String json = gson.toJson(ret);
         compound.setString("json", json);
@@ -73,7 +75,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     public void readFromNBT(NBTTagCompound compound) {
         Gson gson = new Gson();
         HashMap<String, String> ret = gson.fromJson(compound.getString("json"), HashMap.class);
-        for(Map.Entry<String, String> entry : ret.entrySet())
+        for (Map.Entry<String, String> entry : ret.entrySet())
             mapping.put(deserialize(entry.getKey()), entry.getValue());
         type = compound.getInteger("type");
         super.readFromNBT(compound);
@@ -81,8 +83,8 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     @Nullable
     public String getMapping(int chunkX, int chunkY) {
-        for(Map.Entry<ChunkPos, String> entry : mapping.entrySet())
-            if(entry.getKey().chunkXPos == chunkX && entry.getKey().chunkZPos == chunkY) return entry.getValue();
+        for (Map.Entry<ChunkPos, String> entry : mapping.entrySet())
+            if (entry.getKey().chunkXPos == chunkX && entry.getKey().chunkZPos == chunkY) return entry.getValue();
         return null;
     }
 

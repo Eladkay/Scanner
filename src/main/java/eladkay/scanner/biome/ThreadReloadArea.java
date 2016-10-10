@@ -25,28 +25,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SideOnly(Side.CLIENT)
-public class ThreadReloadArea extends Thread
-{
+public class ThreadReloadArea extends Thread {
     public static final PixelBuffer pixels = new PixelBuffer(GuiBiomeScanner.TILES_TEX * 16, GuiBiomeScanner.TILES_TEX * 16);
     private static final Map<IBlockState, Integer> colorCache = new HashMap<>();
     private static BlockPos.MutableBlockPos currentBlockPos = new BlockPos.MutableBlockPos(0, 0, 0);
     public final World worldObj;
     public final GuiBiomeScanner gui;
 
-    public ThreadReloadArea(World w, GuiBiomeScanner m)
-    {
+    public ThreadReloadArea(World w, GuiBiomeScanner m) {
         super("LM_MapReloader");
         setDaemon(true);
         worldObj = w;
         gui = m;
     }
 
-    private static int getBlockColor(IBlockState state)
-    {
+    private static int getBlockColor(IBlockState state) {
         Integer col = colorCache.get(state);
 
-        if(col == null)
-        {
+        if (col == null) {
             col = 0xFF000000 | getBlockColor0(state);
             colorCache.put(state, col);
         }
@@ -54,48 +50,30 @@ public class ThreadReloadArea extends Thread
         return col;
     }
 
-    private static int getBlockColor0(IBlockState state)
-    {
+    private static int getBlockColor0(IBlockState state) {
         Block b = state.getBlock();
 
-        if(b == Blocks.SANDSTONE)
-        {
+        if (b == Blocks.SANDSTONE) {
             return MapColor.SAND.colorValue;
-        }
-        else if(b == Blocks.FIRE)
-        {
+        } else if (b == Blocks.FIRE) {
             return MapColor.RED.colorValue;
-        }
-        else if(b == Blocks.YELLOW_FLOWER)
-        {
+        } else if (b == Blocks.YELLOW_FLOWER) {
             return MapColor.YELLOW.colorValue;
-        }
-        else if(b == Blocks.LAVA)
-        {
+        } else if (b == Blocks.LAVA) {
             return MapColor.ADOBE.colorValue;
-        }
-        else if(b == Blocks.END_STONE)
-        {
+        } else if (b == Blocks.END_STONE) {
             return MapColor.SAND.colorValue;
-        }
-        else if(b == Blocks.OBSIDIAN)
-        {
+        } else if (b == Blocks.OBSIDIAN) {
             return 0x150047;
-        }
-        else if(b == Blocks.GRAVEL)
-        {
+        } else if (b == Blocks.GRAVEL) {
             return 0x8D979B;
-        }
-        else if(b == Blocks.GRASS)
-        {
+        } else if (b == Blocks.GRASS) {
             return 0x74BC7C;
         }
         //else if(b.getMaterial(state) == Material.water)
         //	return LMColorUtils.multiply(MapColor.waterColor.colorValue, b.colorMultiplier(worldObj, pos), 200);
-        else if(b == Blocks.RED_FLOWER)
-        {
-            switch(state.getValue(Blocks.RED_FLOWER.getTypeProperty()))
-            {
+        else if (b == Blocks.RED_FLOWER) {
+            switch (state.getValue(Blocks.RED_FLOWER.getTypeProperty())) {
                 case DANDELION:
                     return MapColor.YELLOW.colorValue;
                 case POPPY:
@@ -117,11 +95,8 @@ public class ThreadReloadArea extends Thread
                 case OXEYE_DAISY:
                     return MapColor.SILVER.colorValue;
             }
-        }
-        else if(b == Blocks.PLANKS)
-        {
-            switch(state.getValue(BlockPlanks.VARIANT))
-            {
+        } else if (b == Blocks.PLANKS) {
+            switch (state.getValue(BlockPlanks.VARIANT)) {
                 case OAK:
                     return 0xC69849;
                 case SPRUCE:
@@ -146,39 +121,30 @@ public class ThreadReloadArea extends Thread
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         Arrays.fill(pixels.getPixels(), 0);
         Chunk chunk;
         int cx, cz, x, z, wx, wz, by, color;
 
         int startY = Minecraft.getMinecraft().thePlayer.getPosition().getY();
 
-        try
-        {
-            for(cz = 0; cz < GuiBiomeScanner.TILES_GUI; cz++)
-            {
-                for(cx = 0; cx < GuiBiomeScanner.TILES_GUI; cx++)
-                {
+        try {
+            for (cz = 0; cz < GuiBiomeScanner.TILES_GUI; cz++) {
+                for (cx = 0; cx < GuiBiomeScanner.TILES_GUI; cx++) {
                     chunk = worldObj.getChunkProvider().getLoadedChunk(gui.startX + cx, gui.startZ + cz);
 
-                    if(chunk != null)
-                    {
+                    if (chunk != null) {
                         x = (gui.startX + cx) * 16;
                         z = (gui.startZ + cz) * 16;
 
-                        for(wz = 0; wz < 16; wz++)
-                        {
-                            for(wx = 0; wx < 16; wx++)
-                            {
-                                for(by = Math.max(255, chunk.getTopFilledSegment() + 15); by > 0; --by)
-                                {
+                        for (wz = 0; wz < 16; wz++) {
+                            for (wx = 0; wx < 16; wx++) {
+                                for (by = Math.max(255, chunk.getTopFilledSegment() + 15); by > 0; --by) {
                                     IBlockState state = chunk.getBlockState(wx, by, wz);
 
                                     currentBlockPos.setPos(x + wx, by, z + wz);
 
-                                    if(state.getBlock() != Blocks.TALLGRASS && !worldObj.isAirBlock(currentBlockPos))
-                                    {
+                                    if (state.getBlock() != Blocks.TALLGRASS && !worldObj.isAirBlock(currentBlockPos)) {
                                         color = getBlockColor(state);
                                         color = LMColorUtils.addBrightness(color, MathHelper.clamp_int(by - startY, -30, 30) * 5);
                                         pixels.setRGB(cx * 16 + wx, cz * 16 + wz, color);
@@ -192,9 +158,7 @@ public class ThreadReloadArea extends Thread
                     GuiBiomeScanner.pixelBuffer = LMColorUtils.toByteBuffer(pixels.getPixels(), false);
                 }
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

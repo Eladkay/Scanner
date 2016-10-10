@@ -13,10 +13,12 @@ import javax.annotation.Nullable;
 public class BaseTE extends TileEntity implements IEnergyReceiver {
     protected BaseEnergyContainer container;
     private int max;
+
     public BaseTE(int max) {
         this.max = max;
         this.container = new BaseEnergyContainer(max, max, max);
     }
+
     @Override
     public NBTTagCompound getUpdateTag() {
         NBTTagCompound tag = new NBTTagCompound();
@@ -80,7 +82,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if(capability == CapabilityEnergy.ENERGY) return (T) container;
+        if (capability == CapabilityEnergy.ENERGY) return (T) container;
         return super.getCapability(capability, facing);
     }
 

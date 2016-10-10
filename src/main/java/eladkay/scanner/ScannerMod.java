@@ -121,13 +121,13 @@ public class ScannerMod {
 
         @Override
         public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-            return sender.getName().matches("(Player\\d+)|(Eladk[a|e]y)");
+            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)");
         }
 
         @Override
         public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
             TileEntity te = server.worldServerForDimension(getCommandSenderAsPlayer(sender).dimension).getTileEntity(getCommandSenderAsPlayer(sender).getPosition().down());
-            if(te instanceof ITickable) for(int i = 0; i < 100000; i++) ((ITickable) te).update();
+            if (te instanceof ITickable) for (int i = 0; i < 100000; i++) ((ITickable) te).update();
 
         }
     }
@@ -152,11 +152,11 @@ public class ScannerMod {
 
         @Override
         public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-            if(args.length != 1) return;
-            if("homepls".equals(args[0]))
+            if (args.length != 1) return;
+            if ("homepls".equals(args[0]))
                 getCommandSenderAsPlayer(sender).dimension = 0;
-            else if("offwego".equals(args[0]))
-                getCommandSenderAsPlayer(sender).dimension = 99;
+            else if ("offwego".equals(args[0]))
+                getCommandSenderAsPlayer(sender).dimension = Config.dimid;
 
         }
     }

@@ -128,17 +128,16 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
 
         if (thread == null) {
             GlStateManager.bindTexture(textureID);
-            GuiHelper.drawTexturedRect((int)posX, (int)posY, TILES_GUI * 16, TILES_GUI * 16, 0D, 0D, UV, UV);
+            GuiHelper.drawTexturedRect((int) posX, (int) posY, TILES_GUI * 16, TILES_GUI * 16, 0D, 0D, UV, UV);
             GlStateManager.color(0, 0, 0, 0);
-            GuiHelper.drawBlankRect((int)posX - 1, (int)posY - 1, TILES_GUI * 16 + 2, TILES_GUI * 16 + 2);
+            GuiHelper.drawBlankRect((int) posX - 1, (int) posY - 1, TILES_GUI * 16 + 2, TILES_GUI * 16 + 2);
         }
 
         GlStateManager.color(1F, 1F, 1F, 1F);
         GlStateManager.enableTexture2D();
         FTBLibClient.setTexture(TEX_CHUNK_CLAIMING);
 
-        for(MapButton mapButton : mapButtons)
-        {
+        for (MapButton mapButton : mapButtons) {
             mapButton.renderWidget(this);
         }
 
@@ -156,14 +155,12 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         int gridX = (int) mapButtons[0].getAX();
         int gridY = (int) mapButtons[0].getAY();
 
-        for(int x = 0; x <= TILES_GUI; x++)
-        {
+        for (int x = 0; x <= TILES_GUI; x++) {
             buffer.pos(gridX + x * 16, gridY, 0D).color(gridR, gridG, gridB, gridA).endVertex();
             buffer.pos(gridX + x * 16, gridY + TILES_GUI * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
         }
 
-        for(int y = 0; y <= TILES_GUI; y++)
-        {
+        for (int y = 0; y <= TILES_GUI; y++) {
             buffer.pos(gridX, gridY + y * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
             buffer.pos(gridX + TILES_GUI * 16, gridY + y * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
         }
@@ -214,6 +211,7 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
             this.chunkPos = new ChunkDimPos(GuiBiomeScanner.this.currentDim, GuiBiomeScanner.this.startX + i % 15, GuiBiomeScanner.this.startZ + i / 15);
         }
 
+
         @Override
         public void onClicked(@Nonnull IGui gui, @Nonnull IMouseButton button) {
             if (button.isLeft()) {
@@ -224,9 +222,9 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
                 if (te.getMapping(chunkPos.posX, chunkPos.posZ) != null ||
                         te.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner *
                                 Config.increase * distance) return;
-                if(type == 0 && distance > 2) return;
-                else if(type == 1 && distance > 4) return;
-                else if(type == 2 && distance > 8) return;
+                if (type == 0 && distance > 2) return;
+                else if (type == 1 && distance > 4) return;
+                else if (type == 2 && distance > 8) return;
                 te.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
                 te.mapping.put(new ChunkPos(chunkPos.posX, chunkPos.posZ), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.posX * 16, 64, chunkPos.posZ * 16)).getBiomeName());
                 te.markDirty();
@@ -251,14 +249,15 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
                 l.add("Click to scan!");
                 l.add("Power cost: " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
                 l.add("Distance (chunks): " + distance);
-                if(type == 0 && distance > 2) l.add("Basic Biome Scanner cannot scan chunks more than 2 chunks away!");
-                else if(type == 1 && distance > 4) l.add("Advanced Biome Scanner cannot scan chunks more than 4 chunks away!");
-                else if(type == 2 && distance > 8) l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
+                if (type == 0 && distance > 2) l.add("Basic Biome Scanner cannot scan chunks more than 2 chunks away!");
+                else if (type == 1 && distance > 4)
+                    l.add("Advanced Biome Scanner cannot scan chunks more than 4 chunks away!");
+                else if (type == 2 && distance > 8)
+                    l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
             }
 
             l.add("{" + chunkPos.posX + ", " + chunkPos.posZ + "}");
         }
-
 
 
     }

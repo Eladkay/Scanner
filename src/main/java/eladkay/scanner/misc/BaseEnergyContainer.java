@@ -49,8 +49,8 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * Constructor for setting the basic values. Will not construct with any stored power.
      *
      * @param capacity The maximum amount of Tesla power that the container should hold.
-     * @param input The maximum rate of power that can be accepted at a time.
-     * @param output The maximum rate of power that can be extracted at a time.
+     * @param input    The maximum rate of power that can be accepted at a time.
+     * @param output   The maximum rate of power that can be extracted at a time.
      */
     public BaseEnergyContainer(long capacity, long input, long output) {
         this(0, capacity, input, output);
@@ -59,10 +59,10 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
     /**
      * Constructor for setting all of the base values, including the stored power.
      *
-     * @param power The amount of stored power to initialize the container with.
+     * @param power    The amount of stored power to initialize the container with.
      * @param capacity The maximum amount of Tesla power that the container should hold.
-     * @param input The maximum rate of power that can be accepted at a time.
-     * @param output The maximum rate of power that can be extracted at a time.
+     * @param input    The maximum rate of power that can be accepted at a time.
+     * @param output   The maximum rate of power that can be extracted at a time.
      */
     public BaseEnergyContainer(long power, long capacity, long input, long output) {
 
@@ -91,9 +91,8 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
     }
 
 
-
     @Override
-    public NBTTagCompound serializeNBT () {
+    public NBTTagCompound serializeNBT() {
 
         final NBTTagCompound dataTag = new NBTTagCompound();
         dataTag.setLong("TeslaPower", this.stored);
@@ -104,7 +103,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
     }
 
     @Override
-    public void deserializeNBT (NBTTagCompound nbt) {
+    public void deserializeNBT(NBTTagCompound nbt) {
 
         this.stored = nbt.getLong("TeslaPower");
 
@@ -128,7 +127,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * @param capacity The new capacity for the container.
      * @return The instance of the container being updated.
      */
-    public BaseEnergyContainer setCapacity (long capacity) {
+    public BaseEnergyContainer setCapacity(long capacity) {
 
         this.capacity = capacity;
 
@@ -143,7 +142,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      *
      * @return The amount of Tesla power that can be accepted at any time.
      */
-    public long getInputRate () {
+    public long getInputRate() {
 
         return this.inputRate;
     }
@@ -154,7 +153,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * @param rate The amount of Tesla power to accept at a time.
      * @return The instance of the container being updated.
      */
-    public BaseEnergyContainer setInputRate (long rate) {
+    public BaseEnergyContainer setInputRate(long rate) {
 
         this.inputRate = rate;
         return this;
@@ -165,7 +164,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      *
      * @return The amount of Tesla power that can be extracted at any time.
      */
-    public long getOutputRate () {
+    public long getOutputRate() {
 
         return this.outputRate;
     }
@@ -176,7 +175,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * @param rate The amount of Tesla power that can be extracted.
      * @return The instance of the container being updated.
      */
-    public BaseEnergyContainer setOutputRate (long rate) {
+    public BaseEnergyContainer setOutputRate(long rate) {
 
         this.outputRate = rate;
         return this;
@@ -189,7 +188,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * @param rate The input/output rate for the Tesla container.
      * @return The instance of the container being updated.
      */
-    public BaseEnergyContainer setTransferRate (long rate) {
+    public BaseEnergyContainer setTransferRate(long rate) {
 
         this.setInputRate(rate);
         this.setOutputRate(rate);

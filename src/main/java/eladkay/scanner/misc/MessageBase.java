@@ -13,7 +13,7 @@ public abstract class MessageBase<REQ extends IMessage> implements IMessage, IMe
     public REQ onMessage(REQ message, MessageContext ctx) {
         if (ctx.side == Side.SERVER)
             handleServerSide(message, ctx.getServerHandler().playerEntity);
-         else
+        else
             handleClientSide(message, Minecraft.getMinecraft().thePlayer); //safe because it runs on the client
 
         return null;

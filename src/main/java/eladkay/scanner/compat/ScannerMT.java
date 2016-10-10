@@ -23,15 +23,17 @@ public class ScannerMT {
         int rarity;
         int maxY;
         int minY;
+
         public Add(ItemStack stack, int rarity, int minY, int maxY) {
             this.stack = stack;
             this.rarity = rarity;
             this.minY = minY;
             this.maxY = maxY;
         }
+
         @Override
         public void apply() {
-            if(!(stack.getItem() instanceof ItemBlock)) return;
+            if (!(stack.getItem() instanceof ItemBlock)) return;
             Block block = ((ItemBlock) stack.getItem()).getBlock();
             IBlockState blockState = block.getStateFromMeta(stack.getItemDamage());
             Oregistry.registerEntry(new Oregistry.Entry(blockState, rarity, maxY, minY));

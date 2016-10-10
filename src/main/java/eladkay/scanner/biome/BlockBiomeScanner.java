@@ -18,10 +18,11 @@ import static eladkay.scanner.ScannerMod.tab;
 
 public class BlockBiomeScanner extends Block implements ITileEntityProvider {
     int type;
+
     public BlockBiomeScanner(int i) {
         super(Material.IRON);
         type = i;
-        switch(type) {
+        switch (type) {
             case 0:
             default:
                 setUnlocalizedName("biomeScannerBasic");
