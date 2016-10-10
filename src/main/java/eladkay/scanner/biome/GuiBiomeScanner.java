@@ -13,6 +13,7 @@ import com.feed_the_beast.ftbl.lib.gui.ButtonLM;
 import com.feed_the_beast.ftbl.lib.gui.GuiLM;
 import com.feed_the_beast.ftbl.lib.math.ChunkDimPos;
 import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
+import com.google.common.collect.Lists;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.GuiHelper;
 import eladkay.scanner.misc.NetworkHelper;
@@ -80,8 +81,10 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         this.currentDim = FTBLibClient.getDim();
         this.currentDimName = this.mc.theWorld.provider.getDimensionType().getName();
         this.mapButtons = new GuiBiomeScanner.MapButton[225];
-        for (int i = 0; i < this.mapButtons.length; ++i)
+        for (int i = 0; i < this.mapButtons.length; ++i) {
             this.mapButtons[i] = new GuiBiomeScanner.MapButton(0, 0, i);
+            register(this.mapButtons[i]);
+        }
 
 
     }
@@ -201,19 +204,31 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         this.refreshWidgets();
     }
 
+    List<MapButton> registered = Lists.newArrayList();
+    public void register(MapButton b) {
+        if(registered.contains(b)) return;
+        this.add(b);
+        registered.add(b);
+    }
+
     public class MapButton extends ButtonLM {
         public final ChunkDimPos chunkPos;
+        private final int index;
+        private boolean isSelected;
 
         public MapButton(int x, int y, int i) {
             super(x, y, 16, 16);
             this.posX += (double) (i % 15) * 240;
             this.posY += (double) (i / 15) * 240;
             this.chunkPos = new ChunkDimPos(GuiBiomeScanner.this.currentDim, GuiBiomeScanner.this.startX + i % 15, GuiBiomeScanner.this.startZ + i / 15);
+            index = 1;
+            isSelected = false;
         }
 
 
         @Override
         public void onClicked(@Nonnull IGui gui, @Nonnull IMouseButton button) {
+            register(this);
             if (button.isLeft()) {
                 TileEntityBiomeScanner te = (TileEntityBiomeScanner) mc.theWorld.getTileEntity(pos);
                 if (te == null) return;
@@ -238,7 +253,7 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
         @Override
         public void addMouseOverText(IGui gui, List<String> l) {
             TileEntityBiomeScanner te = (TileEntityBiomeScanner) mc.theWorld.getTileEntity(pos);
-
+            register(this);
             if (te == null) return;
             long distance = (long) (getDistanceMC(pos.getX(), chunkPos.posX * 16, pos.getZ(),
                     chunkPos.posZ * 16) / 16);
@@ -257,6 +272,22 @@ public class GuiBiomeScanner extends GuiLM implements GuiYesNoCallback {
             }
 
             l.add("{" + chunkPos.posX + ", " + chunkPos.posZ + "}");
+        }
+        @Override
+        public void renderWidget(IGui gui) {
+            int ax = this.getAX();
+            int ay = this.getAY();
+
+            if(this.isSelected || gui.isMouseOver(this)) {
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 0.27F);
+                com.feed_the_beast.ftbl.lib.gui.GuiHelper.drawBlankRect(ax, ay, 16, 16);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            }
+
+            if(!this.isSelected && GuiBiomeScanner.this.isMouseOver(this)) {
+                this.isSelected = true;
+            }
+
         }
 
 
