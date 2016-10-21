@@ -6,12 +6,7 @@ import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
 import com.feed_the_beast.ftbl.lib.MouseButton;
 import com.feed_the_beast.ftbl.lib.config.PropertyBool;
-import com.feed_the_beast.ftbl.lib.gui.ButtonLM;
-import com.feed_the_beast.ftbl.lib.gui.GuiHelper;
-import com.feed_the_beast.ftbl.lib.gui.GuiIcons;
-import com.feed_the_beast.ftbl.lib.gui.GuiLM;
-import com.feed_the_beast.ftbl.lib.gui.GuiLang;
-import com.feed_the_beast.ftbl.lib.gui.PanelLM;
+import com.feed_the_beast.ftbl.lib.gui.*;
 import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.NetworkHelper;
@@ -31,8 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class GuiBiomeScanner extends GuiLM
-{
+public class GuiBiomeScanner extends GuiLM {
     @ConfigValue(id = "enable_depth", file = "biome_scanner", client = true)
     public static final PropertyBool ENABLE_DEPTH = new PropertyBool(false);
 
@@ -41,14 +35,12 @@ public class GuiBiomeScanner extends GuiLM
     public static ThreadReloadArea thread = null;
     public static GuiBiomeScanner instance;
 
-    private class MapButton extends ButtonLM
-    {
+    private class MapButton extends ButtonLM {
         private final ChunkPos chunkPos;
         private final int index;
         private boolean isSelected = false;
 
-        private MapButton(int x, int y, int i)
-        {
+        private MapButton(int x, int y, int i) {
             super(x, y, 16, 16);
             posX += (i % BiomeScanner.TILES_GUI) * getWidth();
             posY += (i / BiomeScanner.TILES_GUI) * getHeight();
@@ -57,61 +49,63 @@ public class GuiBiomeScanner extends GuiLM
         }
 
         @Override
-        public void onClicked(IGui gui, IMouseButton button)
-        {
+        public void onClicked(IGui gui, IMouseButton button) {
+            int distance = biomeScanner.getDist(chunkPos);
+            if (biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null || biomeScanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
+                return;
+            if (biomeScanner.type == 0 && distance > 2)
+                return;
+            else if (biomeScanner.type == 1 && distance > 4)
+                return;
+            else if (biomeScanner.type == 2 && distance > 8)
+                return;
+
+            biomeScanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
+            biomeScanner.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
+            biomeScanner.markDirty();
+            NetworkHelper.instance.sendToServer(new MessageUpdateMap(biomeScanner, chunkPos.chunkXPos, chunkPos.chunkZPos));
+
             GuiHelper.playClickSound();
             currentSelectionMode = 1;
         }
 
         @Override
-        public void addMouseOverText(IGui gui, List<String> l)
-        {
+        public void addMouseOverText(IGui gui, List<String> l) {
             int distance = biomeScanner.getDist(chunkPos);
-            if(biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null)
-            {
+            if (biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null) {
                 l.add(biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos));
-            }
-            else
-            {
+                l.add("(" + chunkPos.chunkXPos + ", " + chunkPos.chunkZPos + ")");
+            } else {
                 l.add("???");
                 l.add("Click to scan!");
                 l.add("Power cost: " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
                 l.add("Distance (chunks): " + distance);
-                if(biomeScanner.type == 0 && distance > 2)
-                {
+                if (biomeScanner.type == 0 && distance > 2) {
                     l.add("Basic Biome Scanner cannot scan chunks more than 2 chunks away!");
-                }
-                else if(biomeScanner.type == 1 && distance > 4)
-                {
+                } else if (biomeScanner.type == 1 && distance > 4) {
                     l.add("Advanced Biome Scanner cannot scan chunks more than 4 chunks away!");
-                }
-                else if(biomeScanner.type == 2 && distance > 8)
-                {
+                } else if (biomeScanner.type == 2 && distance > 8) {
                     l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
                 }
             }
 
-            if(GuiScreen.isCtrlKeyDown())
-            {
+            if (GuiScreen.isCtrlKeyDown()) {
                 l.add(chunkPos.toString());
             }
         }
 
         @Override
-        public void renderWidget(IGui gui)
-        {
+        public void renderWidget(IGui gui) {
             int ax = getAX();
             int ay = getAY();
 
-            if(isSelected || gui.isMouseOver(this))
-            {
+            if (isSelected || gui.isMouseOver(this)) {
                 GlStateManager.color(1F, 1F, 1F, 0.27F);
                 GuiHelper.drawBlankRect(ax, ay, 16, 16);
                 GlStateManager.color(1F, 1F, 1F, 1F);
             }
 
-            if(!isSelected && currentSelectionMode != -1 && isMouseOver(this))
-            {
+            if (!isSelected && currentSelectionMode != -1 && isMouseOver(this)) {
                 isSelected = true;
             }
         }
@@ -124,8 +118,7 @@ public class GuiBiomeScanner extends GuiLM
     private byte currentSelectionMode = -1;
     private final TileEntityBiomeScanner biomeScanner;
 
-    public GuiBiomeScanner(TileEntityBiomeScanner scanner)
-    {
+    public GuiBiomeScanner(TileEntityBiomeScanner scanner) {
         super(BiomeScanner.TILES_GUI * 16, BiomeScanner.TILES_GUI * 16);
 
         biomeScanner = scanner;
@@ -133,23 +126,18 @@ public class GuiBiomeScanner extends GuiLM
         startX = MathHelperLM.chunk(mc.thePlayer.posX) - 7;
         startZ = MathHelperLM.chunk(mc.thePlayer.posZ) - 7;
 
-        buttonClose = new ButtonLM(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate())
-        {
+        buttonClose = new ButtonLM(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate()) {
             @Override
-            public void onClicked(IGui gui, IMouseButton button)
-            {
+            public void onClicked(IGui gui, IMouseButton button) {
                 GuiHelper.playClickSound();
                 closeGui();
             }
         };
 
-        buttonRefresh = new ButtonLM(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate())
-        {
+        buttonRefresh = new ButtonLM(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate()) {
             @Override
-            public void onClicked(IGui gui, IMouseButton button)
-            {
-                if(thread != null)
-                {
+            public void onClicked(IGui gui, IMouseButton button) {
+                if (thread != null) {
                     thread.cancelled = true;
                     thread = null;
                 }
@@ -159,11 +147,9 @@ public class GuiBiomeScanner extends GuiLM
             }
         };
 
-        buttonDepth = new ButtonLM(0, 32, 16, 16)
-        {
+        buttonDepth = new ButtonLM(0, 32, 16, 16) {
             @Override
-            public void onClicked(IGui gui, IMouseButton button)
-            {
+            public void onClicked(IGui gui, IMouseButton button) {
                 ENABLE_DEPTH.setBoolean(!ENABLE_DEPTH.getBoolean());
                 buttonRefresh.onClicked(gui, button);
             }
@@ -171,11 +157,9 @@ public class GuiBiomeScanner extends GuiLM
 
         buttonDepth.setTitle("Map Depth"); //TODO: Lang
 
-        panelButtons = new PanelLM(0, 0, 16, 0)
-        {
+        panelButtons = new PanelLM(0, 0, 16, 0) {
             @Override
-            public void addWidgets()
-            {
+            public void addWidgets() {
                 add(buttonClose);
                 add(buttonRefresh);
                 add(buttonDepth);
@@ -184,37 +168,31 @@ public class GuiBiomeScanner extends GuiLM
             }
 
             @Override
-            public int getAX()
-            {
+            public int getAX() {
                 return getScreenWidth() - 16;
             }
 
             @Override
-            public int getAY()
-            {
+            public int getAY() {
                 return 0;
             }
         };
 
         mapButtons = new MapButton[BiomeScanner.TILES_GUI * BiomeScanner.TILES_GUI];
 
-        for(int i = 0; i < mapButtons.length; i++)
-        {
+        for (int i = 0; i < mapButtons.length; i++) {
             mapButtons[i] = new MapButton(0, 0, i);
         }
     }
 
     @Override
-    public void onInit()
-    {
+    public void onInit() {
         buttonRefresh.onClicked(this, MouseButton.LEFT);
     }
 
     @Override
-    public void addWidgets()
-    {
-        for(MapButton b : mapButtons)
-        {
+    public void addWidgets() {
+        for (MapButton b : mapButtons) {
             add(b);
         }
 
@@ -222,17 +200,14 @@ public class GuiBiomeScanner extends GuiLM
     }
 
     @Override
-    public void drawBackground()
-    {
+    public void drawBackground() {
         super.drawBackground();
 
-        if(textureID == -1)
-        {
+        if (textureID == -1) {
             textureID = TextureUtil.glGenTextures();
         }
 
-        if(pixelBuffer != null)
-        {
+        if (pixelBuffer != null) {
             //boolean hasBlur = false;
             //int filter = hasBlur ? GL11.GL_LINEAR : GL11.GL_NEAREST;
             GlStateManager.bindTexture(textureID);
@@ -250,8 +225,7 @@ public class GuiBiomeScanner extends GuiLM
         //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
-        if(thread == null)
-        {
+        if (thread == null) {
             GlStateManager.bindTexture(textureID);
             GuiHelper.drawTexturedRect(posX, posY, BiomeScanner.TILES_GUI * 16, BiomeScanner.TILES_GUI * 16, 0D, 0D, BiomeScanner.UV, BiomeScanner.UV);
         }
@@ -260,8 +234,7 @@ public class GuiBiomeScanner extends GuiLM
         GlStateManager.enableTexture2D();
         FTBLibClient.setTexture(BiomeScanner.TEX_CHUNK_CLAIMING);
 
-        for(MapButton mapButton : mapButtons)
-        {
+        for (MapButton mapButton : mapButtons) {
             mapButton.renderWidget(this);
         }
 
@@ -277,14 +250,12 @@ public class GuiBiomeScanner extends GuiLM
         int gridX = mapButtons[0].getAX();
         int gridY = mapButtons[0].getAY();
 
-        for(int x = 0; x <= BiomeScanner.TILES_GUI; x++)
-        {
+        for (int x = 0; x <= BiomeScanner.TILES_GUI; x++) {
             buffer.pos(gridX + x * 16, gridY, 0D).color(gridR, gridG, gridB, gridA).endVertex();
             buffer.pos(gridX + x * 16, gridY + BiomeScanner.TILES_GUI * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
         }
 
-        for(int y = 0; y <= BiomeScanner.TILES_GUI; y++)
-        {
+        for (int y = 0; y <= BiomeScanner.TILES_GUI; y++) {
             buffer.pos(gridX, gridY + y * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
             buffer.pos(gridX + BiomeScanner.TILES_GUI * 16, gridY + y * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
         }
@@ -295,20 +266,19 @@ public class GuiBiomeScanner extends GuiLM
         int cx = MathHelperLM.chunk(mc.thePlayer.posX);
         int cy = MathHelperLM.chunk(mc.thePlayer.posZ);
 
-        if(cx >= startX && cy >= startZ && cx < startX + BiomeScanner.TILES_GUI && cy < startZ + BiomeScanner.TILES_GUI)
-        {
+        if (cx >= startX && cy >= startZ && cx < startX + BiomeScanner.TILES_GUI && cy < startZ + BiomeScanner.TILES_GUI) {
             double x = ((cx - startX) * 16D + MathHelperLM.wrap(mc.thePlayer.posX, 16D));
             double y = ((cy - startZ) * 16D + MathHelperLM.wrap(mc.thePlayer.posZ, 16D));
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(posX + x, posY + y, 0D);
-            GlStateManager.pushMatrix();
+            /*GlStateManager.pushMatrix();
             //GlStateManager.rotate((int)((ep.rotationYaw + 180F) / (180F / 8F)) * (180F / 8F), 0F, 0F, 1F);
             GlStateManager.rotate(mc.thePlayer.rotationYaw + 180F, 0F, 0F, 1F);
             FTBLibClient.setTexture(BiomeScanner.TEX_ENTITY);
             GlStateManager.color(1F, 1F, 1F, mc.thePlayer.isSneaking() ? 0.4F : 0.7F);
             GuiHelper.drawTexturedRect(-8, -8, 16, 16, 0D, 0D, 1D, 1D);
-            GlStateManager.popMatrix();
+            GlStateManager.popMatrix();*/
             GuiHelper.drawPlayerHead(mc.thePlayer.getName(), -2, -2, 4, 4);
             GlStateManager.popMatrix();
         }
@@ -321,43 +291,15 @@ public class GuiBiomeScanner extends GuiLM
     }
 
     @Override
-    public void mouseReleased(IGui gui)
-    {
+    public void mouseReleased(IGui gui) {
         super.mouseReleased(gui);
 
-        if(currentSelectionMode != -1)
-        {
+        if (currentSelectionMode != -1) {
             Collection<ChunkPos> c = new ArrayList<>();
 
-            for(ChunkPos chunkPos : c)
-            {
-                int distance = biomeScanner.getDist(chunkPos);
-                if(biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null || biomeScanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
-                {
-                    return;
-                }
-                if(biomeScanner.type == 0 && distance > 2)
-                {
-                    return;
-                }
-                else if(biomeScanner.type == 1 && distance > 4)
-                {
-                    return;
-                }
-                else if(biomeScanner.type == 2 && distance > 8)
-                {
-                    return;
-                }
-                biomeScanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
-                biomeScanner.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
-                biomeScanner.markDirty();
-                NetworkHelper.instance.sendToServer(new MessageUpdateMap(biomeScanner, chunkPos.chunkXPos, chunkPos.chunkZPos));
-            }
 
-            for(MapButton b : mapButtons)
-            {
-                if(b.isSelected)
-                {
+            for (MapButton b : mapButtons) {
+                if (b.isSelected) {
                     c.add(b.chunkPos);
                     b.isSelected = false;
                 }
@@ -369,8 +311,7 @@ public class GuiBiomeScanner extends GuiLM
     }
 
     @Override
-    public void drawForeground()
-    {
+    public void drawForeground() {
         super.drawForeground();
     }
 }

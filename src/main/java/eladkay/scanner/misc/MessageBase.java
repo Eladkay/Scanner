@@ -1,6 +1,5 @@
 package eladkay.scanner.misc;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -14,7 +13,7 @@ public abstract class MessageBase<REQ extends IMessage> implements IMessage, IMe
         if (ctx.side == Side.SERVER)
             handleServerSide(message, ctx.getServerHandler().playerEntity);
         else
-            handleClientSide(message, Minecraft.getMinecraft().thePlayer); //safe because it runs on the client
+            handleClientSide(message, null); //safe because it runs on the client
 
         return null;
     }

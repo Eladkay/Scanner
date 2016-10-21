@@ -31,8 +31,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     }
 
     public void onBlockActivated(EntityPlayer player) {
-        if (worldObj.isRemote)
-            new GuiBiomeScanner(this).openGui();
+        ScannerMod.proxy.openGuiBiomeScanner(this);
     }
 
     public String toJson() {
@@ -98,8 +97,8 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public int getDist(ChunkPos chunkPos)
     {
-        double d0 = MathHelperLM.unchunk(pos.getX()) - chunkPos.chunkXPos;
-        double d1 = MathHelperLM.unchunk(pos.getZ()) - chunkPos.chunkZPos;
+        double d0 = pos.getX() - MathHelperLM.unchunk(chunkPos.chunkXPos);
+        double d1 = pos.getZ() - MathHelperLM.unchunk(chunkPos.chunkZPos);
         return (int) (MathHelper.sqrt_double(d0 * d0 + d1 * d1) / 16D);
     }
 }
