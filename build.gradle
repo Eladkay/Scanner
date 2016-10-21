@@ -14,13 +14,13 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.2"
-group= "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "scanner"
 
 minecraft {
     version = "1.10.2-12.18.1.2092"
     runDir = "run"
-    
+
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
     // stable_#            stables are built at the discretion of the MCP team.
@@ -31,35 +31,25 @@ minecraft {
 }
 
 repositories {
-
-    maven {
-
-        url 'http://maven.epoxide.xyz'
-    }
-}
-repositories {
-    maven {
-        url "http://mobiusstrip.eu/maven"
-    }
-    maven {
-        url "http://chickenbones.net/maven/"
-    }
+    maven { url "https://jitpack.io" }
+    maven { url "http://maven.epoxide.xyz" }
+    maven { url "http://mobiusstrip.eu/maven" }
+    maven { url "http://chickenbones.net/maven/" }
 }
 
 dependencies {
-    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4" 
+    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
     compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22:universal"
+    compile "com.github.LatvianModder:FTBLib:api-1.0"
 }
 
 apply plugin: 'java'
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = targetCompatibility = '1.8'
 }
 
-processResources
-{
+processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -67,11 +57,11 @@ processResources
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'

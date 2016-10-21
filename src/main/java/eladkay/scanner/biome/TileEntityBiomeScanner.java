@@ -1,5 +1,6 @@
 package eladkay.scanner.biome;
 
+import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import com.google.gson.Gson;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
@@ -10,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -30,7 +32,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public void onBlockActivated(EntityPlayer player) {
         if (worldObj.isRemote)
-            new GuiBiomeScanner(0, pos, type).openGui();
+            new GuiBiomeScanner(this).openGui();
     }
 
     public String toJson() {
@@ -92,5 +94,12 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     public void update() {
         Block block = worldObj.getBlockState(pos).getBlock();
         this.type = block == ScannerMod.biomeScannerBasic ? 0 : block == ScannerMod.biomeScannerAdv ? 1 : block == ScannerMod.biomeScannerElite ? 2 : 3;
+    }
+
+    public int getDist(ChunkPos chunkPos)
+    {
+        double d0 = MathHelperLM.unchunk(pos.getX()) - chunkPos.chunkXPos;
+        double d1 = MathHelperLM.unchunk(pos.getZ()) - chunkPos.chunkZPos;
+        return (int) (MathHelper.sqrt_double(d0 * d0 + d1 * d1) / 16D);
     }
 }
