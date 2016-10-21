@@ -26,6 +26,15 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
         super(Config.maxEnergyBufferBiome);
     }
 
+    private static String serialize(ChunkPos pos) {
+        return pos.chunkXPos + "/" + pos.chunkZPos;
+    }
+
+    public static ChunkPos deserialize(String s) {
+        String[] split = s.split("/");
+        return new ChunkPos(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
+    }
+
     BaseEnergyContainer container() {
         return container;
     }
@@ -40,15 +49,6 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
         for (Map.Entry<ChunkPos, String> entry : mapping.entrySet())
             ret.put(serialize(entry.getKey()), entry.getValue());
         return gson.toJson(ret);
-    }
-
-    private static String serialize(ChunkPos pos) {
-        return pos.chunkXPos + "/" + pos.chunkZPos;
-    }
-
-    public static ChunkPos deserialize(String s) {
-        String[] split = s.split("/");
-        return new ChunkPos(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
     }
 
     @Override
@@ -95,8 +95,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
         this.type = block == ScannerMod.biomeScannerBasic ? 0 : block == ScannerMod.biomeScannerAdv ? 1 : block == ScannerMod.biomeScannerElite ? 2 : 3;
     }
 
-    public int getDist(ChunkPos chunkPos)
-    {
+    public int getDist(ChunkPos chunkPos) {
         double d0 = pos.getX() - MathHelperLM.unchunk(chunkPos.chunkXPos);
         double d1 = pos.getZ() - MathHelperLM.unchunk(chunkPos.chunkZPos);
         return (int) (MathHelper.sqrt_double(d0 * d0 + d1 * d1) / 16D);

@@ -52,7 +52,7 @@ public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
 
     @Override
     public void handleServerSide(MessageUpdateMap message, EntityPlayer player) {
-        
+
         TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
         ChunkPos chunkPos = new ChunkPos(message.chunkX, message.chunkY);
         int powerCost = Config.minEnergyPerChunkBiomeScanner * Config.increase * bs.getDist(chunkPos);

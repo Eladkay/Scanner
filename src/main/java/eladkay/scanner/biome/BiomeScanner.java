@@ -7,8 +7,7 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Created by LatvianModder on 29.09.2016.
  */
-public class BiomeScanner
-{
+public class BiomeScanner {
     public static final int TILES_TEX = 16;
     public static final int TILES_GUI = 15;
     public static final int TILES_GUI_HALF = TILES_GUI / 2;

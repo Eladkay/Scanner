@@ -29,95 +29,16 @@ import java.util.List;
 public class GuiBiomeScanner extends GuiLM {
     @ConfigValue(id = "enable_depth", file = "biome_scanner", client = true)
     public static final PropertyBool ENABLE_DEPTH = new PropertyBool(false);
-
-    static ByteBuffer pixelBuffer = null;
-    private static int textureID = -1;
     public static ThreadReloadArea thread = null;
     public static GuiBiomeScanner instance;
-
-    private class MapButton extends ButtonLM {
-        private final ChunkPos chunkPos;
-        private final int index;
-        private boolean isSelected = false;
-
-        private MapButton(int x, int y, int i) {
-            super(x, y, 16, 16);
-            posX += (i % BiomeScanner.TILES_GUI) * getWidth();
-            posY += (i / BiomeScanner.TILES_GUI) * getHeight();
-            chunkPos = new ChunkPos(startX + (i % BiomeScanner.TILES_GUI), startZ + (i / BiomeScanner.TILES_GUI));
-            index = i;
-        }
-
-        @Override
-        public void onClicked(IGui gui, IMouseButton button) {
-            int distance = biomeScanner.getDist(chunkPos);
-            if (biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null || biomeScanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
-                return;
-            if (biomeScanner.type == 0 && distance > 2)
-                return;
-            else if (biomeScanner.type == 1 && distance > 4)
-                return;
-            else if (biomeScanner.type == 2 && distance > 8)
-                return;
-
-            biomeScanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
-            biomeScanner.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
-            biomeScanner.markDirty();
-            NetworkHelper.instance.sendToServer(new MessageUpdateMap(biomeScanner, chunkPos.chunkXPos, chunkPos.chunkZPos));
-
-            GuiHelper.playClickSound();
-            currentSelectionMode = 1;
-        }
-
-        @Override
-        public void addMouseOverText(IGui gui, List<String> l) {
-            int distance = biomeScanner.getDist(chunkPos);
-            if (biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null) {
-                l.add(biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos));
-                l.add("(" + chunkPos.chunkXPos + ", " + chunkPos.chunkZPos + ")");
-            } else {
-                l.add("???");
-                l.add("Click to scan!");
-                l.add("Power cost: " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
-                l.add("Distance (chunks): " + distance);
-                if (biomeScanner.type == 0 && distance > 2) {
-                    l.add("Basic Biome Scanner cannot scan chunks more than 2 chunks away!");
-                } else if (biomeScanner.type == 1 && distance > 4) {
-                    l.add("Advanced Biome Scanner cannot scan chunks more than 4 chunks away!");
-                } else if (biomeScanner.type == 2 && distance > 8) {
-                    l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
-                }
-            }
-
-            if (GuiScreen.isCtrlKeyDown()) {
-                l.add(chunkPos.toString());
-            }
-        }
-
-        @Override
-        public void renderWidget(IGui gui) {
-            int ax = getAX();
-            int ay = getAY();
-
-            if (isSelected || gui.isMouseOver(this)) {
-                GlStateManager.color(1F, 1F, 1F, 0.27F);
-                GuiHelper.drawBlankRect(ax, ay, 16, 16);
-                GlStateManager.color(1F, 1F, 1F, 1F);
-            }
-
-            if (!isSelected && currentSelectionMode != -1 && isMouseOver(this)) {
-                isSelected = true;
-            }
-        }
-    }
-
+    static ByteBuffer pixelBuffer = null;
+    private static int textureID = -1;
     public final int startX, startZ;
     private final ButtonLM buttonRefresh, buttonClose, buttonDepth;
     private final MapButton mapButtons[];
     private final PanelLM panelButtons;
-    private byte currentSelectionMode = -1;
     private final TileEntityBiomeScanner biomeScanner;
-
+    private byte currentSelectionMode = -1;
     public GuiBiomeScanner(TileEntityBiomeScanner scanner) {
         super(BiomeScanner.TILES_GUI * 16, BiomeScanner.TILES_GUI * 16);
 
@@ -313,5 +234,81 @@ public class GuiBiomeScanner extends GuiLM {
     @Override
     public void drawForeground() {
         super.drawForeground();
+    }
+
+    private class MapButton extends ButtonLM {
+        private final ChunkPos chunkPos;
+        private final int index;
+        private boolean isSelected = false;
+
+        private MapButton(int x, int y, int i) {
+            super(x, y, 16, 16);
+            posX += (i % BiomeScanner.TILES_GUI) * getWidth();
+            posY += (i / BiomeScanner.TILES_GUI) * getHeight();
+            chunkPos = new ChunkPos(startX + (i % BiomeScanner.TILES_GUI), startZ + (i / BiomeScanner.TILES_GUI));
+            index = i;
+        }
+
+        @Override
+        public void onClicked(IGui gui, IMouseButton button) {
+            int distance = biomeScanner.getDist(chunkPos);
+            if (biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null || biomeScanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
+                return;
+            if (biomeScanner.type == 0 && distance > 2)
+                return;
+            else if (biomeScanner.type == 1 && distance > 4)
+                return;
+            else if (biomeScanner.type == 2 && distance > 8)
+                return;
+
+            biomeScanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
+            biomeScanner.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
+            biomeScanner.markDirty();
+            NetworkHelper.instance.sendToServer(new MessageUpdateMap(biomeScanner, chunkPos.chunkXPos, chunkPos.chunkZPos));
+
+            GuiHelper.playClickSound();
+            currentSelectionMode = 1;
+        }
+
+        @Override
+        public void addMouseOverText(IGui gui, List<String> l) {
+            int distance = biomeScanner.getDist(chunkPos);
+            if (biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null) {
+                l.add(biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos));
+                l.add("(" + chunkPos.chunkXPos + ", " + chunkPos.chunkZPos + ")");
+            } else {
+                l.add("???");
+                l.add("Click to scan!");
+                l.add("Power cost: " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
+                l.add("Distance (chunks): " + distance);
+                if (biomeScanner.type == 0 && distance > 2) {
+                    l.add("Basic Biome Scanner cannot scan chunks more than 2 chunks away!");
+                } else if (biomeScanner.type == 1 && distance > 4) {
+                    l.add("Advanced Biome Scanner cannot scan chunks more than 4 chunks away!");
+                } else if (biomeScanner.type == 2 && distance > 8) {
+                    l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
+                }
+            }
+
+            if (GuiScreen.isCtrlKeyDown()) {
+                l.add(chunkPos.toString());
+            }
+        }
+
+        @Override
+        public void renderWidget(IGui gui) {
+            int ax = getAX();
+            int ay = getAY();
+
+            if (isSelected || gui.isMouseOver(this)) {
+                GlStateManager.color(1F, 1F, 1F, 0.27F);
+                GuiHelper.drawBlankRect(ax, ay, 16, 16);
+                GlStateManager.color(1F, 1F, 1F, 1F);
+            }
+
+            if (!isSelected && currentSelectionMode != -1 && isMouseOver(this)) {
+                isSelected = true;
+            }
+        }
     }
 }

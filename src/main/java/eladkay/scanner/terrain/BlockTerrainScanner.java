@@ -25,6 +25,8 @@ import javax.annotation.Nullable;
 import static eladkay.scanner.ScannerMod.tab;
 
 public class BlockTerrainScanner extends Block implements ITileEntityProvider {
+    public static PropertyBool ONOFF = PropertyBool.create("state");
+
     public BlockTerrainScanner() {
         super(Material.IRON);
         setRegistryName(ScannerMod.MODID + ":terrainScanner");
@@ -93,9 +95,6 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         return ((TileEntityTerrainScanner) worldIn.getTileEntity(pos)).on ? state.withProperty(ONOFF, true) : state.withProperty(ONOFF, false);
     }
-
-    public static PropertyBool ONOFF = PropertyBool.create("state");
-
 
     @Override
     public int getMetaFromState(IBlockState state) {

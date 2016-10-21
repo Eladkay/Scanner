@@ -30,6 +30,10 @@ public class Oregistry {
     }
 
     public static class Entry {
+        public IBlockState ore;
+        public int rarity;
+        public int maxY;
+        public int minY;
         public Entry(IBlockState ore, int rarity, int maxY, int minY) {
             this.ore = ore;
             this.rarity = rarity;
@@ -46,11 +50,6 @@ public class Oregistry {
                     ", minY=" + minY +
                     '}';
         }
-
-        public IBlockState ore;
-        public int rarity;
-        public int maxY;
-        public int minY;
     }
 
 }
