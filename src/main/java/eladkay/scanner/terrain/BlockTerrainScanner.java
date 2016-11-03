@@ -52,7 +52,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         BlockPos start = pos.east().down(pos.getY());
         for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
             IBlockState state = worldIn.getBlockState(p);
-            if (state.getBlock() == ScannerMod.air)
+            if (state.getBlock().isAir(state, worldIn, p))
                 worldIn.setBlockState(p, Blocks.AIR.getDefaultState());
         }
         super.breakBlock(worldIn, pos, bs);
@@ -63,7 +63,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         BlockPos start = pos.east().down(pos.getY());
         for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
             IBlockState state = worldIn.getBlockState(p);
-            if (state.getBlock() == ScannerMod.air)
+            if (state.getBlock().isAir(state, worldIn, p))
                 worldIn.setBlockState(p, Blocks.AIR.getDefaultState());
         }
     }
@@ -73,8 +73,8 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         if (Config.showOutline) {
             BlockPos start = pos.east().down(pos.getY());
             for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
-                IBlockState state = worldObj.getBlockState(pos);
-                if (state.getBlock().isReplaceable(worldObj, p) || state.getBlock().isAir(state, worldObj, p))
+                IBlockState state = worldObj.getBlockState(p);
+                if (state.getBlock() == Blocks.AIR)
                     worldObj.setBlockState(p, ScannerMod.air.getDefaultState());
             }
         }

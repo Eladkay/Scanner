@@ -1,5 +1,7 @@
 {
   "variants": {
-    "normal": { "model": "scanner:biomeScanner" }
+    "normal": {
+      "model": "scanner:biomeScannerUltimate"
+    }
   }
 }
