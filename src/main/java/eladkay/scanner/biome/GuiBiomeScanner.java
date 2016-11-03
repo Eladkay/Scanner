@@ -1,12 +1,14 @@
 package eladkay.scanner.biome;
 
-import com.feed_the_beast.ftbl.api.client.FTBLibClient;
-import com.feed_the_beast.ftbl.api.config.ConfigValue;
 import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
 import com.feed_the_beast.ftbl.lib.MouseButton;
-import com.feed_the_beast.ftbl.lib.config.PropertyBool;
-import com.feed_the_beast.ftbl.lib.gui.*;
+import com.feed_the_beast.ftbl.lib.gui.ButtonLM;
+import com.feed_the_beast.ftbl.lib.gui.GuiHelper;
+import com.feed_the_beast.ftbl.lib.gui.GuiIcons;
+import com.feed_the_beast.ftbl.lib.gui.GuiLM;
+import com.feed_the_beast.ftbl.lib.gui.GuiLang;
+import com.feed_the_beast.ftbl.lib.gui.PanelLM;
 import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.NetworkHelper;
@@ -27,8 +29,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class GuiBiomeScanner extends GuiLM {
-    @ConfigValue(id = "enable_depth", file = "biome_scanner", client = true)
-    public static final PropertyBool ENABLE_DEPTH = new PropertyBool(false);
     public static ThreadReloadArea thread = null;
     public static GuiBiomeScanner instance;
     static ByteBuffer pixelBuffer = null;
@@ -71,7 +71,7 @@ public class GuiBiomeScanner extends GuiLM {
         buttonDepth = new ButtonLM(0, 32, 16, 16) {
             @Override
             public void onClicked(IGui gui, IMouseButton button) {
-                ENABLE_DEPTH.setBoolean(!ENABLE_DEPTH.getBoolean());
+                BiomeScanner.ENABLE_DEPTH.setBoolean(!BiomeScanner.ENABLE_DEPTH.getBoolean());
                 buttonRefresh.onClicked(gui, button);
             }
         };
@@ -153,7 +153,6 @@ public class GuiBiomeScanner extends GuiLM {
 
         GlStateManager.color(1F, 1F, 1F, 1F);
         GlStateManager.enableTexture2D();
-        FTBLibClient.setTexture(BiomeScanner.TEX_CHUNK_CLAIMING);
 
         for (MapButton mapButton : mapButtons) {
             mapButton.renderWidget(this);
@@ -208,7 +207,7 @@ public class GuiBiomeScanner extends GuiLM {
 
         buttonRefresh.render(GuiIcons.REFRESH);
         buttonClose.render(GuiIcons.ACCEPT);
-        buttonDepth.render(ENABLE_DEPTH.getBoolean() ? GuiIcons.ACCEPT : GuiIcons.ACCEPT_GRAY);
+        buttonDepth.render(BiomeScanner.ENABLE_DEPTH.getBoolean() ? GuiIcons.ACCEPT : GuiIcons.ACCEPT_GRAY);
     }
 
     @Override

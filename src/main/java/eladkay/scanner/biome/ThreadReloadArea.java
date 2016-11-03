@@ -125,7 +125,7 @@ public class ThreadReloadArea extends Thread {
 
         Chunk chunk;
         int cx, cz, x, z, wx, wz, by, color, topY;
-        boolean depth = GuiBiomeScanner.ENABLE_DEPTH.getBoolean();
+        boolean depth = BiomeScanner.ENABLE_DEPTH.getBoolean();
 
         int startY = Minecraft.getMinecraft().thePlayer.getPosition().getY();
 

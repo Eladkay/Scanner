@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = ScannerMod.MODID, name = "Scanner", dependencies = "required-after:ftbl;after:MineTweaker3;required-after:EnderIO", version = "1.2.7")
+@Mod(modid = ScannerMod.MODID, name = "Scanner", dependencies = "required-after:ftbl;after:MineTweaker3", version = "1.2.7")
 public class ScannerMod {
     public static final String MODID = "scanner";
 
