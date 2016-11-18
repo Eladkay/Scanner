@@ -18,7 +18,7 @@ group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-co
 archivesBaseName = "scanner"
 
 minecraft {
-    version = "1.10.2-12.18.1.2092"
+    version = "1.10.2-12.18.2.2123"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -56,7 +56,7 @@ repositories {
 
 dependencies {
     compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    compile "LatMod:FTBLib:1.10.2-3.1.3:api"
+    compile "LatMod:FTBLib:1.10.2-3.2.0:api"
     compile "LatMod:RedstoneFlux:1.2.0"
     compile "CraftTweaker:CraftTweaker:1.10.2-3.0.13"
     //compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22:universal"
