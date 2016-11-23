@@ -16,7 +16,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     public BaseTE(int max) {
         this.max = max;
-        this.container = new BaseEnergyContainer(max, max, max);
+        this.container = new BaseEnergyContainer(max, max, max, this);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        this.container = new BaseEnergyContainer(nbt.getCompoundTag("TeslaContainer"));
+        this.container = new BaseEnergyContainer(nbt.getCompoundTag("TeslaContainer"), this);
 
     }
 

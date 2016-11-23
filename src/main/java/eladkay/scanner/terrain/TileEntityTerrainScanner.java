@@ -61,8 +61,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         on = state;
         NBTTagCompound tag = new NBTTagCompound();
         writeToNBT(tag);
-        worldObj.setBlockState(pos, worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state));
-        worldObj.getTileEntity(pos).readFromNBT(tag);
+        /*worldObj.setBlockState(pos, worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state));
+        worldObj.getTileEntity(pos).readFromNBT(tag);*/
         markDirty();
         worldObj.markAndNotifyBlock(pos, worldObj.getChunkFromBlockCoords(pos), worldObj.getBlockState(pos), worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state), 4);
         worldObj.notifyBlockUpdate(pos, worldObj.getBlockState(pos), worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state), 3);

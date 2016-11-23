@@ -5,6 +5,7 @@ import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import cofh.api.energy.IEnergyStorage;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -15,6 +16,7 @@ import net.minecraftforge.common.util.INBTSerializable;
  */
 public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IEnergyStorage, INBTSerializable<NBTTagCompound>, net.minecraftforge.energy.IEnergyStorage {
 
+    private final TileEntity te;
     /**
      * The amount of stored Tesla power.
      */
@@ -40,20 +42,20 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * will not set the amount of stored power. These values are arbitrary and should not be
      * taken as a base line for balancing.
      */
-    public BaseEnergyContainer() {
+    public BaseEnergyContainer(TileEntity tileEntity) {
 
-        this(5000, 50, 50);
+        this(5000, 50, 50, tileEntity);
     }
 
     /**
      * Constructor for setting the basic values. Will not construct with any stored power.
-     *
-     * @param capacity The maximum amount of Tesla power that the container should hold.
+     *  @param capacity The maximum amount of Tesla power that the container should hold.
      * @param input    The maximum rate of power that can be accepted at a time.
      * @param output   The maximum rate of power that can be extracted at a time.
+     * @param te
      */
-    public BaseEnergyContainer(long capacity, long input, long output) {
-        this(0, capacity, input, output);
+    public BaseEnergyContainer(long capacity, long input, long output, TileEntity tileEntity) {
+        this(0, capacity, input, output, tileEntity);
     }
 
     /**
@@ -64,12 +66,13 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * @param input    The maximum rate of power that can be accepted at a time.
      * @param output   The maximum rate of power that can be extracted at a time.
      */
-    public BaseEnergyContainer(long power, long capacity, long input, long output) {
+    public BaseEnergyContainer(long power, long capacity, long input, long output, TileEntity tileEntity) {
 
         this.stored = power;
         this.capacity = capacity;
         this.inputRate = input;
         this.outputRate = output;
+        this.te = tileEntity;
     }
 
     /**
@@ -79,8 +82,10 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
      * it has been written on the compound tag.
      *
      * @param dataTag The NBTCompoundTag to read the important data from.
+     * @param te
      */
-    public BaseEnergyContainer(NBTTagCompound dataTag) {
+    public BaseEnergyContainer(NBTTagCompound dataTag, TileEntity te) {
+        this.te = te;
 
         this.deserializeNBT(dataTag);
     }
@@ -201,7 +206,8 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
 
         if (!simulate)
             this.stored -= removedPower;
-        return maxExtract;
+        te.markDirty();
+        return (int) removedPower;
     }
 
     @Override
@@ -211,8 +217,8 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
 
         if (!simulate)
             this.stored += acceptedTesla;
-
-        return maxReceive;
+        te.markDirty();
+        return (int) acceptedTesla;
     }
 
     @Override
