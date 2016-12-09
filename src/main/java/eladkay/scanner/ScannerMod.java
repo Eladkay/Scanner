@@ -20,6 +20,8 @@ import net.minecraft.util.ITickable;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.ChunkProviderEnd;
+import net.minecraft.world.gen.ChunkProviderHell;
 import net.minecraft.world.gen.ChunkProviderOverworld;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Mod;
@@ -36,7 +38,9 @@ public class ScannerMod {
     @SidedProxy(serverSide = "eladkay.scanner.proxy.CommonProxy", clientSide = "eladkay.scanner.proxy.ClientProxy")
     public static CommonProxy proxy;
 
-    public static DimensionType dim;
+    public static DimensionType dimOverWorld;
+    public static DimensionType dimNether;
+    public static DimensionType dimEnd;
     public static BlockTerrainScanner terrainScanner;
     public static BlockBiomeScanner biomeScannerBasic;
     public static BlockBiomeScanner biomeScannerAdv;
@@ -82,8 +86,12 @@ public class ScannerMod {
         MineTweaker.init();
         proxy.init();
         Config.initConfig(event.getSuggestedConfigurationFile());
-        dim = DimensionType.register("fakeoverworld", "", Config.dimid, WorldProviderOverworld.class, true);
-        DimensionManager.registerDimension(Config.dimid, dim);
+        dimOverWorld = DimensionType.register("fakeoverworld", "", Config.dimid, WorldProviderOverworld.class, true);
+        DimensionManager.registerDimension(Config.dimid, dimOverWorld);
+        dimNether = DimensionType.register("fakenether", "", Config.dimid + 1, WorldProviderNether.class, true);
+        DimensionManager.registerDimension(Config.dimid + 1, dimNether);
+        dimEnd = DimensionType.register("fakeend", "", Config.dimid + 2, WorldProviderEnd.class, true);
+        DimensionManager.registerDimension(Config.dimid + 2, dimEnd);
         NetworkHelper.init();
     }
 
@@ -97,12 +105,38 @@ public class ScannerMod {
 
         @Override
         public DimensionType getDimensionType() {
-            return dim;
+            return dimOverWorld;
         }
 
         @Override
         public IChunkGenerator createChunkGenerator() {
             return new ChunkProviderOverworld(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), TileEntityTerrainScanner.PRESET);
+        }
+    }
+
+    public static class WorldProviderNether extends WorldProvider {
+
+        @Override
+        public DimensionType getDimensionType() {
+            return dimNether;
+        }
+
+        @Override
+        public IChunkGenerator createChunkGenerator() {
+            return new ChunkProviderHell(worldObj, worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getSeed());
+        }
+    }
+
+    public static class WorldProviderEnd extends WorldProvider {
+
+        @Override
+        public DimensionType getDimensionType() {
+            return dimEnd;
+        }
+
+        @Override
+        public IChunkGenerator createChunkGenerator() {
+            return new ChunkProviderEnd(worldObj, worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getSeed());
         }
     }
 
@@ -154,9 +188,9 @@ public class ScannerMod {
         public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
             if (args.length != 1) return;
             if ("homepls".equals(args[0]))
-                getCommandSenderAsPlayer(sender).dimension = 0;
-            else if ("offwego".equals(args[0]))
-                getCommandSenderAsPlayer(sender).dimension = Config.dimid;
+                getCommandSenderAsPlayer(sender).changeDimension(0);
+            else if (args[0].contains("offwego"))
+                getCommandSenderAsPlayer(sender).changeDimension(Integer.parseInt(args[0].replace("offwego", "")));
 
         }
     }

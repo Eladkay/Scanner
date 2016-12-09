@@ -2,6 +2,7 @@ package eladkay.scanner.misc;
 
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.biome.MessageUpdateMap;
+import eladkay.scanner.terrain.MessageUpdateState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -18,6 +19,7 @@ public class NetworkHelper {
         instance.registerMessage(MessageUpdateMap.class, MessageUpdateMap.class, ++id, Side.SERVER);
         instance.registerMessage(MessageUpdateEnergy.class, MessageUpdateEnergy.class, ++id, Side.CLIENT);
         instance.registerMessage(MessageUpdateEnergyServer.class, MessageUpdateEnergyServer.class, ++id, Side.SERVER);
+        instance.registerMessage(MessageUpdateState.class, MessageUpdateState.class, ++id, Side.SERVER);
         //todo this is bad
         //Caused by: java.lang.NoClassDefFoundError: net/minecraft/client/entity/EntityPlayerSP
     }

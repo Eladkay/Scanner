@@ -1,6 +1,7 @@
 package eladkay.scanner.proxy;
 
 import eladkay.scanner.biome.TileEntityBiomeScanner;
+import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.world.World;
 
 public class CommonProxy {
@@ -14,5 +15,9 @@ public class CommonProxy {
 
     public World getWorld() {
         return null;
+    }
+
+    public void openGuiTerrainScanner(TileEntityTerrainScanner tileEntity) {
+
     }
 }
