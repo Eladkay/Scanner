@@ -3,7 +3,11 @@ package eladkay.scanner.biome;
 import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
 import com.feed_the_beast.ftbl.lib.MouseButton;
-import com.feed_the_beast.ftbl.lib.gui.*;
+import com.feed_the_beast.ftbl.lib.gui.ButtonLM;
+import com.feed_the_beast.ftbl.lib.gui.GuiHelper;
+import com.feed_the_beast.ftbl.lib.gui.GuiLM;
+import com.feed_the_beast.ftbl.lib.gui.GuiLang;
+import com.feed_the_beast.ftbl.lib.gui.PanelLM;
 import com.feed_the_beast.ftbl.lib.gui.misc.GuiConfigs;
 import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
 import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
@@ -13,12 +17,10 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +28,6 @@ import java.util.List;
 
 public class GuiBiomeScanner extends GuiLM {
     public static GuiBiomeScanner instance;
-    private static int textureID = -1;
     public final int startX, startZ;
     private final ButtonLM buttonRefresh, buttonClose;
     private final MapButton mapButtons[];
@@ -101,31 +102,14 @@ public class GuiBiomeScanner extends GuiLM {
     public void drawBackground() {
         super.drawBackground();
 
-        if (textureID == -1) {
-            textureID = TextureUtil.glGenTextures();
-        }
-
-        if (ThreadReloadChunkSelector.pixelBuffer != null) {
-            //boolean hasBlur = false;
-            //int filter = hasBlur ? GL11.GL_LINEAR : GL11.GL_NEAREST;
-            GlStateManager.bindTexture(textureID);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, GuiConfigs.CHUNK_SELECTOR_TILES_TEX * 16, GuiConfigs.CHUNK_SELECTOR_TILES_TEX * 16, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, ThreadReloadChunkSelector.pixelBuffer);
-            ThreadReloadChunkSelector.pixelBuffer = null;
-        }
-
         GlStateManager.color(0F, 0F, 0F, 1F);
         GuiHelper.drawBlankRect(posX - 2, posY - 2, getWidth() + 4, getHeight() + 4);
         //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
-        if (!ThreadReloadChunkSelector.isReloading()) {
-            GlStateManager.bindTexture(textureID);
-            GuiHelper.drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
-        }
+        ThreadReloadChunkSelector.updateTexture();
+        GlStateManager.bindTexture(ThreadReloadChunkSelector.getTextureID());
+        GuiHelper.drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
 
         GlStateManager.color(1F, 1F, 1F, 1F);
         GlStateManager.enableTexture2D();
