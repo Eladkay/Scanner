@@ -3,8 +3,10 @@ package eladkay.scanner.proxy;
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.biome.GuiBiomeScanner;
 import eladkay.scanner.biome.TileEntityBiomeScanner;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 
 public class ClientProxy extends CommonProxy {
@@ -24,5 +26,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void openGuiBiomeScanner(TileEntityBiomeScanner tileEntity) {
         new GuiBiomeScanner(tileEntity).openGui();
+    }
+
+    @Override
+    public World getWorld() {
+        return Minecraft.getMinecraft().theWorld;
     }
 }

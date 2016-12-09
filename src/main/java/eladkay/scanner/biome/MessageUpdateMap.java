@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
 
@@ -51,13 +52,13 @@ public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
     } //noop
 
     @Override
-    public void handleServerSide(MessageUpdateMap message, EntityPlayer player) {
+    public void handleServerSide(MessageUpdateMap message, MessageContext player) {
 
-        TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.getServerHandler().playerEntity.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
         ChunkPos chunkPos = new ChunkPos(message.chunkX, message.chunkY);
         int powerCost = Config.minEnergyPerChunkBiomeScanner * Config.increase * bs.getDist(chunkPos);
         bs.container().extractEnergy(powerCost, false);
-        bs.mapping.put(chunkPos, player.worldObj.getBiomeGenForCoords(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).getBiomeName());
+        bs.mapping.put(chunkPos, player.getServerHandler().playerEntity.worldObj.getBiomeGenForCoords(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).getBiomeName());
         bs.markDirty();
     }
 }

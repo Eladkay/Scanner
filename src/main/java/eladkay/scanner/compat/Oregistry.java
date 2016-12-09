@@ -34,6 +34,7 @@ public class Oregistry {
         public int rarity;
         public int maxY;
         public int minY;
+
         public Entry(IBlockState ore, int rarity, int maxY, int minY) {
             this.ore = ore;
             this.rarity = rarity;

@@ -3,15 +3,12 @@ package eladkay.scanner.biome;
 import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
 import com.feed_the_beast.ftbl.lib.MouseButton;
-import com.feed_the_beast.ftbl.lib.gui.ButtonLM;
-import com.feed_the_beast.ftbl.lib.gui.GuiHelper;
-import com.feed_the_beast.ftbl.lib.gui.GuiLM;
-import com.feed_the_beast.ftbl.lib.gui.GuiLang;
-import com.feed_the_beast.ftbl.lib.gui.PanelLM;
+import com.feed_the_beast.ftbl.lib.gui.*;
 import com.feed_the_beast.ftbl.lib.gui.misc.GuiConfigs;
 import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
 import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import eladkay.scanner.Config;
+import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -34,6 +31,7 @@ public class GuiBiomeScanner extends GuiLM {
     private final PanelLM panelButtons;
     private final TileEntityBiomeScanner biomeScanner;
     private byte currentSelectionMode = -1;
+
     public GuiBiomeScanner(TileEntityBiomeScanner scanner) {
         super(GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16);
 
@@ -208,6 +206,8 @@ public class GuiBiomeScanner extends GuiLM {
         @Override
         public void onClicked(IGui gui, IMouseButton button) {
             int distance = biomeScanner.getDist(chunkPos);
+            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(biomeScanner.getPos().getX(), biomeScanner.getPos().getY(), biomeScanner.getPos().getZ()));
+            System.out.println(biomeScanner.getEnergyStored(null));
             if (biomeScanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null || biomeScanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
                 return;
             if (biomeScanner.type == 0 && distance > 2)

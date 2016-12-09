@@ -49,7 +49,8 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
 
     /**
      * Constructor for setting the basic values. Will not construct with any stored power.
-     *  @param capacity The maximum amount of Tesla power that the container should hold.
+     *
+     * @param capacity The maximum amount of Tesla power that the container should hold.
      * @param input    The maximum rate of power that can be accepted at a time.
      * @param output   The maximum rate of power that can be extracted at a time.
      * @param te

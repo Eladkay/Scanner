@@ -15,12 +15,9 @@ public class NetworkHelper {
 
     public static void init() {
         instance = new SimpleNetworkWrapper(ScannerMod.MODID);
-        try {
-            instance.registerMessage(MessageUpdateMap.class, MessageUpdateMap.class, ++id, Side.SERVER);
-            instance.registerMessage(MessageUpdateEnergy.class, MessageUpdateEnergy.class, ++id, Side.CLIENT);
-        } catch (NoClassDefFoundError server) {
-            server.printStackTrace();
-        }
+        instance.registerMessage(MessageUpdateMap.class, MessageUpdateMap.class, ++id, Side.SERVER);
+        instance.registerMessage(MessageUpdateEnergy.class, MessageUpdateEnergy.class, ++id, Side.CLIENT);
+        instance.registerMessage(MessageUpdateEnergyServer.class, MessageUpdateEnergyServer.class, ++id, Side.SERVER);
         //todo this is bad
         //Caused by: java.lang.NoClassDefFoundError: net/minecraft/client/entity/EntityPlayerSP
     }

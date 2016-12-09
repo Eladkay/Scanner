@@ -11,7 +11,7 @@ public abstract class MessageBase<REQ extends IMessage> implements IMessage, IMe
     @Override
     public REQ onMessage(REQ message, MessageContext ctx) {
         if (ctx.side == Side.SERVER)
-            handleServerSide(message, ctx.getServerHandler().playerEntity);
+            handleServerSide(message, ctx);
         else
             handleClientSide(message, null); //safe because it runs on the client
 
@@ -32,5 +32,5 @@ public abstract class MessageBase<REQ extends IMessage> implements IMessage, IMe
      * @param message the packet
      * @param player  the player reference
      */
-    public abstract void handleServerSide(REQ message, EntityPlayer player);
+    public abstract void handleServerSide(REQ message, MessageContext player);
 }

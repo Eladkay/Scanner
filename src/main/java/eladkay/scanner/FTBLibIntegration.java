@@ -9,16 +9,14 @@ import javax.annotation.Nonnull;
 /**
  * Created by LatvianModder on 15.11.2016.
  */
-public enum FTBLibIntegration implements IFTBLibPlugin
-{
+public enum FTBLibIntegration implements IFTBLibPlugin {
     @FTBLibPlugin
     INSTANCE;
 
     public static FTBLibAPI API;
 
     @Override
-    public void init(@Nonnull FTBLibAPI api)
-    {
+    public void init(@Nonnull FTBLibAPI api) {
         API = api;
     }
 }

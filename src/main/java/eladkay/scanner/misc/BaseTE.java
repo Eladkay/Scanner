@@ -2,6 +2,7 @@ package eladkay.scanner.misc;
 
 import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -49,16 +50,16 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
         int energyReceived = Math.min(max - container.getEnergyStored(), maxReceive);
         if (!simulate) {
-            container.receiveEnergy(energyReceived, simulate);
+            container.receiveEnergy(energyReceived, false);
             markDirty();
-            NetworkHelper.tellEveryone(new MessageUpdateEnergy(pos.getX(), pos.getY(), pos.getZ(), container.getEnergyStored()));
+            NetworkHelper.tellEveryone(new MessageUpdateEnergy(pos.getX(), pos.getY(), pos.getZ(), container.getEnergyStored(), worldObj.provider.getDimension()));
         }
         return energyReceived;
     }
 
     @Override
     public int getEnergyStored(EnumFacing from) {
-        return (int) container.getEnergyStored();
+        return container.getEnergyStored();
     }
 
     @Override
@@ -82,8 +83,13 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) return (T) container;
-        return super.getCapability(capability, facing);
+        return capability == CapabilityEnergy.ENERGY ? (T) container : super.getCapability(capability, facing);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+        super.onDataPacket(net, packet);
+        readFromNBT(packet.getNbtCompound());
     }
 
 

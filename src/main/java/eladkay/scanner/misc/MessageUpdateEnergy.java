@@ -1,9 +1,11 @@
 package eladkay.scanner.misc;
 
+import eladkay.scanner.ScannerMod;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
 
@@ -11,12 +13,14 @@ public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
     int y;
     int z;
     long energy;
+    int dim;
 
-    public MessageUpdateEnergy(int x, int y, int z, long energy) {
+    public MessageUpdateEnergy(int x, int y, int z, long energy, int dim) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.energy = energy;
+        this.dim = dim;
     }
 
     public MessageUpdateEnergy() {
@@ -29,6 +33,7 @@ public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
         y = buf.readInt();
         z = buf.readInt();
         energy = buf.readLong();
+        dim = buf.readInt();
     }
 
     @Override
@@ -37,19 +42,21 @@ public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
         buf.writeInt(y);
         buf.writeInt(z);
         buf.writeLong(energy);
+        buf.writeInt(dim);
     }
 
     @Override
     public void handleClientSide(MessageUpdateEnergy message, EntityPlayer player) {
-        BaseTE te = (BaseTE) Minecraft.getMinecraft().theWorld.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        World server = ScannerMod.proxy.getWorld();
+        BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(message.x, message.y, message.z));
         //System.out.println(Minecraft.getMinecraft().theWorld.getBlockState(new BlockPos(message.x, message.y, message.z)).getBlock());
         //System.out.println(new BlockPos(message.x, message.y, message.z));
-        if (te != null)
-            te.container.setStored(message.energy);
+        if (base != null)
+            base.container.setStored(message.energy);
     }
 
     @Override
-    public void handleServerSide(MessageUpdateEnergy message, EntityPlayer player) {
+    public void handleServerSide(MessageUpdateEnergy message, MessageContext player) {
 
     }
 }
