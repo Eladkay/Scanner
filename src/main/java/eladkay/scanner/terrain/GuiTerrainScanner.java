@@ -1,7 +1,5 @@
 package eladkay.scanner.terrain;
 
-import eladkay.scanner.misc.NetworkHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -9,12 +7,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
 
+import java.io.IOException;
+
 /**
  * Things this should do:
  * Rotate chunk
  * Map
  * Speedup
- * Stop/start
+ * Stop/start (check!)
  */
 public class GuiTerrainScanner extends GuiContainer {
     private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standardBackground.png");
@@ -35,21 +35,42 @@ public class GuiTerrainScanner extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        toggleMode = new GuiButton(0, 85, 15, scanner.on ? "On" : "Off") {
-            @Override
-            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-                displayString = scanner.on ? "Off" : "On";
-                scanner.changeState(!scanner.on);
-                if (scanner.on) {
-                    if (scanner.pos == null) scanner.pos = scanner.getPos();
-                    if (scanner.current.getY() < 0)
-                        scanner.current.setPos(scanner.pos.getX() + 1, 0, scanner.pos.getZ());
-                } else scanner.current.setPos(scanner.pos.getX() + 1, -1, scanner.pos.getY());
-                NetworkHelper.instance.sendToServer(new MessageUpdateState(!scanner.on, scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
-                return super.mousePressed(mc, mouseX, mouseY);
-            }
-        };
+        toggleMode = new GuiButton(0, (this.width / 2) - 75, this.height / 2 + 50, 150, 20, "");
+        rotate = new GuiButton(1, (this.width / 2) - 75, this.height / 2 + 30, 150, 20, "");
         buttonList.add(toggleMode);
+        buttonList.add(rotate);
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        if (button == toggleMode) if (scanner.on) scanner.deactivate();
+        else scanner.activate();
+        else if (button == rotate) {
+            scanner.rotation = scanner.rotation.getNext();
+            if (scanner.on) scanner.deactivate();
+            scanner.current.setPos(scanner.pos.getX() + (scanner.rotation.x > 0 ? 1 : -1), 0, scanner.pos.getZ());
+        }
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        toggleMode.displayString = scanner.on ? "Turn off" : "Turn on";
+        switch (scanner.rotation) {
+            case POSX_POSZ:
+                rotate.displayString = "Build on +x, +z";
+                break;
+            case POSX_NEGZ:
+                rotate.displayString = "Build on +x, -z";
+                break;
+            case NEGX_POSZ:
+                rotate.displayString = "Build on -x, +z";
+                break;
+            case NEGX_NEGZ:
+                rotate.displayString = "Build on -x, -z";
+                break;
+        }
+        drawCenteredString(fontRendererObj, scanner.current.toString(), 50, 20, 4210752);
+        super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {

@@ -42,9 +42,8 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        //((TileEntityTerrainScanner) worldIn.getTileEntity(pos)).onBlockActivated();
         ScannerMod.proxy.openGuiTerrainScanner(((TileEntityTerrainScanner) worldIn.getTileEntity(pos)));
-        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, heldItem, side, hitX, hitY, hitZ);
+        return true;
     }
 
     @Override
