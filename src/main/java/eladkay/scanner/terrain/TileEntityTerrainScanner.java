@@ -23,6 +23,11 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     //BlockPos pos = null;
     public EnumRotation rotation = EnumRotation.POSX_POSZ;
     public int speedup = 1;
+    public BlockPos posStart = null;
+
+    public BlockPos getPosStart() {
+        return posStart != null ? posStart : getPos();
+    }
 
 
     @Override
@@ -32,6 +37,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         on = nbt.getBoolean("on");
         rotation = EnumRotation.values()[nbt.getInteger("rot")];
         speedup = nbt.getInteger("speedup");
+        if (nbt.getLong("posStart") != 0)
+            posStart = BlockPos.fromLong(nbt.getLong("posStart"));
     }
 
     @Override
@@ -41,6 +48,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         nbt.setBoolean("on", on);
         nbt.setInteger("rot", rotation.ordinal());
         nbt.setInteger("speedup", speedup);
+        if (posStart != null)
+            nbt.setLong("posStart", posStart.toLong());
         return nbt;
 
     }
@@ -59,7 +68,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
     public void activate() {
         changeState(true);
-        current.setPos(getPos().getX() + 1, 0, getPos().getZ());
+        current.setPos(getPosStart().getX() + 1, 0, getPosStart().getZ());
     }
 
 
@@ -68,7 +77,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     }
 
     BlockPos getEnd() {
-        return getPos().east().add(15, 255, 15);
+        return getPosStart().east().add(15, 255, 15);
     }
 
     void changeState(boolean state) {
@@ -151,10 +160,10 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                 if (rotation == EnumRotation.NEGX_POSZ || rotation == EnumRotation.POSX_POSZ)
                     current = new MutableBlockPos(current.south());
                 else current = new MutableBlockPos(current.north());
-                current.setPos(pos.getX(), current.getY(), current.getZ());
+                current.setPos(getPosStart().getX(), current.getY(), current.getZ());
             }
             if (current.getZ() > end.getZ() && rotation.z > 0 || current.getZ() < end.getZ() && rotation.z < 0) {
-                current.setPos(getPos().getX(), current.getY() + 1, getPos().getZ());
+                current.setPos(getPosStart().getX(), current.getY() + 1, getPosStart().getZ());
             }
             if (current.getY() > 255)
                 changeState(false);

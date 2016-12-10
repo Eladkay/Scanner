@@ -19,6 +19,7 @@ public class Config {
     public static int increase;
     public static boolean genVanillaOres;
     public static int maxSpeedup;
+    public static int remoteBuildCost;
 
 
     public static void initConfig(File configFile) {
@@ -34,6 +35,7 @@ public class Config {
         maxEnergyBufferBiome = config.get("Scanner", "maxEnergyBufferBiome", 1000000, "The energy buffer of the Biome Scanner").getInt();
         increase = config.get("Scanner", "increase", 8, "The biome scanner will take (base * this * distanceInChunks * speedupInBlocksPerTick) RF/Tesla per tick to run.").getInt();
         maxSpeedup = config.get("Scanner", "maxSpeedup", 8, "The maximum amount of blocks per tick that the terrain scanner can scan. Power usage is multiplied by the amount of speedup.").getInt();
+        remoteBuildCost = config.get("Scanner", "remoteBuildCost", maxEnergyBufferTerrain, "How much building remotely (Biome+Terrain) will cost in addition to the regular cost").getInt();
         config.save();
     }
 

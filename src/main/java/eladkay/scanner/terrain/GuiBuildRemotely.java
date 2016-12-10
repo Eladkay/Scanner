@@ -1,4 +1,4 @@
-package eladkay.scanner.biome;
+package eladkay.scanner.terrain;
 
 import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
@@ -10,7 +10,6 @@ import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -23,16 +22,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class GuiBiomeScanner extends GuiLM {
-    public static GuiBiomeScanner instance;
+public class GuiBuildRemotely extends GuiLM {
+    public static GuiBuildRemotely instance;
     public final int startX, startZ;
     private final ButtonLM buttonRefresh, buttonClose;
     private final MapButton mapButtons[];
     private final PanelLM panelButtons;
-    private final TileEntityBiomeScanner scanner;
+    private final TileEntityTerrainScanner scanner;
     private byte currentSelectionMode = -1;
 
-    public GuiBiomeScanner(TileEntityBiomeScanner scanner) {
+    public GuiBuildRemotely(TileEntityTerrainScanner scanner) {
         super(GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16);
 
         this.scanner = scanner;
@@ -205,21 +204,16 @@ public class GuiBiomeScanner extends GuiLM {
 
         @Override
         public void onClicked(IGui gui, IMouseButton button) {
-            int distance = scanner.getDist(chunkPos);
+            //do stuff
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
-            if (scanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null || scanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
-                return;
-            if (scanner.type == 0 && distance > 2)
-                return;
-            else if (scanner.type == 1 && distance > 4)
-                return;
-            else if (scanner.type == 2 && distance > 8)
+            if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
                 return;
 
-            scanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
-            scanner.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
+            scanner.container.extractEnergy(Config.remoteBuildCost, false);
+            scanner.posStart = new BlockPos(chunkPos.chunkXPos * 16, 0, chunkPos.chunkZPos * 16);
+            scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
             scanner.markDirty();
-            NetworkHelper.instance.sendToServer(new MessageUpdateMap(scanner, chunkPos.chunkXPos, chunkPos.chunkZPos));
+            NetworkHelper.instance.sendToServer(new MessageUpdatePos(scanner, new BlockPos(chunkPos.chunkXPos * 16, 0, chunkPos.chunkZPos * 16)));
 
             GuiHelper.playClickSound();
             currentSelectionMode = 1;
@@ -227,27 +221,13 @@ public class GuiBiomeScanner extends GuiLM {
 
         @Override
         public void addMouseOverText(IGui gui, List<String> l) {
-            int distance = scanner.getDist(chunkPos);
-            if (scanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos) != null) {
-                l.add(scanner.getMapping(chunkPos.chunkXPos, chunkPos.chunkZPos));
-                l.add("(" + chunkPos.chunkXPos + ", " + chunkPos.chunkZPos + ")");
-            } else {
-                l.add("???");
-                l.add("Click to scan!");
-                l.add("Power cost: " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
-                l.add("Distance (chunks): " + distance);
-                if (scanner.type == 0 && distance > 2) {
-                    l.add("Basic Biome Scanner cannot scan chunks more than 2 chunks away!");
-                } else if (scanner.type == 1 && distance > 4) {
-                    l.add("Advanced Biome Scanner cannot scan chunks more than 4 chunks away!");
-                } else if (scanner.type == 2 && distance > 8) {
-                    l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
-                }
-            }
-
-            if (GuiScreen.isCtrlKeyDown()) {
-                l.add(chunkPos.toString());
-            }
+            l.add("Click to scan here!");
+            l.add("Cost: " + Config.remoteBuildCost);
+            l.add(chunkPos.toString());
+            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
+            if (scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16)
+                l.add("Already building!");
+            else if (scanner.getEnergyStored(null) < Config.remoteBuildCost) l.add("Insufficient power!");
         }
 
         @Override
@@ -255,8 +235,12 @@ public class GuiBiomeScanner extends GuiLM {
             int ax = getAX();
             int ay = getAY();
 
-            if (isSelected || gui.isMouseOver(this)) {
+            if ((isSelected || gui.isMouseOver(this)) && !(scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16)) {
                 GlStateManager.color(1F, 1F, 1F, 0.27F);
+                GuiHelper.drawBlankRect(ax, ay, 16, 16);
+                GlStateManager.color(1F, 1F, 1F, 1F);
+            } else if (scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16) {
+                GlStateManager.color(0F, 1F, 0F, 0.27F);
                 GuiHelper.drawBlankRect(ax, ay, 16, 16);
                 GlStateManager.color(1F, 1F, 1F, 1F);
             }
