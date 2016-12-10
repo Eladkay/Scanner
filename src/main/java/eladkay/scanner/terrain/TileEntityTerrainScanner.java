@@ -20,9 +20,9 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     private static final int MAX = Config.maxEnergyBufferTerrain;
     boolean on;
     MutableBlockPos current = new MutableBlockPos(0, -1, 0);
-    BlockPos end = null;
-    BlockPos pos = null;
+    //BlockPos pos = null;
     public EnumRotation rotation = EnumRotation.POSX_POSZ;
+    public int speedup = 1;
 
 
     @Override
@@ -30,9 +30,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         super.readFromNBT(nbt);
         current.setPos(BlockPos.fromLong(nbt.getLong("positions")));
         on = nbt.getBoolean("on");
-        end = BlockPos.fromLong(nbt.getLong("end"));
-        pos = BlockPos.fromLong(nbt.getLong("poss"));
         rotation = EnumRotation.values()[nbt.getInteger("rot")];
+        speedup = nbt.getInteger("speedup");
     }
 
     @Override
@@ -40,11 +39,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         super.writeToNBT(nbt);
         nbt.setLong("positions", current.toLong());
         nbt.setBoolean("on", on);
-        if (end != null)
-            nbt.setLong("end", end.toLong());
-        if (pos != null)
-            nbt.setLong("poss", pos.toLong());
         nbt.setInteger("rot", rotation.ordinal());
+        nbt.setInteger("speedup", speedup);
         return nbt;
 
     }
@@ -55,123 +51,116 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     }
 
     public void onBlockActivated() {
-        if (pos == null) pos = getPos();
         if (current.getY() < 0) {
-            current.setPos(pos.getX() + 1, 0, pos.getZ());
+            current.setPos(getPos().getX() + 1, 0, getPos().getZ());
             changeState(true);
         }
     }
 
     public void activate() {
         changeState(true);
-        if (pos == null) pos = getPos();
-        if (current.getY() < 0) current.setPos(pos.getX() + 1, 0, pos.getZ());
+        current.setPos(getPos().getX() + 1, 0, getPos().getZ());
     }
 
 
     public void deactivate() {
         changeState(false);
-        if (pos == null) pos = getPos();
     }
 
-    private BlockPos getEnd() {
-        if (end == null)
-            end = pos.east().add(15, 255, 15);
-        return end;
+    BlockPos getEnd() {
+        return getPos().east().add(15, 255, 15);
     }
 
     void changeState(boolean state) {
-        if (pos == null) pos = getPos();
         on = state;
         /*worldObj.setBlockState(pos, worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state));
         worldObj.setTileEntity(pos, this);*/
         markDirty();
         try {
-            worldObj.markAndNotifyBlock(pos, worldObj.getChunkFromBlockCoords(pos), worldObj.getBlockState(pos), worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state), 4);
-            worldObj.notifyBlockUpdate(pos, worldObj.getBlockState(pos), worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state), 3);
+            worldObj.markAndNotifyBlock(getPos(), worldObj.getChunkFromBlockCoords(getPos()), worldObj.getBlockState(getPos()), worldObj.getBlockState(getPos()).withProperty(BlockTerrainScanner.ONOFF, state), 4);
+            worldObj.notifyBlockUpdate(getPos(), worldObj.getBlockState(getPos()), worldObj.getBlockState(getPos()).withProperty(BlockTerrainScanner.ONOFF, state), 3);
         } catch (IllegalArgumentException ignored) {
         }
-        worldObj.markBlockRangeForRenderUpdate(pos, pos);
+        worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
     }
 
 
     @Override
     public void update() {
-        if (pos == null) pos = getPos();
-        if (this.worldObj.isRemote || !on)
-            return; //Dont do stuff client side else we get ghosts
-        if (container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
-            changeState(false);
-            return;
-        }
-        WorldServer world;
-        if (worldObj.provider.getDimension() == -1)
-            world = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
-        else if (worldObj.provider.getDimension() == 1)
-            world = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
-        else world = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
-        changeState(true);
-        if (current.getY() >= 256) {
-            changeState(false);
-        }
-
-        /*for(EntityPlayer player : getWorld().playerEntities.stream()
-                .filter((p) -> p instanceof EntityPlayerMP && p.worldObj.provider.getDimension() == getWorld().provider.getDimension())
-                .collect(Collectors.toList()))
-            NetworkHelper.instance.sendTo(new MessageUpdateStateOnClient(on, getPos()), (EntityPlayerMP) player);*/
-
-        IBlockState remote = world.getBlockState(current);
-        IBlockState local = worldObj.getBlockState(current);
-        BlockPos imm = current.toImmutable();
-        if (local.getBlock().isReplaceable(worldObj, imm) || local.getBlock().isAir(local, worldObj, imm)) {
-            worldObj.setBlockState(imm, remote, 2);
-            if (!remote.getBlock().isAir(remote, worldObj, imm))
-                container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
-        }
-
-        if (Config.genVanillaOres && worldObj.getBlockState(current).getBlock() == Blocks.STONE) {
-            if (current.getY() > 8) {
-                int i = ThreadLocalRandom.current().nextInt(25);
-                if (i == 0)
-                    worldObj.setBlockState(current, Blocks.COAL_ORE.getDefaultState(), 2);
-                else if (i == 1)
-                    worldObj.setBlockState(current, Blocks.IRON_ORE.getDefaultState(), 2);
+        for (int j = 0; j < speedup; j++) {
+            if (this.worldObj.isRemote || !on)
+                return; //Dont do stuff client side else we get ghosts
+            if (container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
+                changeState(false);
+                return;
             }
-            if (current.getY() > 8 && current.getY() < 16) {
-                int i = ThreadLocalRandom.current().nextInt(150);
-                if (i == 0)
-                    worldObj.setBlockState(current, Blocks.DIAMOND_ORE.getDefaultState(), 2);
-                else if (i == 1)
-                    worldObj.setBlockState(current, Blocks.EMERALD_ORE.getDefaultState(), 2);
-                else if (i == 2)
-                    worldObj.setBlockState(current, Blocks.REDSTONE_ORE.getDefaultState(), 2);
-                else if (i == 3)
-                    worldObj.setBlockState(current, Blocks.LAPIS_ORE.getDefaultState(), 2);
+            WorldServer remoteWorld;
+            if (worldObj.provider.getDimension() == -1)
+                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
+            else if (worldObj.provider.getDimension() == 1)
+                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
+            else
+                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+            changeState(true);
+
+            IBlockState remote = remoteWorld.getBlockState(current);
+            IBlockState local = worldObj.getBlockState(current);
+            BlockPos imm = current.toImmutable();
+            if (local.getBlock().isReplaceable(worldObj, imm) || local.getBlock().isAir(local, worldObj, imm)) {
+                worldObj.setBlockState(imm, remote, 2);
+                if (!remote.getBlock().isAir(remote, worldObj, imm))
+                    container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
             }
-            if (current.getY() > 8 && current.getY() < 32) {
-                int i = ThreadLocalRandom.current().nextInt(45);
-                if (i == 0)
-                    worldObj.setBlockState(current, Blocks.GOLD_ORE.getDefaultState(), 2);
+
+            if (Config.genVanillaOres && worldObj.getBlockState(current).getBlock() == Blocks.STONE) {
+                if (current.getY() > 8) {
+                    int i = ThreadLocalRandom.current().nextInt(25);
+                    if (i == 0)
+                        worldObj.setBlockState(current, Blocks.COAL_ORE.getDefaultState(), 2);
+                    else if (i == 1)
+                        worldObj.setBlockState(current, Blocks.IRON_ORE.getDefaultState(), 2);
+                }
+                if (current.getY() > 8 && current.getY() < 16) {
+                    int i = ThreadLocalRandom.current().nextInt(150);
+                    if (i == 0)
+                        worldObj.setBlockState(current, Blocks.DIAMOND_ORE.getDefaultState(), 2);
+                    else if (i == 1)
+                        worldObj.setBlockState(current, Blocks.EMERALD_ORE.getDefaultState(), 2);
+                    else if (i == 2)
+                        worldObj.setBlockState(current, Blocks.REDSTONE_ORE.getDefaultState(), 2);
+                    else if (i == 3)
+                        worldObj.setBlockState(current, Blocks.LAPIS_ORE.getDefaultState(), 2);
+                }
+                if (current.getY() > 8 && current.getY() < 32) {
+                    int i = ThreadLocalRandom.current().nextInt(45);
+                    if (i == 0)
+                        worldObj.setBlockState(current, Blocks.GOLD_ORE.getDefaultState(), 2);
+                }
             }
+            Oregistry.getEntryList().stream().filter(entry -> current.getY() < entry.maxY && current.getY() > entry.minY).forEach(entry -> {
+                int i = ThreadLocalRandom.current().nextInt(entry.rarity);
+                if (i == 0) worldObj.setBlockState(current, entry.ore, 2);
+            });
+
+            //Movement needs to happen BELOW oregen else things get weird and desynced
+            if (rotation.x > 0) current = new MutableBlockPos(current.east());
+            else new MutableBlockPos(current.west()); //X++
+            BlockPos end = this.getEnd(); //We do this lazy load do it can cache the right value
+
+            if (current.getX() > end.getX()) {
+                if (rotation == EnumRotation.NEGX_POSZ || rotation == EnumRotation.POSX_POSZ)
+                    current = new MutableBlockPos(current.south());
+                else current = new MutableBlockPos(current.north());
+                current.setPos(pos.getX(), current.getY(), current.getZ());
+            }
+            if (current.getZ() > end.getZ() && rotation.z > 0 || current.getZ() < end.getZ() && rotation.z < 0) {
+                current.setPos(getPos().getX(), current.getY() + 1, getPos().getZ());
+            }
+            if (current.getY() > 255)
+                changeState(false);
+
+            markDirty();
         }
-        Oregistry.getEntryList().stream().filter(entry -> current.getY() < entry.maxY && current.getY() > entry.minY).forEach(entry -> {
-            int i = ThreadLocalRandom.current().nextInt(entry.rarity);
-            if (i == 0) worldObj.setBlockState(current, entry.ore, 2);
-        });
-
-        //Movement needs to happen BELOW oregen else things get weird and desynced
-        current.east(rotation == EnumRotation.POSX_POSZ || rotation == EnumRotation.POSX_NEGZ ? 1 : 0); //X++
-        BlockPos end = this.getEnd(); //We do this lazy load do it can cache the right value
-
-        if (current.getX() > end.getX())
-            current.setPos(pos.getX() + rotation.x, current.getY(), current.getZ() + rotation.z);
-        if (current.getZ() > end.getZ())
-            current.setPos(current.getX(), current.getY() + 1, pos.getZ());
-        if (current.getY() > end.getY()) {
-            changeState(false);
-        }
-
-        markDirty();
     }
 
 

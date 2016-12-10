@@ -18,6 +18,7 @@ public class Config {
     public static int maxEnergyBufferBiome;
     public static int increase;
     public static boolean genVanillaOres;
+    public static int maxSpeedup;
 
 
     public static void initConfig(File configFile) {
@@ -31,7 +32,8 @@ public class Config {
 
         minEnergyPerChunkBiomeScanner = config.get("Scanner", "energyPerChunk", 10000, "The base amount of energy required for the Biome Scanner to scan one chunk.").getInt();
         maxEnergyBufferBiome = config.get("Scanner", "maxEnergyBufferBiome", 1000000, "The energy buffer of the Biome Scanner").getInt();
-        increase = config.get("Scanner", "increase", 8, "The biome scanner will take (base * this * distanceInChunks) RF/Tesla to run.").getInt();
+        increase = config.get("Scanner", "increase", 8, "The biome scanner will take (base * this * distanceInChunks * speedupInBlocksPerTick) RF/Tesla per tick to run.").getInt();
+        maxSpeedup = config.get("Scanner", "maxSpeedup", 8, "The maximum amount of blocks per tick that the terrain scanner can scan. Power usage is multiplied by the amount of speedup.").getInt();
         config.save();
     }
 

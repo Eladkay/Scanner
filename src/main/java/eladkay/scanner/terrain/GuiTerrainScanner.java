@@ -1,6 +1,9 @@
 package eladkay.scanner.terrain;
 
+import eladkay.scanner.Config;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiPageButtonList;
+import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,9 +14,9 @@ import java.io.IOException;
 
 /**
  * Things this should do:
- * Rotate chunk
+ * Rotate chunk (i hate my life)
  * Map
- * Speedup
+ * Speedup (check!)
  * Stop/start (check!)
  */
 public class GuiTerrainScanner extends GuiContainer {
@@ -21,7 +24,7 @@ public class GuiTerrainScanner extends GuiContainer {
     private final TileEntityTerrainScanner scanner;
     private GuiButton rotate;
     private GuiButton toggleMode;
-
+    private GuiSlider sliderSpeedup;
     public GuiTerrainScanner(TileEntityTerrainScanner scanner) {
         super(new Container() {
             @Override
@@ -37,8 +40,33 @@ public class GuiTerrainScanner extends GuiContainer {
         super.initGui();
         toggleMode = new GuiButton(0, (this.width / 2) - 75, this.height / 2 + 50, 150, 20, "");
         rotate = new GuiButton(1, (this.width / 2) - 75, this.height / 2 + 30, 150, 20, "");
+        //noinspection Convert2Lambda
+        sliderSpeedup = new GuiSlider(new GuiPageButtonList.GuiResponder() {
+            @Override
+            public void setEntryValue(int id, boolean value) {
+
+            }
+
+            @Override
+            public void setEntryValue(int id, float value) {
+                scanner.speedup = value < 1 ? 1 : (int) value;
+            }
+
+            @Override
+            public void setEntryValue(int id, String value) {
+
+            }
+        }, 2, (this.width / 2) - 75, this.height / 2 + 10, "Speedup (Blocks/t)", 1f, Float.parseFloat(Config.maxSpeedup + ""), scanner.speedup, new GuiSlider.FormatHelper() {
+            @Override
+            public String getText(int id, String name, float value) {
+                return name;
+            }
+        });
+
         buttonList.add(toggleMode);
-        buttonList.add(rotate);
+        //buttonList.add(rotate); todo
+        if (Config.maxSpeedup > 0)
+            buttonList.add(sliderSpeedup);
     }
 
     @Override
@@ -48,7 +76,7 @@ public class GuiTerrainScanner extends GuiContainer {
         else if (button == rotate) {
             scanner.rotation = scanner.rotation.getNext();
             if (scanner.on) scanner.deactivate();
-            scanner.current.setPos(scanner.pos.getX() + (scanner.rotation.x > 0 ? 1 : -1), 0, scanner.pos.getZ());
+            scanner.current.setPos(scanner.getPos().getX(), 0, scanner.getPos().getZ());
         }
     }
 
@@ -69,12 +97,17 @@ public class GuiTerrainScanner extends GuiContainer {
                 rotate.displayString = "Build on -x, -z";
                 break;
         }
-        drawCenteredString(fontRendererObj, scanner.current.toString(), 50, 20, 4210752);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         this.fontRendererObj.drawString("Terrain Scanner", 50, 6, 4210752);
+        this.fontRendererObj.drawString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 20, 20, 4210752);
+        this.fontRendererObj.drawString("End: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 20, 40, 4210752);
+        if (mc.thePlayer.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)"))
+            this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);
+        if (Config.maxSpeedup > 0)
+            this.fontRendererObj.drawString("Speedup (blocks per tick): " + scanner.speedup, 20, 80, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
