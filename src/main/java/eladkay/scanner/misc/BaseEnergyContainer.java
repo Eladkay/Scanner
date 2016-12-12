@@ -4,6 +4,7 @@ package eladkay.scanner.misc;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import cofh.api.energy.IEnergyStorage;
+import eladkay.scanner.terrain.MessageUpdateScanner;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -208,6 +209,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
         if (!simulate)
             this.stored -= removedPower;
         te.markDirty();
+        MessageUpdateScanner.send(te);
         return (int) removedPower;
     }
 
@@ -219,6 +221,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
         if (!simulate)
             this.stored += acceptedTesla;
         te.markDirty();
+        MessageUpdateScanner.send(te);
         return (int) acceptedTesla;
     }
 

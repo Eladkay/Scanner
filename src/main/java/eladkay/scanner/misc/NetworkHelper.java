@@ -2,7 +2,7 @@ package eladkay.scanner.misc;
 
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.biome.MessageUpdateMap;
-import eladkay.scanner.terrain.MessageUpdatePos;
+import eladkay.scanner.terrain.MessageUpdateScanner;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -19,7 +19,8 @@ public class NetworkHelper {
         instance.registerMessage(MessageUpdateMap.class, MessageUpdateMap.class, ++id, Side.SERVER);
         instance.registerMessage(MessageUpdateEnergy.class, MessageUpdateEnergy.class, ++id, Side.CLIENT);
         instance.registerMessage(MessageUpdateEnergyServer.class, MessageUpdateEnergyServer.class, ++id, Side.SERVER);
-        instance.registerMessage(MessageUpdatePos.class, MessageUpdatePos.class, ++id, Side.SERVER);
+        instance.registerMessage(MessageUpdateScanner.class, MessageUpdateScanner.class, ++id, Side.SERVER);
+        instance.registerMessage(MessageUpdateScanner.class, MessageUpdateScanner.class, ++id, Side.CLIENT);
     }
 
     //lol

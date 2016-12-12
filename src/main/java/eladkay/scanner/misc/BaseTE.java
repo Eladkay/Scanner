@@ -1,6 +1,7 @@
 package eladkay.scanner.misc;
 
 import cofh.api.energy.IEnergyReceiver;
+import eladkay.scanner.terrain.MessageUpdateScanner;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -56,6 +57,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
             container.receiveEnergy(energyReceived, false);
             markDirty();
             NetworkHelper.tellEveryone(new MessageUpdateEnergy(pos.getX(), pos.getY(), pos.getZ(), container.getEnergyStored(), worldObj.provider.getDimension()));
+            MessageUpdateScanner.send(this);
         }
         return energyReceived;
     }

@@ -6,6 +6,7 @@ import eladkay.scanner.misc.BaseTE;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -69,6 +70,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public void activate() {
         changeState(true);
         current.setPos(getPosStart().getX() + 1, 0, getPosStart().getZ());
+        MessageUpdateScanner.send(this);
     }
 
 
@@ -91,6 +93,14 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         } catch (IllegalArgumentException ignored) {
         }
         worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
+        MessageUpdateScanner.send(this);
+    }
+
+    @Override
+    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+        int ret = super.receiveEnergy(from, maxReceive, simulate);
+        MessageUpdateScanner.send(this);
+        return ret;
     }
 
 
@@ -170,6 +180,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
             markDirty();
         }
+        MessageUpdateScanner.send(this);
     }
 
 

@@ -54,13 +54,14 @@ public class GuiTerrainScanner extends GuiContainer {
             public void setEntryValue(int id, float value) {
                 scanner.speedup = value < 1 ? 1 : (int) value;
                 scanner.markDirty();
+                MessageUpdateScanner.send(scanner);
             }
 
             @Override
             public void setEntryValue(int id, String value) {
 
             }
-        }, 2, (this.width / 2) - 75, this.height / 2 + 10, "Speedup (Blocks/t)", 1f, Float.parseFloat(Config.maxSpeedup + ""), scanner.speedup, new GuiSlider.FormatHelper() {
+        }, 2, (this.width / 2) - 75, this.height / 2 + 10, "Speed (Blocks/t)", 1f, Float.parseFloat(Config.maxSpeedup + ""), scanner.speedup, new GuiSlider.FormatHelper() {
             @Override
             public String getText(int id, String name, float value) {
                 return name + ": " + (int) value;
@@ -76,12 +77,16 @@ public class GuiTerrainScanner extends GuiContainer {
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
-        if (button == toggleMode) if (scanner.on) scanner.deactivate();
-        else scanner.activate();
+        if (button == toggleMode) {
+            if (scanner.on) scanner.deactivate();
+            else scanner.activate();
+            MessageUpdateScanner.send(scanner);
+        }
         else if (button == rotate) {
             scanner.rotation = scanner.rotation.getNext();
             if (scanner.on) scanner.deactivate();
             scanner.current.setPos(scanner.getPos().getX(), 0, scanner.getPos().getZ());
+            MessageUpdateScanner.send(scanner);
         } else if (button == showMap) new GuiBuildRemotely(scanner).openGui();
     }
 
@@ -110,23 +115,32 @@ public class GuiTerrainScanner extends GuiContainer {
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
+    public void drawCenteredString(String text, int x, int y, int color) {
+        fontRendererObj.drawString(text, x - fontRendererObj.getStringWidth(text) / 2, y, color);
+    }
+
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        this.fontRendererObj.drawString("Terrain Scanner", 45, 6, 4210752);
-        this.fontRendererObj.drawString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 40, 20, 4210752);
-        this.fontRendererObj.drawString("End: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 40, 35, 4210752);
+        drawCenteredString("Terrain Scanner", 90, 6, 4210752);
+        //this.fontRendererObj.drawString("Terrain Scanner", 45, 6, 4210752);
+        if (!"(0, -1, 0)".equals("(" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")"))
+            drawCenteredString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90, 20, 4210752);
+        else drawCenteredString("Current block: Off", 90, 20, 4210752);
+        //this.fontRendererObj.drawString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 40, 20, 4210752);
+        drawCenteredString("End block: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 90, 35, 4210752);
+        //this.fontRendererObj.drawString("End: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 40, 35, 4210752);
         if (scanner.posStart != null)
-            this.fontRendererObj.drawString("Remote build: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 40, 50, 4210752);
+            drawCenteredString("Remote start: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90, 50, 4210752);
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
             if (mc.theWorld.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
                 flag = true;
         if (!flag) {
-            this.fontRendererObj.drawString("Place ultimate biome scanner", 15, 65, 4210752);
-            this.fontRendererObj.drawString("adjacent to show map", 30, 75, 4210752);
+            this.fontRendererObj.drawString("Place ultimate biome scanner", 15, 60, 4210752);
+            this.fontRendererObj.drawString("adjacent to show map", 30, 70, 4210752);
         }
-        boolean flag0 = false;
+       /* boolean flag0 = false;
         if (mc.thePlayer.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
-            this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);
+            this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);*/
         /*if (Config.maxSpeedup > 0)
             this.fontRendererObj.drawString("Speedup (blocks per tick): " + scanner.speedup, 20, 120, 4210752);*/
     }

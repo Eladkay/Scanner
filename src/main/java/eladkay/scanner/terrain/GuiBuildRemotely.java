@@ -213,7 +213,7 @@ public class GuiBuildRemotely extends GuiLM {
             scanner.posStart = new BlockPos(chunkPos.chunkXPos * 16, 0, chunkPos.chunkZPos * 16);
             scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
             scanner.markDirty();
-            NetworkHelper.instance.sendToServer(new MessageUpdatePos(scanner, new BlockPos(chunkPos.chunkXPos * 16, 0, chunkPos.chunkZPos * 16)));
+            NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
 
             GuiHelper.playClickSound();
             currentSelectionMode = 1;
@@ -221,8 +221,8 @@ public class GuiBuildRemotely extends GuiLM {
 
         @Override
         public void addMouseOverText(IGui gui, List<String> l) {
-            l.add("Click to scan here!");
-            l.add("Cost: " + Config.remoteBuildCost);
+            l.add("Click to scan!");
+            l.add("Power cost: " + Config.remoteBuildCost);
             l.add(chunkPos.toString());
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             if (scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16)

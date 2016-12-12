@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = ScannerMod.MODID, name = "Scanner", version = "1.2.9")
+@Mod(modid = ScannerMod.MODID, name = "Scanner", version = "1.3")
 public class ScannerMod {
     public static final String MODID = "scanner";
 
