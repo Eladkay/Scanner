@@ -54,9 +54,8 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
         int energyReceived = Math.min(max - container.getEnergyStored(), maxReceive);
         if (!simulate) {
-            container.receiveEnergy(energyReceived, false);
+            energyReceived = container.receiveEnergy(energyReceived, false);
             markDirty();
-            NetworkHelper.tellEveryone(new MessageUpdateEnergy(pos.getX(), pos.getY(), pos.getZ(), container.getEnergyStored(), worldObj.provider.getDimension()));
             MessageUpdateScanner.send(this);
         }
         return energyReceived;

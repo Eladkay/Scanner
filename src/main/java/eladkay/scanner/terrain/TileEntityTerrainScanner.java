@@ -99,7 +99,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
         int ret = super.receiveEnergy(from, maxReceive, simulate);
-        MessageUpdateScanner.send(this);
+        //MessageUpdateScanner.send(this);
         return ret;
     }
 

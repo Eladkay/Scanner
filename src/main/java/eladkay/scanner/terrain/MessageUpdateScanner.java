@@ -69,6 +69,9 @@ public class MessageUpdateScanner extends MessageBase<MessageUpdateScanner> {
         } catch (RuntimeException missing) {
             flag = false;
         }
-        if (flag) NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
+        if (flag) {
+            if (scanner.getWorld().isRemote) NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
+            else NetworkHelper.tellEveryone(new MessageUpdateScanner(scanner));
+        }
     }
 }
