@@ -6,6 +6,7 @@ import eladkay.scanner.misc.BaseTE;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
@@ -124,9 +125,15 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
             IBlockState remote = remoteWorld.getBlockState(current);
             IBlockState local = worldObj.getBlockState(current);
+            TileEntity remoteTE = remoteWorld.getTileEntity(current);
             BlockPos imm = current.toImmutable();
             if (local.getBlock().isReplaceable(worldObj, imm) || local.getBlock().isAir(local, worldObj, imm)) {
                 worldObj.setBlockState(imm, remote, 2);
+                if (remoteTE != null) {
+                    NBTTagCompound tag = new NBTTagCompound();
+                    remoteTE.writeToNBT(tag);
+                    worldObj.getTileEntity(imm).writeToNBT(tag);
+                }
                 if (!remote.getBlock().isAir(remote, worldObj, imm))
                     container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
             }
