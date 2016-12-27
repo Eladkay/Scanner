@@ -2,6 +2,8 @@ package eladkay.scanner.terrain;
 
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
+import eladkay.scanner.misc.MessageUpdateEnergyServer;
+import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiPageButtonList;
@@ -86,6 +88,7 @@ public class GuiTerrainScanner extends GuiContainer {
         if (button == toggleMode) {
             if (scanner.on) scanner.deactivate();
             else scanner.activate();
+            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             MessageUpdateScanner.send(scanner);
         } else if (button == rotate) {
             scanner.rotation = scanner.rotation.getNext();
@@ -169,11 +172,12 @@ public class GuiTerrainScanner extends GuiContainer {
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
         if (mc.isSingleplayer()) drawCenteredString("Terrain Scanner", 90, 6, 4210752); //
         else {
             drawCenteredString("Terrain Scanner", 90, 6, 4210752);
-            drawCenteredString("(May be broken with Ender IO", 90, 13, 4210752);
-            drawCenteredString("conduits and cap banks)", 90, 20, 4210752);
+            drawCenteredString("(Warning: May appear broken with Ender", 90, 13, 4210752);
+            drawCenteredString("IO conduits and capacitor banks)", 90, 20, 4210752);
         }
         //this.fontRendererObj.drawString("Terrain Scanner", 45, 6, 4210752);
         if (!"(0, -1, 0)".equals("(" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")"))

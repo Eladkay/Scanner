@@ -1,10 +1,14 @@
 package eladkay.scanner.misc;
 
+import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.stream.Collectors;
 
 public class MessageUpdateEnergyServer extends MessageBase<MessageUpdateEnergyServer> {
     int x;
@@ -42,8 +46,13 @@ public class MessageUpdateEnergyServer extends MessageBase<MessageUpdateEnergySe
     public void handleServerSide(MessageUpdateEnergyServer message, MessageContext player) {
         World server = player.getServerHandler().playerEntity.worldObj;
         BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(message.x, message.y, message.z));
-        if (base == null) System.out.println(new BlockPos(message.x, message.y, message.z));
-        NetworkHelper.tellEveryone(new MessageUpdateEnergy(message.x, message.y, message.z, base.getEnergyStored(null), server.provider.getDimension()));
+        if (base != null)
+            NetworkHelper.tellEveryone(new MessageUpdateEnergy(message.x, message.y, message.z, base.getEnergyStored(null), server.provider.getDimension()));
+        for (BlockPos pos : Lists.newArrayList(EnumFacing.values()).stream().map((it) -> new BlockPos(message.x, message.y, message.z).offset(it)).collect(Collectors.toList())) {
+            server.scheduleBlockUpdate(pos, server.getBlockState(pos).getBlock(), 1, 50000);
+            server.notifyBlockUpdate(pos, server.getBlockState(pos), server.getBlockState(pos), 3);
+        }
+
     }
 
     /**

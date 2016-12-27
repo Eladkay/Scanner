@@ -7,7 +7,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -93,12 +92,6 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         } catch (IllegalArgumentException ignored) {
         }
         worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
-    }
-
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        int ret = super.receiveEnergy(from, maxReceive, simulate);
-        return ret;
     }
 
 
@@ -189,6 +182,13 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
             markDirty();
         }
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        NBTTagCompound tag = new NBTTagCompound();
+        writeToNBT(tag);
+        return tag;
     }
 
 
