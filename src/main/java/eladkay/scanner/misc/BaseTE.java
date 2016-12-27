@@ -1,7 +1,6 @@
 package eladkay.scanner.misc;
 
 import cofh.api.energy.IEnergyReceiver;
-import eladkay.scanner.terrain.MessageUpdateScanner;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -21,7 +20,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     public BaseTE(int max) {
         this.max = max;
-        this.container = new BaseEnergyContainer(max, max, max, this);
+        this.container = new BaseEnergyContainer(max, max);
     }
 
     @Override
@@ -34,7 +33,8 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        this.container = new BaseEnergyContainer(nbt.getCompoundTag("TeslaContainer"), this);
+        this.container = new BaseEnergyContainer(max, max);
+        this.container.deserializeNBT(nbt.getCompoundTag("TeslaContainer"));
 
     }
 
@@ -56,7 +56,6 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
         if (!simulate) {
             energyReceived = container.receiveEnergy(energyReceived, false);
             markDirty();
-            MessageUpdateScanner.send(this);
         }
         return energyReceived;
     }
@@ -82,12 +81,13 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
+        return capability == CapabilityEnergy.ENERGY || capability == BaseEnergyContainer.CAPABILITY_CONSUMER || super.hasCapability(capability, facing);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY ? (T) container : super.getCapability(capability, facing);
+        return capability == CapabilityEnergy.ENERGY || capability == BaseEnergyContainer.CAPABILITY_CONSUMER ? (T) container : super.getCapability(capability, facing);
     }
 
     @Override

@@ -34,6 +34,10 @@ repositories {
     maven { url "http://maven.epoxide.xyz" }
     maven { url "http://mobiusstrip.eu/maven" }
     maven { url "http://chickenbones.net/maven/" }
+    maven {
+
+        url 'http://maven.epoxide.xyz'
+    }
     ivy {
         name "LatMod"
         artifactPattern "http://mods.latmod.com/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"
@@ -63,6 +67,8 @@ dependencies {
     //compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22:universal"
     compile "EnderCore:EnderCore:1.10.2-0.4.1.58-beta"
     compile "EnderIO:EnderIO:1.10.2-3.0.1.125_beta"
+    compile "net.darkhax.tesla:Tesla:1.10.2-1.2.0.37"
+
 }
 
 apply plugin: 'java'

@@ -52,7 +52,7 @@ public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
         //System.out.println(Minecraft.getMinecraft().theWorld.getBlockState(new BlockPos(message.x, message.y, message.z)).getBlock());
         //System.out.println(new BlockPos(message.x, message.y, message.z));
         if (base != null)
-            base.container.setStored(message.energy);
+            base.container.setEnergyStored(message.energy);
     }
 
     @Override
