@@ -8,8 +8,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
 public class MessageUpdateScanner extends MessageBase<MessageUpdateScanner> {
@@ -61,9 +63,9 @@ public class MessageUpdateScanner extends MessageBase<MessageUpdateScanner> {
     }
 
     public static void send(TileEntity scanner) {
-        boolean flag;
+        boolean flag = true;
         try {
-            if (!scanner.getWorld().isRemote)
+            if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
                 FMLServerHandler.instance().getClientToServerNetworkManager();
             flag = true;
         } catch (RuntimeException missing) {

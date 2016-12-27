@@ -209,7 +209,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
         if (!simulate)
             this.stored -= removedPower;
         te.markDirty();
-        //MessageUpdateScanner.send(te);
+        MessageUpdateScanner.send(te);
         return (int) removedPower;
     }
 
@@ -221,7 +221,7 @@ public class BaseEnergyContainer implements IEnergyReceiver, IEnergyProvider, IE
         if (!simulate)
             this.stored += acceptedTesla;
         te.markDirty();
-        //MessageUpdateScanner.send(te);
+        MessageUpdateScanner.send(te);
         return (int) acceptedTesla;
     }
 

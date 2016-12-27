@@ -100,27 +100,32 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
         int ret = super.receiveEnergy(from, maxReceive, simulate);
-        //MessageUpdateScanner.send(this);
+        MessageUpdateScanner.send(this);
         return ret;
     }
 
 
     @Override
     public void update() {
+        if (worldObj.isRemote) return; //Dont do stuff client side else we get ghosts
         for (int j = 0; j < speedup; j++) {
-            if (this.worldObj.isRemote || !on)
-                return; //Dont do stuff client side else we get ghosts
+            if (!on)
+                return;
             if (container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
                 changeState(false);
                 return;
             }
             WorldServer remoteWorld;
-            if (worldObj.provider.getDimension() == -1)
-                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
-            else if (worldObj.provider.getDimension() == 1)
-                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
-            else
-                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+            try {
+                if (worldObj.provider.getDimension() == -1)
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
+                else if (worldObj.provider.getDimension() == 1)
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
+                else
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+            } catch (NullPointerException lazy) {
+                return;
+            }
             changeState(true);
 
             IBlockState remote = remoteWorld.getBlockState(current);
