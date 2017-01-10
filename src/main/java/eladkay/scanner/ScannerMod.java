@@ -41,7 +41,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 @Mod(modid = ScannerMod.MODID, name = "Scanner", version = "1.3.2")
 public class ScannerMod {
     public static final String MODID = "scanner";
-    private static final boolean TESTING = true;
+    private static final boolean TESTING = false;
 
     @SidedProxy(serverSide = "eladkay.scanner.proxy.CommonProxy", clientSide = "eladkay.scanner.proxy.ClientProxy")
     public static CommonProxy proxy;

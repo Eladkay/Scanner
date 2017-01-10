@@ -5,7 +5,6 @@ import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.terrain.BlockTerrainScanner;
-import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -45,8 +44,8 @@ public class Waila {
             TileEntity tileEntity = accessor.getTileEntity();
             if (!(tileEntity instanceof BaseTE)) return currenttip;
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(accessor.getPosition().getX(), accessor.getPosition().getY(), accessor.getPosition().getZ()));
-            int energy = ((TileEntityTerrainScanner) tileEntity).getEnergyStored(accessor.getSide());
-            int max = ((TileEntityTerrainScanner) tileEntity).getMaxEnergyStored(accessor.getSide());
+            int energy = ((BaseTE) tileEntity).getEnergyStored(accessor.getSide());
+            int max = ((BaseTE) tileEntity).getMaxEnergyStored(accessor.getSide());
             /*int energy = accessor.getNBTData().getInteger("energy");
             int max = accessor.getNBTData().getInteger("max");*/
             currenttip.add("Energy: " + energy + "/" + max);

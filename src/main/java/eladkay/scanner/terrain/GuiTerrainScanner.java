@@ -6,6 +6,7 @@ import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiPageButtonList;
 import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -141,8 +142,18 @@ public class GuiTerrainScanner extends GuiContainer {
         return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
     }
 
+    public int getKx() {
+        return mc.displayWidth / 5 + 5;
+    }
+
+    public int getKy() {
+        return mc.displayHeight / 5 - 30;
+    }
+    
+
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if (scanner == null) return;
         toggleMode.displayString = scanner.on ? "Turn off" : "Turn on";
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
@@ -164,7 +175,16 @@ public class GuiTerrainScanner extends GuiContainer {
                 break;
         }
         //drawMultiEnergyBar((this.width / 2) - 112, this.height / 2 - 15, mouseX, mouseY);
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
+        drawGuiContainerForegroundLayer(mouseX, mouseY);
+        //super.drawScreen(mouseX, mouseY, partialTicks);
+        for (GuiButton aButtonList : this.buttonList) {
+            aButtonList.drawButton(this.mc, mouseX, mouseY);
+        }
+
+        for (GuiLabel aLabelList : this.labelList) {
+            aLabelList.drawLabel(this.mc, mouseX, mouseY);
+        }
     }
 
     public void drawCenteredString(String text, int x, int y, int color) {
@@ -173,28 +193,28 @@ public class GuiTerrainScanner extends GuiContainer {
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
-        if (mc.isSingleplayer()) drawCenteredString("Terrain Scanner", 90, 6, 4210752); //
+        if (mc.isSingleplayer()) drawCenteredString("Terrain Scanner", 90 + getKx(), 6 + getKy(), 4210752); //
         else {
-            drawCenteredString("Terrain Scanner", 90, 6, 4210752);
-            drawCenteredString("(Warning: May appear broken with Ender", 90, 13, 4210752);
-            drawCenteredString("IO conduits and capacitor banks)", 90, 20, 4210752);
+            drawCenteredString("Terrain Scanner", 90 + getKx(), 6 + getKy(), 4210752);
+            drawCenteredString("(Warning: May appear broken with", 90 + getKx(), 13 + getKy(), 4210752);
+            drawCenteredString("EnderIO conduits and capacitor banks)", 90 + getKx(), 20 + getKy(), 4210752);
         }
         //this.fontRendererObj.drawString("Terrain Scanner", 45, 6, 4210752);
         if (!"(0, -1, 0)".equals("(" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")"))
-            drawCenteredString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90, 35, 4210752);
-        else drawCenteredString("Current block: Off", 90, 35, 4210752);
+            drawCenteredString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90 + getKx(), 35 + getKy(), 4210752);
+        else drawCenteredString("Current block: Off", 90 + getKx(), 35 + getKy(), 4210752);
         //this.fontRendererObj.drawString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 40, 20, 4210752);
-        drawCenteredString("End block: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 90, 45, 4210752);
+        drawCenteredString("End block: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 90 + getKx(), 45 + getKy(), 4210752);
         //this.fontRendererObj.drawString("End: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 40, 35, 4210752);
         if (scanner.posStart != null)
-            drawCenteredString("Remote start: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90, 55, 4210752);
+            drawCenteredString("Remote start: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90 + getKx(), 55 + getKy(), 4210752);
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
             if (mc.theWorld.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
                 flag = true;
         if (!flag) {
-            this.fontRendererObj.drawString("Place ultimate biome scanner", 15, 65, 4210752);
-            this.fontRendererObj.drawString("adjacent to show map", 30, 75, 4210752);
+            this.fontRendererObj.drawString("Place ultimate biome scanner", 15 + getKx(), 65 + getKy(), 4210752);
+            this.fontRendererObj.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
         }
        /* boolean flag0 = false;
         if (mc.thePlayer.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)

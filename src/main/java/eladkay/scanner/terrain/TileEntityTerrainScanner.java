@@ -86,12 +86,12 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         /*worldObj.setBlockState(pos, worldObj.getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state));
         worldObj.setTileEntity(pos, this);*/
         markDirty();
-        try {
+        /*try {
             worldObj.markAndNotifyBlock(getPos(), worldObj.getChunkFromBlockCoords(getPos()), worldObj.getBlockState(getPos()), worldObj.getBlockState(getPos()).withProperty(BlockTerrainScanner.ONOFF, state), 4);
             worldObj.notifyBlockUpdate(getPos(), worldObj.getBlockState(getPos()), worldObj.getBlockState(getPos()).withProperty(BlockTerrainScanner.ONOFF, state), 3);
         } catch (IllegalArgumentException ignored) {
         }
-        worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
+        worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());*/
     }
 
 
