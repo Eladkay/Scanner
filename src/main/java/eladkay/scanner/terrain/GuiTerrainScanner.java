@@ -143,11 +143,13 @@ public class GuiTerrainScanner extends GuiContainer {
     }
 
     public int getKx() {
-        return mc.displayWidth / 5 + 5;
+        return 0;
+        //return mc.displayWidth / 5 + 5;
     }
 
     public int getKy() {
-        return mc.displayHeight / 5 - 30;
+        return 0;
+        // return mc.displayHeight / 5 - 30;
     }
     
 
@@ -175,9 +177,9 @@ public class GuiTerrainScanner extends GuiContainer {
                 break;
         }
         //drawMultiEnergyBar((this.width / 2) - 112, this.height / 2 - 15, mouseX, mouseY);
-        drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-        drawGuiContainerForegroundLayer(mouseX, mouseY);
-        //super.drawScreen(mouseX, mouseY, partialTicks);
+        /*drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
+        drawGuiContainerForegroundLayer(mouseX, mouseY);*/
+        super.drawScreen(mouseX, mouseY, partialTicks);
         for (GuiButton aButtonList : this.buttonList) {
             aButtonList.drawButton(this.mc, mouseX, mouseY);
         }

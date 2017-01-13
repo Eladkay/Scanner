@@ -3,6 +3,7 @@ package eladkay.scanner.terrain;
 import eladkay.scanner.Config;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,6 +12,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -78,7 +80,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     }
 
     BlockPos getEnd() {
-        return getPosStart().east().add(15, 255, 15);
+        return getPosStart()./*east().*/add(15, 255, 15);
     }
 
     void changeState(boolean state) {
@@ -98,6 +100,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     @Override
     public void update() {
         if (worldObj.isRemote) return; //Dont do stuff client side else we get ghosts
+        int multiplier = 0;
         for (int j = 0; j < speedup; j++) {
             if (!on)
                 return;
@@ -122,7 +125,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             IBlockState local = worldObj.getBlockState(current);
             TileEntity remoteTE = remoteWorld.getTileEntity(current);
             BlockPos imm = current.toImmutable();
-            if (local.getBlock().isReplaceable(worldObj, imm) || local.getBlock().isAir(local, worldObj, imm)) {
+            if ((local.getBlock().isReplaceable(worldObj, imm) || local.getBlock().isAir(local, worldObj, imm)) && !(local.getBlock() instanceof BlockFluidBase) && !(local.getBlock() instanceof BlockLiquid)) {
                 worldObj.setBlockState(imm, remote, 2);
                 if (remoteTE != null) {
                     NBTTagCompound tag = new NBTTagCompound();
@@ -130,7 +133,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                     worldObj.getTileEntity(imm).writeToNBT(tag);
                 }
                 if (!remote.getBlock().isAir(remote, worldObj, imm))
-                    container.extractEnergy(Config.energyPerBlockTerrainScanner, false);
+                    multiplier++;
+
             }
 
             if (Config.genVanillaOres && worldObj.getBlockState(current).getBlock() == Blocks.STONE) {
@@ -182,6 +186,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
             markDirty();
         }
+        container.extractEnergy(Config.energyPerBlockTerrainScanner * multiplier, false);
     }
 
     @Override
