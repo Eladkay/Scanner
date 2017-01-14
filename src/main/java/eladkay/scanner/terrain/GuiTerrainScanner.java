@@ -6,7 +6,6 @@ import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiPageButtonList;
 import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -151,7 +150,7 @@ public class GuiTerrainScanner extends GuiContainer {
         return 0;
         // return mc.displayHeight / 5 - 30;
     }
-    
+
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -180,13 +179,13 @@ public class GuiTerrainScanner extends GuiContainer {
         /*drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         drawGuiContainerForegroundLayer(mouseX, mouseY);*/
         super.drawScreen(mouseX, mouseY, partialTicks);
-        for (GuiButton aButtonList : this.buttonList) {
+        /*for (GuiButton aButtonList : this.buttonList) {
             aButtonList.drawButton(this.mc, mouseX, mouseY);
         }
 
         for (GuiLabel aLabelList : this.labelList) {
             aLabelList.drawLabel(this.mc, mouseX, mouseY);
-        }
+        }*/
     }
 
     public void drawCenteredString(String text, int x, int y, int color) {

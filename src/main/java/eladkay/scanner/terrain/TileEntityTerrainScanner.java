@@ -15,6 +15,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TileEntityTerrainScanner extends BaseTE implements ITickable {
@@ -28,6 +29,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public int speedup = 1;
     public BlockPos posStart = null;
 
+    @Nonnull
     public BlockPos getPosStart() {
         return posStart != null ? posStart : getPos();
     }
@@ -79,6 +81,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         changeState(false);
     }
 
+    @Nonnull
     BlockPos getEnd() {
         return getPosStart()./*east().*/add(15, 255, 15);
     }

@@ -5,12 +5,15 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Loader;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
 public class Oregistry {
     public static List<Entry> entries = Lists.newArrayList();
 
+    @Nullable
     public static Entry registerEntry(Entry entry) {
         FMLLog.info("Registering Entry \"" + entry + "\".");
 
@@ -25,6 +28,7 @@ public class Oregistry {
     }
 
 
+    @Nonnull
     public static Collection<Entry> getEntryList() {
         return entries;
     }

@@ -4,6 +4,8 @@ import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
+
 public class CommonProxy {
     public void init() {
 
@@ -13,6 +15,7 @@ public class CommonProxy {
 
     }
 
+    @Nullable
     public World getWorld() {
         return null;
     }
