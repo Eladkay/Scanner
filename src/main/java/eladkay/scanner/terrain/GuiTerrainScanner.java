@@ -154,11 +154,11 @@ public class GuiTerrainScanner extends GuiContainer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        if (scanner == null) return;
+        if (scanner == null || toggleMode == null || showMap == null) return;
         toggleMode.displayString = scanner.on ? "Turn off" : "Turn on";
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
-            if (mc.theWorld.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
+            if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
                 flag = true;
         showMap.visible = flag;
         switch (scanner.rotation) {
@@ -205,20 +205,23 @@ public class GuiTerrainScanner extends GuiContainer {
             drawCenteredString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90 + getKx(), 35 + getKy(), 4210752);
         else drawCenteredString("Current block: Off", 90 + getKx(), 35 + getKy(), 4210752);
         //this.fontRendererObj.drawString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 40, 20, 4210752);
-        drawCenteredString("End block: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 90 + getKx(), 45 + getKy(), 4210752);
+        drawCenteredString("End block: (" + scanner.getEnd().getX() + ", " + scanner.maxY + ", " + scanner.getEnd().getZ() + ")", 90 + getKx(), 45 + getKy(), 4210752);
         //this.fontRendererObj.drawString("End: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 40, 35, 4210752);
         if (scanner.posStart != null)
             drawCenteredString("Remote start: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90 + getKx(), 55 + getKy(), 4210752);
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
-            if (mc.theWorld.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
+            if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
                 flag = true;
         if (!flag) {
             this.fontRendererObj.drawString("Place ultimate biome scanner", 15 + getKx(), 65 + getKy(), 4210752);
             this.fontRendererObj.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
         }
+
+        if (scanner.queue != null)
+            this.fontRendererObj.drawString("Scanner Queue attached", 30 + getKx(), 150 + getKy(), 4210752);
        /* boolean flag0 = false;
-        if (mc.thePlayer.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
+        if (mc.player.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
             this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);*/
         /*if (Config.maxSpeedup > 0)
             this.fontRendererObj.drawString("Speedup (blocks per tick): " + scanner.speedup, 20, 120, 4210752);*/

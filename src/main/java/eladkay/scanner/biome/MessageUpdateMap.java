@@ -54,11 +54,11 @@ public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
     @Override
     public void handleServerSide(MessageUpdateMap message, MessageContext player) {
 
-        TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.getServerHandler().playerEntity.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.getServerHandler().playerEntity.world.getTileEntity(new BlockPos(message.x, message.y, message.z));
         ChunkPos chunkPos = new ChunkPos(message.chunkX, message.chunkY);
         int powerCost = Config.minEnergyPerChunkBiomeScanner * Config.increase * bs.getDist(chunkPos);
         bs.container().extractEnergy(powerCost, false);
-        bs.mapping.put(chunkPos, player.getServerHandler().playerEntity.worldObj.getBiomeGenForCoords(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).getBiomeName());
+        bs.mapping.put(chunkPos, player.getServerHandler().playerEntity.world.getBiome(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).getBiomeName());
         bs.markDirty();
     }
 }

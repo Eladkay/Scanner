@@ -5,9 +5,7 @@ import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.MineTweaker;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.proxy.CommonProxy;
-import eladkay.scanner.terrain.BlockAirey;
-import eladkay.scanner.terrain.BlockTerrainScanner;
-import eladkay.scanner.terrain.TileEntityTerrainScanner;
+import eladkay.scanner.terrain.*;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -50,6 +48,7 @@ public class ScannerMod {
     public static DimensionType dimNether;
     public static DimensionType dimEnd;
     public static BlockTerrainScanner terrainScanner;
+    public static BlockScannerQueue scannerQueue;
     public static BlockBiomeScanner biomeScannerBasic;
     public static BlockBiomeScanner biomeScannerAdv;
     public static BlockBiomeScanner biomeScannerElite;
@@ -71,10 +70,14 @@ public class ScannerMod {
         };
         GameRegistry.register(air = new BlockAirey());
 
+        //Terrain Scanner and accessories
         GameRegistry.register(terrainScanner = new BlockTerrainScanner());
         GameRegistry.register(new ItemBlock(terrainScanner).setRegistryName(MODID + ":terrainScanner").setCreativeTab(tab));
         GameRegistry.registerTileEntity(TileEntityTerrainScanner.class, "terrainScanner");
 
+        GameRegistry.register(scannerQueue = new BlockScannerQueue());
+        GameRegistry.register(new ItemBlock(scannerQueue).setRegistryName(MODID + ":scannerQueue").setCreativeTab(tab));
+        GameRegistry.registerTileEntity(TileEntityScannerQueue.class, "q");
 
         GameRegistry.registerTileEntity(TileEntityBiomeScanner.class, "biomeScanner");
         //Biome Scanner Tiers
@@ -95,7 +98,7 @@ public class ScannerMod {
             Item item = new Item() {
                 @Override
                 public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-                    playerIn.addChatComponentMessage(new TextComponentString(String.valueOf(FMLCommonHandler.instance().getMinecraftServerInstance())));
+                    playerIn.sendMessage(new TextComponentString(String.valueOf(FMLCommonHandler.instance().getMinecraftServerInstance())));
                     return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
                 }
             }.setRegistryName("scanner:testytest").setUnlocalizedName("scanner:testytest").setCreativeTab(tab);
@@ -129,7 +132,7 @@ public class ScannerMod {
 
         @Override
         public IChunkGenerator createChunkGenerator() {
-            return new ChunkProviderOverworld(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), TileEntityTerrainScanner.PRESET);
+            return new ChunkProviderOverworld(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), TileEntityTerrainScanner.PRESET);
         }
     }
 
@@ -142,7 +145,7 @@ public class ScannerMod {
 
         @Override
         public IChunkGenerator createChunkGenerator() {
-            return new ChunkProviderHell(worldObj, worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getSeed());
+            return new ChunkProviderHell(world, world.getWorldInfo().isMapFeaturesEnabled(), world.getSeed());
         }
     }
 
@@ -155,7 +158,7 @@ public class ScannerMod {
 
         @Override
         public IChunkGenerator createChunkGenerator() {
-            return new ChunkProviderEnd(worldObj, worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getSeed());
+            return new ChunkProviderEnd(world, world.getWorldInfo().isMapFeaturesEnabled(), world.getSeed());
         }
     }
 
@@ -163,18 +166,18 @@ public class ScannerMod {
 
 
         @Override
-        public String getCommandName() {
+        public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)");
+        }
+
+        @Override
+        public String getName() {
             return "speedts";
         }
 
         @Override
-        public String getCommandUsage(ICommandSender sender) {
+        public String getUsage(ICommandSender sender) {
             return "/speedts";
-        }
-
-        @Override
-        public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)");
         }
 
         @Override
@@ -189,12 +192,12 @@ public class ScannerMod {
 
 
         @Override
-        public String getCommandName() {
+        public String getName() {
             return "goto";
         }
 
         @Override
-        public String getCommandUsage(ICommandSender sender) {
+        public String getUsage(ICommandSender sender) {
             return "/goto";
         }
 

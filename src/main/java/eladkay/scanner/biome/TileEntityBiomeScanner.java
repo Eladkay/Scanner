@@ -91,13 +91,13 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     @Override
     public void update() {
-        Block block = worldObj.getBlockState(pos).getBlock();
+        Block block = getWorld().getBlockState(pos).getBlock();
         this.type = block == ScannerMod.biomeScannerBasic ? 0 : block == ScannerMod.biomeScannerAdv ? 1 : block == ScannerMod.biomeScannerElite ? 2 : 3;
     }
 
     public int getDist(ChunkPos chunkPos) {
         double d0 = pos.getX() - MathHelperLM.unchunk(chunkPos.chunkXPos);
         double d1 = pos.getZ() - MathHelperLM.unchunk(chunkPos.chunkZPos);
-        return (int) (MathHelper.sqrt_double(d0 * d0 + d1 * d1) / 16D);
+        return (int) (MathHelper.sqrt(d0 * d0 + d1 * d1) / 16D);
     }
 }

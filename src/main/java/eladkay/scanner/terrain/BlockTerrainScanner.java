@@ -69,17 +69,18 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public IBlockState onBlockPlaced(World worldObj, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state0, EntityLivingBase placer, ItemStack stack) {
         if (Config.showOutline) {
             BlockPos start = pos.east().down(pos.getY());
             for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
-                IBlockState state = worldObj.getBlockState(p);
+                IBlockState state = worldIn.getBlockState(p);
                 if (state.getBlock() == Blocks.AIR)
-                    worldObj.setBlockState(p, ScannerMod.air.getDefaultState());
+                    worldIn.setBlockState(p, ScannerMod.air.getDefaultState());
             }
         }
-        return super.onBlockPlaced(worldObj, pos, facing, hitX, hitY, hitZ, meta, placer);
+        super.onBlockPlacedBy(worldIn, pos, state0, placer, stack);
     }
+
 
     @Override
     public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {

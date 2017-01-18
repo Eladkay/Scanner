@@ -37,8 +37,8 @@ public class GuiBiomeScanner extends GuiLM {
 
         this.scanner = scanner;
 
-        startX = MathHelperLM.chunk(mc.thePlayer.posX) - 7;
-        startZ = MathHelperLM.chunk(mc.thePlayer.posZ) - 7;
+        startX = MathHelperLM.chunk(mc.player.posX) - 7;
+        startZ = MathHelperLM.chunk(mc.player.posZ) - 7;
 
         buttonClose = new ButtonLM(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate()) {
             @Override
@@ -51,7 +51,7 @@ public class GuiBiomeScanner extends GuiLM {
         buttonRefresh = new ButtonLM(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate()) {
             @Override
             public void onClicked(IGui gui, IMouseButton button) {
-                ThreadReloadChunkSelector.reloadArea(mc.theWorld, startX, startZ);
+                ThreadReloadChunkSelector.reloadArea(mc.world, startX, startZ);
             }
         };
 
@@ -141,23 +141,23 @@ public class GuiBiomeScanner extends GuiLM {
         tessellator.draw();
         GlStateManager.enableTexture2D();
 
-        int cx = MathHelperLM.chunk(mc.thePlayer.posX);
-        int cy = MathHelperLM.chunk(mc.thePlayer.posZ);
+        int cx = MathHelperLM.chunk(mc.player.posX);
+        int cy = MathHelperLM.chunk(mc.player.posZ);
 
         if (cx >= startX && cy >= startZ && cx < startX + GuiConfigs.CHUNK_SELECTOR_TILES_GUI && cy < startZ + GuiConfigs.CHUNK_SELECTOR_TILES_GUI) {
-            double x = ((cx - startX) * 16D + MathHelperLM.wrap(mc.thePlayer.posX, 16D));
-            double y = ((cy - startZ) * 16D + MathHelperLM.wrap(mc.thePlayer.posZ, 16D));
+            double x = ((cx - startX) * 16D + MathHelperLM.wrap(mc.player.posX, 16D));
+            double y = ((cy - startZ) * 16D + MathHelperLM.wrap(mc.player.posZ, 16D));
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(posX + x, posY + y, 0D);
             /*GlStateManager.pushMatrix();
             //GlStateManager.rotate((int)((ep.rotationYaw + 180F) / (180F / 8F)) * (180F / 8F), 0F, 0F, 1F);
-            GlStateManager.rotate(mc.thePlayer.rotationYaw + 180F, 0F, 0F, 1F);
+            GlStateManager.rotate(mc.player.rotationYaw + 180F, 0F, 0F, 1F);
             FTBLibClient.setTexture(GuiConfigs.TEX_ENTITY);
-            GlStateManager.color(1F, 1F, 1F, mc.thePlayer.isSneaking() ? 0.4F : 0.7F);
+            GlStateManager.color(1F, 1F, 1F, mc.player.isSneaking() ? 0.4F : 0.7F);
             GuiHelper.drawTexturedRect(-8, -8, 16, 16, 0D, 0D, 1D, 1D);
             GlStateManager.popMatrix();*/
-            GuiHelper.drawPlayerHead(mc.thePlayer.getName(), -2, -2, 4, 4);
+            GuiHelper.drawPlayerHead(mc.player.getName(), -2, -2, 4, 4);
             GlStateManager.popMatrix();
         }
 
@@ -217,7 +217,7 @@ public class GuiBiomeScanner extends GuiLM {
                 return;
 
             scanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
-            scanner.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.theWorld.getBiomeGenForCoords(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
+            scanner.mapping.put(new ChunkPos(chunkPos.chunkXPos, chunkPos.chunkZPos), mc.world.getBiome(new BlockPos(chunkPos.chunkXPos * 16, 64, chunkPos.chunkZPos * 16)).getBiomeName());
             scanner.markDirty();
             NetworkHelper.instance.sendToServer(new MessageUpdateMap(scanner, chunkPos.chunkXPos, chunkPos.chunkZPos));
 

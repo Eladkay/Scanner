@@ -43,6 +43,7 @@ public class Waila {
         public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
             TileEntity tileEntity = accessor.getTileEntity();
             if (!(tileEntity instanceof BaseTE)) return currenttip;
+            if (((BaseTE) tileEntity).container == null) return currenttip;
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(accessor.getPosition().getX(), accessor.getPosition().getY(), accessor.getPosition().getZ()));
             int energy = ((BaseTE) tileEntity).getEnergyStored(accessor.getSide());
             int max = ((BaseTE) tileEntity).getMaxEnergyStored(accessor.getSide());

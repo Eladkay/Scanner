@@ -20,7 +20,9 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     public BaseTE(int max) {
         this.max = max;
-        this.container = new BaseEnergyContainer(max, max);
+        if (max != 0)
+            this.container = new BaseEnergyContainer(max, max);
+        else this.container = null;
     }
 
     @Override
@@ -33,15 +35,19 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        this.container = new BaseEnergyContainer(max, max);
-        this.container.deserializeNBT(nbt.getCompoundTag("TeslaContainer"));
-
+        this.max = nbt.getInteger("max");
+        if (max != 0) {
+            this.container = new BaseEnergyContainer(max, max);
+            this.container.deserializeNBT(nbt.getCompoundTag("TeslaContainer"));
+        } else this.container = null;
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        nbt.setTag("TeslaContainer", this.container.serializeNBT());
+        nbt.setInteger("max", max);
+        if (this.container != null)
+            nbt.setTag("TeslaContainer", this.container.serializeNBT());
         return nbt;
     }
 
@@ -52,6 +58,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+        if (this.container == null) return 0;
         int energyReceived = Math.min(max - container.getEnergyStored(), maxReceive);
         if (!simulate) {
             energyReceived = container.receiveEnergy(energyReceived, false);
@@ -62,6 +69,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     @Override
     public int getEnergyStored(EnumFacing from) {
+        if (this.container == null) return 0;
         return container.getEnergyStored();
     }
 
@@ -81,13 +89,13 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY || capability == BaseEnergyContainer.CAPABILITY_CONSUMER || super.hasCapability(capability, facing);
+        return container == null ? super.hasCapability(capability, facing) : capability == CapabilityEnergy.ENERGY || capability == BaseEnergyContainer.CAPABILITY_CONSUMER || super.hasCapability(capability, facing);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY || capability == BaseEnergyContainer.CAPABILITY_CONSUMER ? (T) container : super.getCapability(capability, facing);
+        return capability == CapabilityEnergy.ENERGY || capability == BaseEnergyContainer.CAPABILITY_CONSUMER ? container != null ? (T) container : super.getCapability(capability, facing) : super.getCapability(capability, facing);
     }
 
     @Override

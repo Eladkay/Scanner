@@ -24,13 +24,13 @@ public class BlockAirey extends BlockAir {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(IBlockState stateIn, World worldObj, BlockPos pos, Random rand) {
-        worldObj.spawnParticle(EnumParticleTypes.PORTAL,
-                pos.getX() + (worldObj.rand.nextDouble() - 0.5D),
-                pos.getY() + worldObj.rand.nextDouble(),
-                pos.getZ() + (worldObj.rand.nextDouble() - 0.5D),
-                (worldObj.rand.nextDouble() - 0.5D) * 2.0D,
-                -worldObj.rand.nextDouble(),
-                (worldObj.rand.nextDouble() - 0.5D) * 2.0D);
+    public void randomDisplayTick(IBlockState stateIn, World world, BlockPos pos, Random rand) {
+        world.spawnParticle(EnumParticleTypes.PORTAL,
+                pos.getX() + (world.rand.nextDouble() - 0.5D),
+                pos.getY() + world.rand.nextDouble(),
+                pos.getZ() + (world.rand.nextDouble() - 0.5D),
+                (world.rand.nextDouble() - 0.5D) * 2.0D,
+                -world.rand.nextDouble(),
+                (world.rand.nextDouble() - 0.5D) * 2.0D);
     }
 }

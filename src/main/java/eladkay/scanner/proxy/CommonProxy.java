@@ -1,6 +1,7 @@
 package eladkay.scanner.proxy;
 
 import eladkay.scanner.biome.TileEntityBiomeScanner;
+import eladkay.scanner.terrain.TileEntityScannerQueue;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.world.World;
 
@@ -21,6 +22,10 @@ public class CommonProxy {
     }
 
     public void openGuiTerrainScanner(TileEntityTerrainScanner tileEntity) {
+
+    }
+
+    public void openGuiScannerQueue(TileEntityScannerQueue tileEntity) {
 
     }
 }

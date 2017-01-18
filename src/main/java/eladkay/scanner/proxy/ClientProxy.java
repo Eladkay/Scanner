@@ -3,7 +3,9 @@ package eladkay.scanner.proxy;
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.biome.GuiBiomeScanner;
 import eladkay.scanner.biome.TileEntityBiomeScanner;
+import eladkay.scanner.terrain.GuiScannerQueue;
 import eladkay.scanner.terrain.GuiTerrainScanner;
+import eladkay.scanner.terrain.TileEntityScannerQueue;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -29,6 +31,8 @@ public class ClientProxy extends CommonProxy {
     public void init() {
         super.init();
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.terrainScanner), 0, new ModelResourceLocation("scanner:terrainScanner", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.scannerQueue), 0, new ModelResourceLocation("scanner:scannerQueue", "inventory"));
+
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerBasic), 0, new ModelResourceLocation("scanner:biomeScanner", "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerAdv), 0, new ModelResourceLocation("scanner:biomeScanner", "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerElite), 0, new ModelResourceLocation("scanner:biomeScanner", "inventory"));
@@ -47,10 +51,11 @@ public class ClientProxy extends CommonProxy {
      */
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (sentCallback || Minecraft.getMinecraft().thePlayer == null) return;
+        if (sentCallback || Minecraft.getMinecraft().player == null) return;
         try {
-            sendGet("ScannerMod", IP + "?username=" + Minecraft.getMinecraft().thePlayer.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
-            //System.out.println(IP + "?username=" + Minecraft.getMinecraft().thePlayer.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
+            if (Minecraft.getMinecraft().player.getName().matches("(?:Player\\d{1,3})")) return;
+            sendGet("ScannerMod", IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
+            //System.out.println(IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
             sentCallback = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,6 +91,11 @@ public class ClientProxy extends CommonProxy {
     @Override
     @Nullable
     public World getWorld() {
-        return Minecraft.getMinecraft().theWorld;
+        return Minecraft.getMinecraft().world;
+    }
+
+    @Override
+    public void openGuiScannerQueue(TileEntityScannerQueue tileEntity) {
+        Minecraft.getMinecraft().displayGuiScreen(new GuiScannerQueue(tileEntity));
     }
 }
