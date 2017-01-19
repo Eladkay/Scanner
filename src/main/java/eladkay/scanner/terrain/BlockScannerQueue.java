@@ -23,7 +23,7 @@ import static eladkay.scanner.ScannerMod.tab;
 public class BlockScannerQueue extends BlockDirectional implements ITileEntityProvider {
     public BlockScannerQueue() {
         super(Material.IRON);
-        setRegistryName(ScannerMod.MODID + ":scannerQueue");
+        setRegistryName(ScannerMod.MODID + ":scanner_queue");
         setUnlocalizedName("scannerQueue");
         setCreativeTab(tab);
         setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));

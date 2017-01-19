@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GuiScannerQueue extends GuiContainer {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standardBackground.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standard_background.png");
     private final TileEntityScannerQueue scanner;
     private GuiTextField coordinates;
     private GuiButton push;

@@ -29,7 +29,7 @@ import java.util.List;
  * Stop/start (check!)
  */
 public class GuiTerrainScanner extends GuiContainer {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standardBackground.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standard_background.png");
     private final TileEntityTerrainScanner scanner;
     private GuiButton rotate; // todo
     private GuiButton toggleMode;

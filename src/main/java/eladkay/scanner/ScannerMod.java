@@ -73,26 +73,26 @@ public class ScannerMod {
 
         //Terrain Scanner and accessories
         GameRegistry.register(terrainScanner = new BlockTerrainScanner());
-        GameRegistry.register(new ItemBlock(terrainScanner).setRegistryName(MODID + ":terrainScanner").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(terrainScanner).setRegistryName(MODID + ":terrain_scanner").setCreativeTab(tab));
         GameRegistry.registerTileEntity(TileEntityTerrainScanner.class, "terrainScanner");
 
         GameRegistry.register(scannerQueue = new BlockScannerQueue());
-        GameRegistry.register(new ItemBlock(scannerQueue).setRegistryName(MODID + ":scannerQueue").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(scannerQueue).setRegistryName(MODID + ":scanner_queue").setCreativeTab(tab));
         GameRegistry.registerTileEntity(TileEntityScannerQueue.class, "q");
 
         GameRegistry.registerTileEntity(TileEntityBiomeScanner.class, "biomeScanner");
         //Biome Scanner Tiers
-        GameRegistry.register((biomeScannerBasic = (BlockBiomeScanner) new BlockBiomeScanner(0).setRegistryName(ScannerMod.MODID + ":biomeScannerBasic")));
-        GameRegistry.register(new ItemBlock(biomeScannerBasic).setRegistryName(MODID + ":biomeScannerBasic").setCreativeTab(tab));
+        GameRegistry.register((biomeScannerBasic = (BlockBiomeScanner) new BlockBiomeScanner(0).setRegistryName(ScannerMod.MODID + ":biome_scanner_basic")));
+        GameRegistry.register(new ItemBlock(biomeScannerBasic).setRegistryName(MODID + ":biome_scanner_basic").setCreativeTab(tab));
 
-        GameRegistry.register((biomeScannerAdv = (BlockBiomeScanner) new BlockBiomeScanner(1).setRegistryName(ScannerMod.MODID + ":biomeScannerAdv")));
-        GameRegistry.register(new ItemBlock(biomeScannerAdv).setRegistryName(MODID + ":biomeScannerAdv").setCreativeTab(tab));
+        GameRegistry.register((biomeScannerAdv = (BlockBiomeScanner) new BlockBiomeScanner(1).setRegistryName(ScannerMod.MODID + ":biome_scanner_adv")));
+        GameRegistry.register(new ItemBlock(biomeScannerAdv).setRegistryName(MODID + ":biome_scanner_adv").setCreativeTab(tab));
 
-        GameRegistry.register((biomeScannerElite = (BlockBiomeScanner) new BlockBiomeScanner(2).setRegistryName(ScannerMod.MODID + ":biomeScannerElite")));
-        GameRegistry.register(new ItemBlock(biomeScannerElite).setRegistryName(MODID + ":biomeScannerElite").setCreativeTab(tab));
+        GameRegistry.register((biomeScannerElite = (BlockBiomeScanner) new BlockBiomeScanner(2).setRegistryName(ScannerMod.MODID + ":biome_scanner_elite")));
+        GameRegistry.register(new ItemBlock(biomeScannerElite).setRegistryName(MODID + ":biome_scanner_elite").setCreativeTab(tab));
 
-        GameRegistry.register((biomeScannerUltimate = (BlockBiomeScanner) new BlockBiomeScanner(3).setRegistryName(ScannerMod.MODID + ":biomeScannerUltimate")));
-        GameRegistry.register(new ItemBlock(biomeScannerUltimate).setRegistryName(MODID + ":biomeScannerUltimate").setCreativeTab(tab));
+        GameRegistry.register((biomeScannerUltimate = (BlockBiomeScanner) new BlockBiomeScanner(3).setRegistryName(ScannerMod.MODID + ":biome_scanner_ultimate")));
+        GameRegistry.register(new ItemBlock(biomeScannerUltimate).setRegistryName(MODID + ":biome_scanner_ultimate").setCreativeTab(tab));
 
 
         if (TESTING) {

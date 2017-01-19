@@ -27,7 +27,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
 
     public BlockTerrainScanner() {
         super(Material.IRON);
-        setRegistryName(ScannerMod.MODID + ":terrainScanner");
+        setRegistryName(ScannerMod.MODID + ":terrain_scanner");
         setUnlocalizedName("terrainScanner");
         setCreativeTab(tab);
         setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));
