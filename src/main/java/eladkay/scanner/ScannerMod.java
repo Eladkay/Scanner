@@ -19,6 +19,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -64,8 +65,8 @@ public class ScannerMod {
         instance = this;
         tab = new CreativeTabs(MODID) {
             @Override
-            public Item getTabIconItem() {
-                return Item.getItemFromBlock(terrainScanner);
+            public ItemStack getTabIconItem() {
+                return new ItemStack(Item.getItemFromBlock(terrainScanner));
             }
         };
         GameRegistry.register(air = new BlockAirey());
@@ -97,9 +98,9 @@ public class ScannerMod {
         if (TESTING) {
             Item item = new Item() {
                 @Override
-                public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+                public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
                     playerIn.sendMessage(new TextComponentString(String.valueOf(FMLCommonHandler.instance().getMinecraftServerInstance())));
-                    return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
+                    return super.onItemRightClick(worldIn, playerIn, hand);
                 }
             }.setRegistryName("scanner:testytest").setUnlocalizedName("scanner:testytest").setCreativeTab(tab);
             GameRegistry.register(item);
@@ -158,7 +159,7 @@ public class ScannerMod {
 
         @Override
         public IChunkGenerator createChunkGenerator() {
-            return new ChunkProviderEnd(world, world.getWorldInfo().isMapFeaturesEnabled(), world.getSeed());
+            return new ChunkProviderEnd(world, world.getWorldInfo().isMapFeaturesEnabled(), world.getSeed(), new BlockPos(0, 64, 0));
         }
     }
 

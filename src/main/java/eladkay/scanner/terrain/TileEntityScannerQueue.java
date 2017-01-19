@@ -109,8 +109,8 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
     @Override
     public void update() {
         scanner = getNearbyQueue0(getWorld(), this, TileEntityTerrainScanner.class);
+        flag = false;
         if (scanner != null) {
-            flag = false;
             for (EnumFacing facing : EnumFacing.values())
                 flag |= getWorld().getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate;
         }

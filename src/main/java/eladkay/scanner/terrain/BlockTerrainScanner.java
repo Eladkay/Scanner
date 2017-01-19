@@ -20,8 +20,6 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
-
 import static eladkay.scanner.ScannerMod.tab;
 
 public class BlockTerrainScanner extends Block implements ITileEntityProvider {
@@ -41,7 +39,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ScannerMod.proxy.openGuiTerrainScanner(((TileEntityTerrainScanner) worldIn.getTileEntity(pos)));
         return true;
     }

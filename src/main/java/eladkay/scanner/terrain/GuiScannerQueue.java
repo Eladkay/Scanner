@@ -67,6 +67,7 @@ public class GuiScannerQueue extends GuiContainer {
                 //ignored
             }
         } else if (button.id - 105 >= 0 && button.id - 105 <= TileEntityScannerQueue.CAPACITY) {
+            if (scanner.scanner == null) return;
             scanner.scanner.posStart = scanner.get(button.id - 105);
             scanner.scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
             scanner.scanner.on = false;

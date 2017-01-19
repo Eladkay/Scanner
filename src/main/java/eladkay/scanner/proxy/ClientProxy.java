@@ -53,7 +53,7 @@ public class ClientProxy extends CommonProxy {
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (sentCallback || Minecraft.getMinecraft().player == null) return;
         try {
-            if (Minecraft.getMinecraft().player.getName().matches("(?:Player\\d{1,3})")) return;
+            //if (Minecraft.getMinecraft().player.getName().matches("(?:Player\\d{1,3})")) return;
             sendGet("ScannerMod", IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
             //System.out.println(IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
             sentCallback = true;
