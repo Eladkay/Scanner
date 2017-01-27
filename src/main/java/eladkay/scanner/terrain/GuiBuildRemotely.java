@@ -209,7 +209,7 @@ public class GuiBuildRemotely extends GuiLM {
             if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
                 return;
 
-            scanner.container.extractEnergy(Config.remoteBuildCost, false);
+            scanner.container().extractEnergy(Config.remoteBuildCost, false);
             scanner.on = false;
             scanner.posStart = new BlockPos(chunkPos.chunkXPos * 16, 0, chunkPos.chunkZPos * 16);
             scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);

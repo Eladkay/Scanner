@@ -4,7 +4,6 @@ import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import com.google.gson.Gson;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
-import eladkay.scanner.misc.BaseEnergyContainer;
 import eladkay.scanner.misc.BaseTE;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,9 +34,6 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
         return new ChunkPos(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
     }
 
-    BaseEnergyContainer container() {
-        return container;
-    }
 
     public void onBlockActivated(EntityPlayer player) {
         ScannerMod.proxy.openGuiBiomeScanner(this);

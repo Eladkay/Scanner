@@ -51,8 +51,8 @@ public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
         BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(message.x, message.y, message.z));
         //System.out.println(Minecraft.getMinecraft().world.getBlockState(new BlockPos(message.x, message.y, message.z)).getBlock());
         //System.out.println(new BlockPos(message.x, message.y, message.z));
-        if (base != null && base.container != null)
-            base.container.setEnergyStored(message.energy);
+        if (base != null && base.container() != null)
+            base.container().setEnergyStored(message.energy);
     }
 
     @Override

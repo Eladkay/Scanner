@@ -116,7 +116,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         for (int j = 0; j < speedup; j++) {
             if (!on)
                 return;
-            if (container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
+            if (container().getEnergyStored() < Config.energyPerBlockTerrainScanner) {
                 //changeState(false);
                 return;
             }
@@ -206,7 +206,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
             markDirty();
         }
-        container.extractEnergy(Config.energyPerBlockTerrainScanner * multiplier, false);
+        container().extractEnergy(Config.energyPerBlockTerrainScanner * multiplier, false);
     }
 
     @Override

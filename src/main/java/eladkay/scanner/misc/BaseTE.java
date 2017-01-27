@@ -15,7 +15,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import javax.annotation.Nullable;
 
 public class BaseTE extends TileEntity implements IEnergyReceiver {
-    public BaseEnergyContainer container;
+    private BaseEnergyContainer container;
     private int max;
 
     public BaseTE(int max) {
@@ -65,6 +65,18 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
             markDirty();
         }
         return energyReceived;
+    }
+
+    public BaseEnergyContainer container() {
+        if (shouldHaveContainer())
+            if (container == null)
+                return container = new BaseEnergyContainer(max);
+            else return container;
+        else return null;
+    }
+
+    protected boolean shouldHaveContainer() {
+        return max > 0;
     }
 
     @Override
