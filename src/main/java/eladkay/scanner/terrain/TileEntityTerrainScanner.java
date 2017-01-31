@@ -137,7 +137,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             IBlockState local = getWorld().getBlockState(current);
             TileEntity remoteTE = remoteWorld.getTileEntity(current);
             BlockPos imm = current.toImmutable();
-            if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm)) && !(local.getBlock() instanceof BlockFluidBase) && !(local.getBlock() instanceof BlockLiquid)) {
+            if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm))) {
                 getWorld().setBlockState(imm, remote, 2);
                 if (remoteTE != null) {
                     NBTTagCompound tag = new NBTTagCompound();
