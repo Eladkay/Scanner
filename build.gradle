@@ -18,7 +18,7 @@ group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-co
 archivesBaseName = "scanner"
 
 minecraft {
-    version = "1.10.2-12.18.3.2185"
+    version = "1.10.2-12.18.3.2202"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.

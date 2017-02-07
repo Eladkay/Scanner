@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
@@ -54,7 +55,14 @@ public class ClientProxy extends CommonProxy {
         if (sentCallback || Minecraft.getMinecraft().player == null) return;
         try {
             if (Minecraft.getMinecraft().player.getName().matches("(?:Player\\d{1,3})")) return;
-            sendGet("ScannerMod", IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
+            new Thread(() -> {
+                try {
+                    sendGet("ScannerMod", IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
+                } catch (Exception e) {
+                    sentCallback = true;
+                    e.printStackTrace();
+                }
+            }).start();
             //System.out.println(IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
             sentCallback = true;
         } catch (Exception e) {
