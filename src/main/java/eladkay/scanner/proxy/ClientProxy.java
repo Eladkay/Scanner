@@ -52,6 +52,10 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (sentCallback || Minecraft.getMinecraft().player == null) return;
+        if (Minecraft.getMinecraft().isSnooperEnabled()) {
+            sentCallback = true;
+            System.out.println("Player opted out of Scanner statistics");
+        }
         try {
             if (Minecraft.getMinecraft().player.getName().matches("(?:Player\\d{1,3})")) return;
             new Thread(() -> {
