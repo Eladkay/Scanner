@@ -1,0 +1,17 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "type=none": {
+      "model": "scanner:dimensionalCore_none"
+    },
+    "type=overworld": {
+      "model": "scanner:dimensionalCore_overworld"
+    },
+    "type=nether": {
+      "model": "scanner:dimensionalCore_nether"
+    },
+    "type=end": {
+      "model": "scanner:dimensionalCore_end"
+    }
+  }
+}

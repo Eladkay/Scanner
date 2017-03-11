@@ -4,20 +4,21 @@ import eladkay.scanner.Config;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.WtfException;
-import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static eladkay.scanner.terrain.EnumDimensions.*;
 
 public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
@@ -110,6 +111,23 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (getWorld().isRemote) return; //Dont do stuff client side else we get ghosts
         queue = TileEntityScannerQueue.getNearbyQueue(getWorld(), this);
 
+        EnumDimensions type = getWorld().provider.getDimension() == -1 ? NETHER : getWorld().provider.getDimension() == 1 ? END : OVERWORLD;
+        for (EnumFacing facing : EnumFacing.values()) {
+            IBlockState te = world.getBlockState(getPos().offset(facing));
+            if (te.getBlock() instanceof BlockDimensionalCore && te.getValue(BlockDimensionalCore.TYPE) != NONE)
+                type = te.getValue(BlockDimensionalCore.TYPE);
+        }
+        WorldServer remoteWorld;
+        try {
+            if (type == NETHER)
+                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
+            else if (type == END)
+                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
+            else
+                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+        } catch (NullPointerException lazy) {
+            return;
+        }
         if (getWorld().isBlockPowered(getPos())) on = true;
         //System.out.println(queue);
         int multiplier = 0;
@@ -120,19 +138,9 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                 //changeState(false);
                 return;
             }
-            WorldServer remoteWorld;
-            try {
-                if (getWorld().provider.getDimension() == -1)
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
-                else if (getWorld().provider.getDimension() == 1)
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
-                else
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
-            } catch (NullPointerException lazy) {
-                return;
-            }
             changeState(true);
 
+            remoteWorld.getBlockState(current);
             IBlockState remote = remoteWorld.getBlockState(current);
             IBlockState local = getWorld().getBlockState(current);
             TileEntity remoteTE = remoteWorld.getTileEntity(current);

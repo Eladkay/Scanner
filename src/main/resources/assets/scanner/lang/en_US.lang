@@ -5,3 +5,8 @@ tile.biomeScannerElite.name=Biome Scanner (Elite)
 tile.biomeScannerUltimate.name=Biome Scanner (Ultimate)
 tile.scannerQueue.name=Scanner Queue
 itemGroup.scanner=Scanner
+
+tile.dimensionalCore_nether.name=Dimensional Core (Nether)
+tile.dimensionalCore_end.name=Dimensional Core (End)
+tile.dimensionalCore_overworld.name=Dimensional Core (Overworld)
+tile.dimensionalCore_none.name=Dimensional Core

@@ -6,19 +6,22 @@ import eladkay.scanner.compat.MineTweaker;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.proxy.CommonProxy;
 import eladkay.scanner.terrain.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -35,6 +38,8 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import java.util.List;
 
 @Mod(modid = ScannerMod.MODID, name = "Scanner", version = ScannerMod.VERSION)
 public class ScannerMod {
@@ -53,6 +58,7 @@ public class ScannerMod {
     public static BlockBiomeScanner biomeScannerAdv;
     public static BlockBiomeScanner biomeScannerElite;
     public static BlockBiomeScanner biomeScannerUltimate;
+    public static BlockDimensionalCore dimensionalCore;
     @Mod.Instance(MODID)
     public static ScannerMod instance;
     public static CreativeTabs tab;
@@ -72,26 +78,111 @@ public class ScannerMod {
 
         //Terrain Scanner and accessories
         GameRegistry.register(terrainScanner = new BlockTerrainScanner());
-        GameRegistry.register(new ItemBlock(terrainScanner).setRegistryName(MODID + ":terrainScanner").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(terrainScanner) {
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                tooltip.add("The ultimate terrain reconstruction tool.");
+                tooltip.add("Its GUI is fairly self-explanatory in my opinion.");
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+        }.setRegistryName(MODID + ":terrainScanner").setCreativeTab(tab));
         GameRegistry.registerTileEntity(TileEntityTerrainScanner.class, "terrainScanner");
 
         GameRegistry.register(scannerQueue = new BlockScannerQueue());
-        GameRegistry.register(new ItemBlock(scannerQueue).setRegistryName(MODID + ":scannerQueue").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(scannerQueue) {
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                tooltip.add("Provides a buffer of chunks and allows you to queue up chunks for scanning.");
+                tooltip.add("Place next to Terrain Scanner.");
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+        }.setRegistryName(MODID + ":scannerQueue").setCreativeTab(tab));
         GameRegistry.registerTileEntity(TileEntityScannerQueue.class, "q");
 
-        GameRegistry.registerTileEntity(TileEntityBiomeScanner.class, "biomeScanner");
+        GameRegistry.register(dimensionalCore = new BlockDimensionalCore());
+        GameRegistry.register(new ItemBlock(dimensionalCore) {
+
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                if (stack.getItemDamage() == EnumDimensions.NONE.ordinal()) tooltip.add("Crafting component.");
+                else {
+                    tooltip.add("Allows you to build chunks from other dimensions. ");
+                    tooltip.add("Place next to Terrain Scanner.");
+                }
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+
+            @Override
+            public String getUnlocalizedName(ItemStack stack) {
+                return super.getUnlocalizedName(stack) + "_" + EnumDimensions.values()[stack.getMetadata()].getName();
+            }
+
+            @Override
+            public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+                IBlockState iblockstate = worldIn.getBlockState(pos);
+                Block block = iblockstate.getBlock();
+
+                if (!block.isReplaceable(worldIn, pos)) {
+                    pos = pos.offset(facing);
+                }
+
+                if (stack.stackSize != 0 && playerIn.canPlayerEdit(pos, facing, stack) && worldIn.canBlockBePlaced(this.block, pos, false, facing, null, stack)) {
+                    int i = stack.getMetadata();
+                    IBlockState iblockstate1 = this.block.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, i, playerIn, stack);
+
+                    if (placeBlockAt(stack, playerIn, worldIn, pos, facing, hitX, hitY, hitZ, iblockstate1)) {
+                        SoundType soundtype = worldIn.getBlockState(pos).getBlock().getSoundType(worldIn.getBlockState(pos), worldIn, pos, playerIn);
+                        worldIn.playSound(playerIn, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                        --stack.stackSize;
+                    }
+
+                    return EnumActionResult.SUCCESS;
+                } else {
+                    return EnumActionResult.FAIL;
+                }
+            }
+        }.setHasSubtypes(true).setRegistryName(MODID + ":dimensionalCore").setCreativeTab(tab));
+
+
         //Biome Scanner Tiers
+
+        GameRegistry.registerTileEntity(TileEntityBiomeScanner.class, "biomeScanner");
+
         GameRegistry.register((biomeScannerBasic = (BlockBiomeScanner) new BlockBiomeScanner(0).setRegistryName(ScannerMod.MODID + ":biomeScannerBasic")));
-        GameRegistry.register(new ItemBlock(biomeScannerBasic).setRegistryName(MODID + ":biomeScannerBasic").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(biomeScannerBasic) {
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                tooltip.add("Provides info about biomes far away.");
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+        }.setRegistryName(MODID + ":biomeScannerBasic").setCreativeTab(tab));
 
         GameRegistry.register((biomeScannerAdv = (BlockBiomeScanner) new BlockBiomeScanner(1).setRegistryName(ScannerMod.MODID + ":biomeScannerAdv")));
-        GameRegistry.register(new ItemBlock(biomeScannerAdv).setRegistryName(MODID + ":biomeScannerAdv").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(biomeScannerAdv) {
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                tooltip.add("Provides info about biomes far away.");
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+        }.setRegistryName(MODID + ":biomeScannerAdv").setCreativeTab(tab));
 
         GameRegistry.register((biomeScannerElite = (BlockBiomeScanner) new BlockBiomeScanner(2).setRegistryName(ScannerMod.MODID + ":biomeScannerElite")));
-        GameRegistry.register(new ItemBlock(biomeScannerElite).setRegistryName(MODID + ":biomeScannerElite").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(biomeScannerElite) {
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                tooltip.add("Provides info about biomes far away.");
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+        }.setRegistryName(MODID + ":biomeScannerElite").setCreativeTab(tab));
 
         GameRegistry.register((biomeScannerUltimate = (BlockBiomeScanner) new BlockBiomeScanner(3).setRegistryName(ScannerMod.MODID + ":biomeScannerUltimate")));
-        GameRegistry.register(new ItemBlock(biomeScannerUltimate).setRegistryName(MODID + ":biomeScannerUltimate").setCreativeTab(tab));
+        GameRegistry.register(new ItemBlock(biomeScannerUltimate) {
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                tooltip.add("Provides info about biomes far away.");
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+        }.setRegistryName(MODID + ":biomeScannerUltimate").setCreativeTab(tab));
 
 
         if (TESTING) {
