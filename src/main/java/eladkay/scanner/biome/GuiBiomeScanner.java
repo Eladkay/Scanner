@@ -1,5 +1,6 @@
 package eladkay.scanner.biome;
 
+import com.feed_the_beast.ftbl.api.client.FTBLibClient;
 import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
 import com.feed_the_beast.ftbl.lib.MouseButton;
@@ -10,6 +11,7 @@ import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -22,6 +24,8 @@ import org.lwjgl.opengl.GL11;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static com.feed_the_beast.ftbl.lib.gui.GuiHelper.drawTexturedRect;
 
 public class GuiBiomeScanner extends GuiLM {
     public static GuiBiomeScanner instance;
@@ -66,7 +70,7 @@ public class GuiBiomeScanner extends GuiLM {
 
             @Override
             public int getAX() {
-                return getScreenWidth() - 16;
+                return getWidth() - 16;
             }
 
             @Override
@@ -107,7 +111,7 @@ public class GuiBiomeScanner extends GuiLM {
 
         ThreadReloadChunkSelector.updateTexture();
         GlStateManager.bindTexture(ThreadReloadChunkSelector.getTextureID());
-        GuiHelper.drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
+        drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
 
         GlStateManager.color(1F, 1F, 1F, 1F);
         GlStateManager.enableTexture2D();
@@ -157,12 +161,18 @@ public class GuiBiomeScanner extends GuiLM {
             GlStateManager.color(1F, 1F, 1F, mc.player.isSneaking() ? 0.4F : 0.7F);
             GuiHelper.drawTexturedRect(-8, -8, 16, 16, 0D, 0D, 1D, 1D);
             GlStateManager.popMatrix();*/
-            GuiHelper.drawPlayerHead(mc.player.getName(), -2, -2, 4, 4);
+            drawPlayerHead(mc.player.getName(), -2, -2, 4, 4);
             GlStateManager.popMatrix();
         }
 
         GlStateManager.color(1F, 1F, 1F, 1F);
 
+    }
+
+    public static void drawPlayerHead(String username, int x, int y, int w, int h) {
+        Minecraft.getMinecraft().getTextureManager().bindTexture(FTBLibClient.getSkinTexture(username));
+        drawTexturedRect(x, y, w, h, 0.125D, 0.125D, 0.25D, 0.25D);
+        drawTexturedRect(x, y, w, h, 0.625D, 0.125D, 0.75D, 0.25D);
     }
 
     @Override

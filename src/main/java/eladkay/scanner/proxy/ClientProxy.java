@@ -72,10 +72,10 @@ public class ClientProxy extends CommonProxy {
                 }
             }).start();
             //System.out.println(IP + "?username=" + Minecraft.getMinecraft().player.getName() + "&timestamp=" + new Date().toString().replace(" ", "") + "&version=" + ScannerMod.VERSION);
-            sentCallback = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        sentCallback = true;
     }
 
     private static String sendGet(String userAgent, String url) throws Exception {

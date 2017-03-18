@@ -8,6 +8,7 @@ import com.feed_the_beast.ftbl.lib.gui.misc.GuiConfigs;
 import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
 import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
 import eladkay.scanner.Config;
+import eladkay.scanner.biome.GuiBiomeScanner;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.renderer.GlStateManager;
@@ -65,7 +66,7 @@ public class GuiBuildRemotely extends GuiLM {
 
             @Override
             public int getAX() {
-                return getScreenWidth() - 16;
+                return getWidth() - 16;
             }
 
             @Override
@@ -156,7 +157,7 @@ public class GuiBuildRemotely extends GuiLM {
             GlStateManager.color(1F, 1F, 1F, mc.player.isSneaking() ? 0.4F : 0.7F);
             GuiHelper.drawTexturedRect(-8, -8, 16, 16, 0D, 0D, 1D, 1D);
             GlStateManager.popMatrix();*/
-            GuiHelper.drawPlayerHead(mc.player.getName(), -2, -2, 4, 4);
+            GuiBiomeScanner.drawPlayerHead(mc.player.getName(), -2, -2, 4, 4);
             GlStateManager.popMatrix();
         }
 
