@@ -1,9 +1,9 @@
 package eladkay.scanner.biome;
 
-import com.feed_the_beast.ftbl.api.client.FTBLibClient;
 import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
 import com.feed_the_beast.ftbl.lib.MouseButton;
+import com.feed_the_beast.ftbl.lib.client.FTBLibClient;
 import com.feed_the_beast.ftbl.lib.gui.*;
 import com.feed_the_beast.ftbl.lib.gui.misc.GuiConfigs;
 import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
