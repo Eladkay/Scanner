@@ -70,7 +70,7 @@ public class GuiBuildRemotely extends GuiBase
 
             @Override
             public int getAX() {
-                return getWidth() - 16;
+                return height - 16;
             }
 
             @Override
@@ -105,7 +105,7 @@ public class GuiBuildRemotely extends GuiBase
         super.drawBackground();
 
         GlStateManager.color(0F, 0F, 0F, 1F);
-        GuiHelper.drawBlankRect(posX - 2, posY - 2, getWidth() + 4, getHeight() + 4);
+        GuiHelper.drawBlankRect(posX - 2, posY - 2, width + 4, height + 4);
         //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
@@ -202,8 +202,8 @@ public class GuiBuildRemotely extends GuiBase
 
         private MapButton(int x, int y, int i) {
             super(x, y, 16, 16);
-            posX += (i % GuiConfigs.CHUNK_SELECTOR_TILES_GUI) * getWidth();
-            posY += (i / GuiConfigs.CHUNK_SELECTOR_TILES_GUI) * getHeight();
+            posX += (i % GuiConfigs.CHUNK_SELECTOR_TILES_GUI) * width;
+            posY += (i / GuiConfigs.CHUNK_SELECTOR_TILES_GUI) * height;
             chunkPos = new ChunkPos(startX + (i % GuiConfigs.CHUNK_SELECTOR_TILES_GUI), startZ + (i / GuiConfigs.CHUNK_SELECTOR_TILES_GUI));
             index = i;
         }

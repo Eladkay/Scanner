@@ -60,8 +60,7 @@ repositories {
 
 dependencies {
     compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-//    compile "LatMod:FTBLib:1.10.2-3.2.1"
-//    compile "LatMod:FTBUtilities:1.10.2-3.2.1"
+    compile 'LatMod:FTBLib:1.10.2-3.5.0:api'
     compile "LatMod:RedstoneFlux:1.2.0"
     compile "CraftTweaker:CraftTweaker:1.10.2-3.0.13"
     //compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22:universal"
