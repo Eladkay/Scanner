@@ -1,9 +1,12 @@
 package eladkay.scanner.terrain;
 
-import com.feed_the_beast.ftbl.api.gui.IGui;
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
 import com.feed_the_beast.ftbl.lib.MouseButton;
-import com.feed_the_beast.ftbl.lib.gui.*;
+import com.feed_the_beast.ftbl.lib.gui.Button;
+import com.feed_the_beast.ftbl.lib.gui.GuiBase;
+import com.feed_the_beast.ftbl.lib.gui.GuiHelper;
+import com.feed_the_beast.ftbl.lib.gui.GuiLang;
+import com.feed_the_beast.ftbl.lib.gui.Panel;
 import com.feed_the_beast.ftbl.lib.gui.misc.GuiConfigs;
 import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
 import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
@@ -23,12 +26,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class GuiBuildRemotely extends GuiLM {
+public class GuiBuildRemotely extends GuiBase
+{
     public static GuiBuildRemotely instance;
     public final int startX, startZ;
-    private final ButtonLM buttonRefresh, buttonClose;
+    private final Button buttonRefresh, buttonClose;
     private final MapButton mapButtons[];
-    private final PanelLM panelButtons;
+    private final Panel panelButtons;
     private final TileEntityTerrainScanner scanner;
     private byte currentSelectionMode = -1;
 
@@ -40,22 +44,22 @@ public class GuiBuildRemotely extends GuiLM {
         startX = MathHelperLM.chunk(mc.player.posX) - 7;
         startZ = MathHelperLM.chunk(mc.player.posZ) - 7;
 
-        buttonClose = new ButtonLM(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate()) {
+        buttonClose = new Button(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate()) {
             @Override
-            public void onClicked(IGui gui, IMouseButton button) {
+            public void onClicked(GuiBase gui, IMouseButton button) {
                 GuiHelper.playClickSound();
                 closeGui();
             }
         };
 
-        buttonRefresh = new ButtonLM(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate()) {
+        buttonRefresh = new Button(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate()) {
             @Override
-            public void onClicked(IGui gui, IMouseButton button) {
+            public void onClicked(GuiBase gui, IMouseButton button) {
                 ThreadReloadChunkSelector.reloadArea(mc.world, startX, startZ);
             }
         };
 
-        panelButtons = new PanelLM(0, 0, 16, 0) {
+        panelButtons = new Panel(0, 0, 16, 0) {
             @Override
             public void addWidgets() {
                 add(buttonClose);
@@ -166,7 +170,7 @@ public class GuiBuildRemotely extends GuiLM {
     }
 
     @Override
-    public void mouseReleased(IGui gui) {
+    public void mouseReleased(GuiBase gui) {
         super.mouseReleased(gui);
 
         if (currentSelectionMode != -1) {
@@ -190,7 +194,8 @@ public class GuiBuildRemotely extends GuiLM {
         super.drawForeground();
     }
 
-    private class MapButton extends ButtonLM {
+    private class MapButton extends Button
+    {
         private final ChunkPos chunkPos;
         private final int index;
         private boolean isSelected = false;
@@ -204,7 +209,7 @@ public class GuiBuildRemotely extends GuiLM {
         }
 
         @Override
-        public void onClicked(IGui gui, IMouseButton button) {
+        public void onClicked(GuiBase gui, IMouseButton button) {
             //do stuff
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
@@ -222,7 +227,7 @@ public class GuiBuildRemotely extends GuiLM {
         }
 
         @Override
-        public void addMouseOverText(IGui gui, List<String> l) {
+        public void addMouseOverText(GuiBase gui, List<String> l) {
             l.add("Click to scan!");
             l.add("Power cost: " + Config.remoteBuildCost);
             l.add(chunkPos.toString());
@@ -233,7 +238,7 @@ public class GuiBuildRemotely extends GuiLM {
         }
 
         @Override
-        public void renderWidget(IGui gui) {
+        public void renderWidget(GuiBase gui) {
             int ax = getAX();
             int ay = getAY();
 
