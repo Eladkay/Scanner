@@ -1,6 +1,7 @@
 package eladkay.scanner.biome;
 
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
+import com.feed_the_beast.ftbl.lib.Color4I;
 import com.feed_the_beast.ftbl.lib.MouseButton;
 import com.feed_the_beast.ftbl.lib.client.FTBLibClient;
 import com.feed_the_beast.ftbl.lib.gui.Button;
@@ -108,16 +109,14 @@ public class GuiBiomeScanner extends GuiBase
     public void drawBackground() {
         super.drawBackground();
 
-        GlStateManager.color(0F, 0F, 0F, 1F);
-        GuiHelper.drawBlankRect(posX - 2, posY - 2, width + 4, height + 4);
+        GuiHelper.drawBlankRect(posX - 2, posY - 2, width + 4, height + 4, Color4I.BLACK);
         //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
         ThreadReloadChunkSelector.updateTexture();
         GlStateManager.bindTexture(ThreadReloadChunkSelector.getTextureID());
-        drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
+        drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, Color4I.WHITE, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
 
-        GlStateManager.color(1F, 1F, 1F, 1F);
         GlStateManager.enableTexture2D();
 
         for (MapButton mapButton : mapButtons) {
@@ -175,8 +174,8 @@ public class GuiBiomeScanner extends GuiBase
 
     public static void drawPlayerHead(String username, int x, int y, int w, int h) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(FTBLibClient.getSkinTexture(username));
-        drawTexturedRect(x, y, w, h, 0.125D, 0.125D, 0.25D, 0.25D);
-        drawTexturedRect(x, y, w, h, 0.625D, 0.125D, 0.75D, 0.25D);
+        drawTexturedRect(x, y, w, h, Color4I.WHITE, 0.125D, 0.125D, 0.25D, 0.25D);
+        drawTexturedRect(x, y, w, h, Color4I.WHITE, 0.625D, 0.125D, 0.75D, 0.25D);
     }
 
     @Override
@@ -271,9 +270,7 @@ public class GuiBiomeScanner extends GuiBase
             int ay = getAY();
 
             if (isSelected || gui.isMouseOver(this)) {
-                GlStateManager.color(1F, 1F, 1F, 0.27F);
-                GuiHelper.drawBlankRect(ax, ay, 16, 16);
-                GlStateManager.color(1F, 1F, 1F, 1F);
+                GuiHelper.drawBlankRect(ax, ay, 16, 16, Color4I.WHITE_A33);
             }
 
             if (!isSelected && currentSelectionMode != -1 && isMouseOver(this)) {

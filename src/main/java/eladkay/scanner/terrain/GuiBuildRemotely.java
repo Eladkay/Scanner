@@ -1,6 +1,7 @@
 package eladkay.scanner.terrain;
 
 import com.feed_the_beast.ftbl.api.gui.IMouseButton;
+import com.feed_the_beast.ftbl.lib.Color4I;
 import com.feed_the_beast.ftbl.lib.MouseButton;
 import com.feed_the_beast.ftbl.lib.gui.Button;
 import com.feed_the_beast.ftbl.lib.gui.GuiBase;
@@ -28,6 +29,7 @@ import java.util.List;
 
 public class GuiBuildRemotely extends GuiBase
 {
+    private static final Color4I COL_GREEN = new Color4I(0x6600FF00);
     public static GuiBuildRemotely instance;
     public final int startX, startZ;
     private final Button buttonRefresh, buttonClose;
@@ -104,16 +106,14 @@ public class GuiBuildRemotely extends GuiBase
     public void drawBackground() {
         super.drawBackground();
 
-        GlStateManager.color(0F, 0F, 0F, 1F);
-        GuiHelper.drawBlankRect(posX - 2, posY - 2, width + 4, height + 4);
-        //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
         GlStateManager.color(1F, 1F, 1F, 1F);
+        GuiHelper.drawBlankRect(posX - 2, posY - 2, width + 4, height + 4, Color4I.BLACK);
+        //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
 
         ThreadReloadChunkSelector.updateTexture();
         GlStateManager.bindTexture(ThreadReloadChunkSelector.getTextureID());
-        GuiHelper.drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
+        GuiHelper.drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, Color4I.WHITE, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
 
-        GlStateManager.color(1F, 1F, 1F, 1F);
         GlStateManager.enableTexture2D();
 
         for (MapButton mapButton : mapButtons) {
@@ -243,13 +243,9 @@ public class GuiBuildRemotely extends GuiBase
             int ay = getAY();
 
             if ((isSelected || gui.isMouseOver(this)) && !(scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16)) {
-                GlStateManager.color(1F, 1F, 1F, 0.27F);
-                GuiHelper.drawBlankRect(ax, ay, 16, 16);
-                GlStateManager.color(1F, 1F, 1F, 1F);
+                GuiHelper.drawBlankRect(ax, ay, 16, 16, Color4I.WHITE_A33);
             } else if (scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16) {
-                GlStateManager.color(0F, 1F, 0F, 0.27F);
-                GuiHelper.drawBlankRect(ax, ay, 16, 16);
-                GlStateManager.color(1F, 1F, 1F, 1F);
+                GuiHelper.drawBlankRect(ax, ay, 16, 16, COL_GREEN);
             }
 
             if (!isSelected && currentSelectionMode != -1 && isMouseOver(this)) {
