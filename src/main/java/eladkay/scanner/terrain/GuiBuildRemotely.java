@@ -29,7 +29,7 @@ import java.util.List;
 
 public class GuiBuildRemotely extends GuiBase
 {
-    private static final Color4I COL_GREEN = new Color4I(0x6600FF00);
+    private static final Color4I COL_GREEN = new Color4I(false, 0x6600FF00);
     public static GuiBuildRemotely instance;
     public final int startX, startZ;
     private final Button buttonRefresh, buttonClose;
