@@ -11,7 +11,7 @@ import com.feed_the_beast.ftbl.lib.gui.GuiLang;
 import com.feed_the_beast.ftbl.lib.gui.Panel;
 import com.feed_the_beast.ftbl.lib.gui.misc.GuiConfigs;
 import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
-import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
+import com.feed_the_beast.ftbl.lib.math.MathUtils;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
@@ -46,8 +46,8 @@ public class GuiBiomeScanner extends GuiBase
 
         this.scanner = scanner;
 
-        startX = MathHelperLM.chunk(mc.player.posX) - 7;
-        startZ = MathHelperLM.chunk(mc.player.posZ) - 7;
+        startX = MathUtils.chunk(mc.player.posX) - 7;
+        startZ = MathUtils.chunk(mc.player.posZ) - 7;
 
         buttonClose = new Button(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate()) {
             @Override
@@ -148,12 +148,12 @@ public class GuiBiomeScanner extends GuiBase
         tessellator.draw();
         GlStateManager.enableTexture2D();
 
-        int cx = MathHelperLM.chunk(mc.player.posX);
-        int cy = MathHelperLM.chunk(mc.player.posZ);
+        int cx = MathUtils.chunk(mc.player.posX);
+        int cy = MathUtils.chunk(mc.player.posZ);
 
         if (cx >= startX && cy >= startZ && cx < startX + GuiConfigs.CHUNK_SELECTOR_TILES_GUI && cy < startZ + GuiConfigs.CHUNK_SELECTOR_TILES_GUI) {
-            double x = ((cx - startX) * 16D + MathHelperLM.wrap(mc.player.posX, 16D));
-            double y = ((cy - startZ) * 16D + MathHelperLM.wrap(mc.player.posZ, 16D));
+            double x = ((cx - startX) * 16D + MathUtils.wrap(mc.player.posX, 16D));
+            double y = ((cy - startZ) * 16D + MathUtils.wrap(mc.player.posZ, 16D));
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(posX + x, posY + y, 0D);

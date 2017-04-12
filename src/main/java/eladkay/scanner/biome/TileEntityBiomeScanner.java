@@ -1,6 +1,6 @@
 package eladkay.scanner.biome;
 
-import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
+import com.feed_the_beast.ftbl.lib.math.MathUtils;
 import com.google.gson.Gson;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
@@ -92,8 +92,8 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     }
 
     public int getDist(ChunkPos chunkPos) {
-        double d0 = pos.getX() - MathHelperLM.unchunk(chunkPos.chunkXPos);
-        double d1 = pos.getZ() - MathHelperLM.unchunk(chunkPos.chunkZPos);
+        double d0 = pos.getX() - MathUtils.unchunk(chunkPos.chunkXPos);
+        double d1 = pos.getZ() - MathUtils.unchunk(chunkPos.chunkZPos);
         return (int) (MathHelper.sqrt(d0 * d0 + d1 * d1) / 16D);
     }
 }
