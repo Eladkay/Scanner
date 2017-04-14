@@ -13,7 +13,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.4.1"
+version = "1.5.1"
 group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "scanner"
 
@@ -55,7 +55,6 @@ repositories {
         name "EnderIO"
         artifactPattern "https://addons-origin.cursecdn.com/files/2340/734/[module]-[revision](-[classifier]).[ext]"
     }
-
 }
 
 dependencies {
@@ -67,7 +66,6 @@ dependencies {
     //compile "EnderCore:EnderCore:1.10.2-0.4.1.64-beta"
     //compile "EnderIO:EnderIO:1.10.2-3.1.156"
     compile "net.darkhax.tesla:Tesla:1.10.2-1.2.0.37"
-
 }
 
 apply plugin: 'java'
