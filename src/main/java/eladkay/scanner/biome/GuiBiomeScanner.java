@@ -70,7 +70,7 @@ public class GuiBiomeScanner extends GuiBase
                 add(buttonClose);
                 add(buttonRefresh);
 
-                setHeight(getWidgets().size() * 16);
+                setHeight(widgets.size() * 16);
             }
 
             @Override
