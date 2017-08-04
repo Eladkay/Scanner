@@ -13,7 +13,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -41,15 +40,14 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
     @Override
     public void writeCustomNBT(@NotNull NBTTagCompound cmp, boolean sync) {
         NBTTagList list = new NBTTagList();
-        for (BlockPos pos : queue)
-            list.appendTag(new NBTTagLong(pos.toLong()));
-        cmp.setTag("list", list);
+        for (BlockPos pos : queue) list.appendTag(new NBTTagLong(pos.toLong()));
+        cmp.setTag("queue", list);
         super.writeCustomNBT(cmp, sync);
     }
 
     @Override
     public void readCustomNBT(@NotNull NBTTagCompound cmp) {
-        NBTTagList list = cmp.getTagList("list", Constants.NBT.TAG_LONG);
+        NBTTagList list = cmp.getTagList("queue", 4);
         for (int i = 0; i < list.tagCount(); i++) queue.add(BlockPos.fromLong(((NBTTagLong) list.get(i)).getLong()));
         super.readCustomNBT(cmp);
     }

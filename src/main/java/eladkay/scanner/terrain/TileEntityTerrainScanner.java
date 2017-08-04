@@ -30,16 +30,16 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     transient TileEntityScannerQueue queue;
     @Save
     boolean on;
-    @Save
+    @Save(saveName = "positions")
     MutableBlockPos current = new MutableBlockPos(0, -1, 0);
     //BlockPos pos = null;
-    @Save
+    @Save(saveName = "rot")
     public EnumRotation rotation = EnumRotation.POSX_POSZ;
-    @Save
+    @Save(saveName = "speedup")
     public int speedup = 1;
     @Save
     public BlockPos posStart = null;
-    @Save
+    @Save(saveName = "my")
     public int maxY = 127;
 
     @Nonnull
