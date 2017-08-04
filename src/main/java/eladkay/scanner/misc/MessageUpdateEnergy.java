@@ -1,18 +1,26 @@
 package eladkay.scanner.misc;
 
+import com.teamwizardry.librarianlib.common.network.PacketBase;
+import com.teamwizardry.librarianlib.common.util.autoregister.PacketRegister;
+import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.ScannerMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
-public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
+@PacketRegister(Side.CLIENT)
+public class MessageUpdateEnergy extends PacketBase {
 
+    @Save
     int x;
+    @Save
     int y;
+    @Save
     int z;
+    @Save
     long energy;
+    @Save
     int dim;
 
     public MessageUpdateEnergy(int x, int y, int z, long energy, int dim) {
@@ -28,35 +36,12 @@ public class MessageUpdateEnergy extends MessageBase<MessageUpdateEnergy> {
     }
 
     @Override
-    public void fromBytes(ByteBuf buf) {
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
-        energy = buf.readLong();
-        dim = buf.readInt();
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
-        buf.writeLong(energy);
-        buf.writeInt(dim);
-    }
-
-    @Override
-    public void handleClientSide(MessageUpdateEnergy message, EntityPlayer player) {
+    public void handle(MessageContext player) {
         World server = ScannerMod.proxy.getWorld();
-        BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(x, y, z));
         //System.out.println(Minecraft.getMinecraft().world.getBlockState(new BlockPos(message.x, message.y, message.z)).getBlock());
         //System.out.println(new BlockPos(message.x, message.y, message.z));
         if (base != null && base.container() != null)
-            base.container().setEnergyStored(message.energy);
-    }
-
-    @Override
-    public void handleServerSide(MessageUpdateEnergy message, MessageContext player) {
-
+            base.container().setEnergyStored(energy);
     }
 }

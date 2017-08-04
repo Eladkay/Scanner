@@ -1,12 +1,12 @@
-tile.terrainScanner.name=Terrain Scanner
-tile.biomeScannerBasic.name=Biome Scanner (Basic)
-tile.biomeScannerAdv.name=Biome Scanner (Advanced)
-tile.biomeScannerElite.name=Biome Scanner (Elite)
-tile.biomeScannerUltimate.name=Biome Scanner (Ultimate)
-tile.scannerQueue.name=Scanner Queue
+tile.scanner:terrainScanner.name=Terrain Scanner
+tile.scanner:biomeScannerBasic.name=Biome Scanner (Basic)
+tile.scanner:biomeScannerAdv.name=Biome Scanner (Advanced)
+tile.scanner:biomeScannerElite.name=Biome Scanner (Elite)
+tile.scanner:biomeScannerUltimate.name=Biome Scanner (Ultimate)
+tile.scanner:scannerQueue.name=Scanner Queue
 itemGroup.scanner=Scanner
 
-tile.dimensionalCore_nether.name=Dimensional Core (Nether)
-tile.dimensionalCore_end.name=Dimensional Core (End)
-tile.dimensionalCore_overworld.name=Dimensional Core (Overworld)
-tile.dimensionalCore_none.name=Dimensional Core
+tile.scanner:dimensionalCore_nether.name=Dimensional Core (Nether)
+tile.scanner:dimensionalCore_end.name=Dimensional Core (End)
+tile.scanner:dimensionalCore_overworld.name=Dimensional Core (Overworld)
+tile.scanner:dimensionalCore_none.name=Dimensional Core

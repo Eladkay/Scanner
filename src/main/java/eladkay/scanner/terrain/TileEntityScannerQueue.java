@@ -1,5 +1,8 @@
 package eladkay.scanner.terrain;
 
+import com.google.common.collect.Lists;
+import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
+import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.misc.BaseTE;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,16 +13,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
 import java.util.Iterator;
-import java.util.Queue;
+import java.util.LinkedList;
 
+@TileRegister("q")
 public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterable<BlockPos> {
-    public Queue<BlockPos> queue = new ArrayDeque<>();
+    public LinkedList<BlockPos> queue = Lists.newLinkedList();
 
     transient TileEntityTerrainScanner scanner;
+    @Save
     public boolean flag;
 
     @Nullable
@@ -30,6 +35,21 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
             //else System.out.println(te != null ? te.getClass() : "No te here!");
         }
         return null;
+    }
+
+    @Override
+    public void writeCustomNBT(@NotNull NBTTagCompound cmp, boolean sync) {
+        NBTTagList list = new NBTTagList();
+        for (BlockPos pos : queue) list.appendTag(new NBTTagLong(pos.toLong()));
+        cmp.setTag("queue", list);
+        super.writeCustomNBT(cmp, sync);
+    }
+
+    @Override
+    public void readCustomNBT(@NotNull NBTTagCompound cmp) {
+        NBTTagList list = cmp.getTagList("queue", 4);
+        for (int i = 0; i < list.tagCount(); i++) queue.add(BlockPos.fromLong(((NBTTagLong) list.get(i)).getLong()));
+        super.readCustomNBT(cmp);
     }
 
     @Nullable
@@ -43,7 +63,9 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
 
     @Nullable
     public BlockPos pop() {
-        return queue.poll();
+        BlockPos ret = queue.poll();
+        markDirty();
+        return ret;
     }
 
     @Override
@@ -64,6 +86,7 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
 
     public void remove(BlockPos pos) {
         queue.remove(pos);
+        markDirty();
     }
 
     static final int CAPACITY = 5;
@@ -71,6 +94,7 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
     public void push(BlockPos pos) {
         if (queue.size() >= CAPACITY) return;
         queue.add(pos);
+        markDirty();
     }
 
     @Nullable
@@ -78,29 +102,6 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
         return queue.peek();
     }
 
-
-    @Override
-    public NBTTagCompound getUpdateTag() {
-        NBTTagCompound tag = new NBTTagCompound();
-        writeToNBT(tag);
-        return tag;
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        super.writeToNBT(nbt);
-        NBTTagList list = new NBTTagList();
-        for (BlockPos pos : queue) list.appendTag(new NBTTagLong(pos.toLong()));
-        nbt.setTag("queue", list);
-        return nbt;
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt) {
-        super.readFromNBT(nbt);
-        NBTTagList list = nbt.getTagList("queue", 4);
-        for (int i = 0; i < list.tagCount(); i++) queue.add(BlockPos.fromLong(((NBTTagLong) list.get(i)).getLong()));
-    }
 
     public TileEntityScannerQueue() {
         super(0);

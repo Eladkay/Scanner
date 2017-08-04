@@ -1,20 +1,27 @@
 package eladkay.scanner.biome;
 
 
+import com.teamwizardry.librarianlib.common.network.PacketBase;
+import com.teamwizardry.librarianlib.common.util.autoregister.PacketRegister;
+import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.Config;
-import eladkay.scanner.misc.MessageBase;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
-public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
+@PacketRegister(Side.SERVER)
+public class MessageUpdateMap extends PacketBase {
 
+    @Save
     private int x;
+    @Save
     private int y;
+    @Save
     private int z;
+    @Save
     private int chunkX;
+    @Save
     private int chunkY;
 
     public MessageUpdateMap() {
@@ -29,36 +36,15 @@ public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
         this.chunkY = chunkY;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
-        chunkX = buf.readInt();
-        chunkY = buf.readInt();
-    }
 
     @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
-        buf.writeInt(chunkX);
-        buf.writeInt(chunkY);
-    }
+    public void handle(MessageContext player) {
 
-    @Override
-    public void handleClientSide(MessageUpdateMap message, EntityPlayer player) {
-    } //noop
-
-    @Override
-    public void handleServerSide(MessageUpdateMap message, MessageContext player) {
-
-        TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.getServerHandler().playerEntity.world.getTileEntity(new BlockPos(message.x, message.y, message.z));
-        ChunkPos chunkPos = new ChunkPos(message.chunkX, message.chunkY);
+        TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.getServerHandler().playerEntity.world.getTileEntity(new BlockPos(x, y, z));
+        ChunkPos chunkPos = new ChunkPos(chunkX, chunkY);
         int powerCost = Config.minEnergyPerChunkBiomeScanner * Config.increase * bs.getDist(chunkPos);
         bs.container().extractEnergy(powerCost, false);
-        bs.mapping.put(chunkPos, player.getServerHandler().playerEntity.world.getBiome(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).getBiomeName());
+        bs.mapping.put(chunkPos, player.getServerHandler().playerEntity.world.getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkY * 16 + 8)).getBiomeName());
         bs.markDirty();
     }
 }

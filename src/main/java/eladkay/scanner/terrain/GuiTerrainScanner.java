@@ -1,9 +1,9 @@
 package eladkay.scanner.terrain;
 
+import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
-import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiPageButtonList;
@@ -62,7 +62,7 @@ public class GuiTerrainScanner extends GuiContainer {
             public void setEntryValue(int id, float value) {
                 scanner.speedup = value < 1 ? 1 : (int) value;
                 scanner.markDirty();
-                MessageUpdateScanner.send(scanner);
+                MessageUpdateScannerServer.send(scanner);
             }
 
             @Override
@@ -88,13 +88,13 @@ public class GuiTerrainScanner extends GuiContainer {
         if (button == toggleMode) {
             if (scanner.on) scanner.deactivate();
             else scanner.activate();
-            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
-            MessageUpdateScanner.send(scanner);
+            PacketHandler.NETWORK.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
+            MessageUpdateScannerServer.send(scanner);
         } else if (button == rotate) {
             scanner.rotation = scanner.rotation.getNext();
             if (scanner.on) scanner.deactivate();
             scanner.current.setPos(scanner.getPos().getX(), 0, scanner.getPos().getZ());
-            MessageUpdateScanner.send(scanner);
+            MessageUpdateScannerServer.send(scanner);
         } else if (button == showMap) new GuiBuildRemotely(scanner).openGui();
     }
 
@@ -193,7 +193,7 @@ public class GuiTerrainScanner extends GuiContainer {
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
+        PacketHandler.NETWORK.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
         if (mc.isSingleplayer()) drawCenteredString("Terrain Scanner", 90 + getKx(), 6 + getKy(), 4210752); //
         else {
             drawCenteredString("Terrain Scanner", 90 + getKx(), 6 + getKy(), 4210752);

@@ -18,7 +18,7 @@ group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-co
 archivesBaseName = "scanner"
 
 minecraft {
-    version = "1.10.2-12.18.3.2202"
+    version = "1.10.2-12.18.3.2422"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -34,6 +34,9 @@ repositories {
     maven { url "http://maven.epoxide.xyz" }
     maven { url "http://mobiusstrip.eu/maven" }
     maven { url "http://chickenbones.net/maven/" }
+    maven {
+        url = "http://maven.bluexin.be/repository/snapshots/"
+    }
     maven {
 
         url 'http://maven.epoxide.xyz'
@@ -59,13 +62,15 @@ repositories {
 
 dependencies {
     compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    compile 'LatMod:FTBLib:1.1x-3.6.4:api'
+    //compile 'LatMod:FTBLib:1.1x-3.6.5:api'
     compile "LatMod:RedstoneFlux:1.2.0"
     compile "CraftTweaker:CraftTweaker:1.10.2-3.0.13"
     //compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22:universal"
     //compile "EnderCore:EnderCore:1.10.2-0.4.1.64-beta"
     //compile "EnderIO:EnderIO:1.10.2-3.1.156"
     compile "net.darkhax.tesla:Tesla:1.10.2-1.2.0.37"
+    compile "com.teamwizardry.librarianlib:librarianlib-1.10.2:3.1.5-SNAPSHOT:deobf"
+
 }
 
 apply plugin: 'java'
