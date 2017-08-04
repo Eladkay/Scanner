@@ -9,9 +9,9 @@ import com.feed_the_beast.ftbl.lib.gui.GuiLang;
 import com.feed_the_beast.ftbl.lib.gui.Panel;
 import com.feed_the_beast.ftbl.lib.gui.misc.GuiChunkSelectorBase;
 import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
+import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
-import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -61,7 +61,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         ChunkPos pos = chunks.iterator().next();
 
         int distance = scanner.getDist(pos);
-        NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
+        PacketHandler.NETWORK.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
         if(scanner.getMapping(pos.chunkXPos, pos.chunkZPos) != null || scanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
         {
             return;
@@ -74,7 +74,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         scanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
         scanner.mapping.put(new ChunkPos(pos.chunkXPos, pos.chunkZPos), mc.world.getBiome(new BlockPos(pos.chunkXPos << 4, 64, pos.chunkZPos << 4)).getBiomeName());
         scanner.markDirty();
-        NetworkHelper.instance.sendToServer(new MessageUpdateMap(scanner, pos.chunkXPos, pos.chunkZPos));
+        PacketHandler.NETWORK.sendToServer(new MessageUpdateMap(scanner, pos.chunkXPos, pos.chunkZPos));
     }
 
     @Override

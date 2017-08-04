@@ -1,9 +1,9 @@
 package eladkay.scanner.terrain;
 
+import com.teamwizardry.librarianlib.common.base.block.BlockModContainer;
+import com.teamwizardry.librarianlib.common.base.block.ItemModBlock;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
@@ -11,6 +11,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -21,22 +22,34 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 import static eladkay.scanner.ScannerMod.tab;
 
-public class BlockTerrainScanner extends Block implements ITileEntityProvider {
+public class BlockTerrainScanner extends BlockModContainer {
     public static PropertyBool ONOFF = PropertyBool.create("state");
 
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public ItemBlock createItemForm() {
+        return new ItemModBlock(this) {
+            @Override
+            public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+                tooltip.add("The ultimate terrain reconstruction tool.");
+                tooltip.add("Its GUI is fairly self-explanatory in my opinion.");
+                super.addInformation(stack, playerIn, tooltip, advanced);
+            }
+        };
+    }
+
     public BlockTerrainScanner() {
-        super(Material.IRON);
-        setRegistryName(ScannerMod.MODID + ":terrainScanner");
-        setUnlocalizedName("terrainScanner");
+        super("terrainScanner", Material.IRON);
         setCreativeTab(tab);
         setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createTileEntity(World worldIn, IBlockState meta) {
         return new TileEntityTerrainScanner();
     }
 

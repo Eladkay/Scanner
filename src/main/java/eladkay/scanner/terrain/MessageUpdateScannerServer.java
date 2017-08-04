@@ -14,8 +14,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.server.FMLServerHandler;
 import org.jetbrains.annotations.NotNull;
 
-@PacketRegister(Side.CLIENT)
-public class MessageUpdateScanner extends PacketBase {
+@PacketRegister(Side.SERVER)
+public class MessageUpdateScannerServer extends PacketBase {
     @Save
     private int x;
     @Save
@@ -25,13 +25,12 @@ public class MessageUpdateScanner extends PacketBase {
     @Save
     private NBTTagCompound data;
 
-    public MessageUpdateScanner(TileEntity scanner) {
+    public MessageUpdateScannerServer(TileEntity scanner) {
         this.x = scanner.getPos().getX();
         this.y = scanner.getPos().getY();
         this.z = scanner.getPos().getZ();
         this.data = scanner.writeToNBT(new NBTTagCompound());
     }
-
 
 
     public static void send(TileEntity scanner) {
@@ -46,7 +45,7 @@ public class MessageUpdateScanner extends PacketBase {
         if (flag) {
             if (scanner.getWorld().isRemote)
                 PacketHandler.NETWORK.sendToServer(new MessageUpdateScannerServer(scanner));
-            else PacketHandler.NETWORK.sendToAll(new MessageUpdateScanner(scanner));
+            else PacketHandler.NETWORK.sendToAll(new MessageUpdateScannerServer(scanner));
         }
     }
 

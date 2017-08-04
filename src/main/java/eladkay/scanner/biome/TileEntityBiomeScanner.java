@@ -2,6 +2,7 @@ package eladkay.scanner.biome;
 
 import com.feed_the_beast.ftbl.lib.math.MathUtils;
 import com.google.gson.Gson;
+import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.misc.BaseTE;
@@ -16,6 +17,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+@TileRegister("biomeScanner")
 public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public HashMap<ChunkPos, String> mapping = new HashMap<>();

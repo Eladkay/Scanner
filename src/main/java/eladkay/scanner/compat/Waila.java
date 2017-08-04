@@ -1,9 +1,9 @@
 package eladkay.scanner.compat;
 
+import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import eladkay.scanner.biome.BlockBiomeScanner;
 import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
-import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.terrain.BlockTerrainScanner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -44,7 +44,7 @@ public class Waila {
             TileEntity tileEntity = accessor.getTileEntity();
             if (!(tileEntity instanceof BaseTE)) return currenttip;
             if (((BaseTE) tileEntity).container() == null) return currenttip;
-            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(accessor.getPosition().getX(), accessor.getPosition().getY(), accessor.getPosition().getZ()));
+            PacketHandler.NETWORK.sendToServer(new MessageUpdateEnergyServer(accessor.getPosition().getX(), accessor.getPosition().getY(), accessor.getPosition().getZ()));
             int energy = ((BaseTE) tileEntity).getEnergyStored(accessor.getSide());
             int max = ((BaseTE) tileEntity).getMaxEnergyStored(accessor.getSide());
             /*int energy = accessor.getNBTData().getInteger("energy");

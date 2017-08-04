@@ -35,6 +35,9 @@ repositories {
     maven { url "http://mobiusstrip.eu/maven" }
     maven { url "http://chickenbones.net/maven/" }
     maven {
+        url = "http://maven.bluexin.be/repository/snapshots/"
+    }
+    maven {
 
         url 'http://maven.epoxide.xyz'
     }
@@ -66,6 +69,8 @@ dependencies {
     //compile "EnderCore:EnderCore:1.10.2-0.4.1.64-beta"
     //compile "EnderIO:EnderIO:1.10.2-3.1.156"
     compile "net.darkhax.tesla:Tesla:1.10.2-1.2.0.37"
+    compile "com.teamwizardry.librarianlib:librarianlib-1.10.2:3.1.5-SNAPSHOT:deobf"
+
 }
 
 apply plugin: 'java'

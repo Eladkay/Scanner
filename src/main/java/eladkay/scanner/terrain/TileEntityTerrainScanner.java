@@ -1,5 +1,7 @@
 package eladkay.scanner.terrain;
 
+import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
+import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.Config;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
@@ -20,17 +22,24 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static eladkay.scanner.terrain.EnumDimensions.*;
 
+@TileRegister("terrainScanner")
 public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
     public static final String PRESET = "{\"coordinateScale\":684.412,\"heightScale\":684.412,\"lowerLimitScale\":512.0,\"upperLimitScale\":512.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":80.0,\"mainNoiseScaleY\":160.0,\"mainNoiseScaleZ\":80.0,\"baseSize\":8.5,\"stretchY\":12.0,\"biomeDepthWeight\":1.0,\"biomeDepthOffset\":0.0,\"biomeScaleWeight\":1.0,\"biomeScaleOffset\":0.0,\"seaLevel\":63,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":8,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":4,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":4,\"riverSize\":4,\"dirtSize\":33,\"dirtCount\":10,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":33,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":33,\"graniteCount\":10,\"graniteMinHeight\":0,\"graniteMaxHeight\":80,\"dioriteSize\":33,\"dioriteCount\":10,\"dioriteMinHeight\":0,\"dioriteMaxHeight\":80,\"andesiteSize\":33,\"andesiteCount\":10,\"andesiteMinHeight\":0,\"andesiteMaxHeight\":80,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":0,\"coalMaxHeight\":128,\"ironSize\":9,\"ironCount\":20,\"ironMinHeight\":0,\"ironMaxHeight\":64,\"goldSize\":9,\"goldCount\":2,\"goldMinHeight\":0,\"goldMaxHeight\":32,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":0,\"redstoneMaxHeight\":16,\"diamondSize\":8,\"diamondCount\":1,\"diamondMinHeight\":0,\"diamondMaxHeight\":16,\"lapisSize\":7,\"lapisCount\":1,\"lapisCenterHeight\":16,\"lapisSpread\":16}";
     private static final int MAX = Config.maxEnergyBufferTerrain;
-    TileEntityScannerQueue queue;
+    transient TileEntityScannerQueue queue;
+    @Save
     boolean on;
+    @Save
     MutableBlockPos current = new MutableBlockPos(0, -1, 0);
     //BlockPos pos = null;
+    @Save
     public EnumRotation rotation = EnumRotation.POSX_POSZ;
+    @Save
     public int speedup = 1;
+    @Save
     public BlockPos posStart = null;
+    @Save
     public int maxY = 127;
 
     @Nonnull
@@ -39,35 +48,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     }
 
 
-    @Override
-    public void readFromNBT(NBTTagCompound nbt) {
-        super.readFromNBT(nbt);
-        current.setPos(BlockPos.fromLong(nbt.getLong("positions")));
-        on = nbt.getBoolean("on");
-        rotation = EnumRotation.values()[nbt.getInteger("rot")];
-        speedup = nbt.getInteger("speedup");
-        if (nbt.getLong("posStart") != 0)
-            posStart = BlockPos.fromLong(nbt.getLong("posStart"));
-        maxY = nbt.getInteger("my");
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        super.writeToNBT(nbt);
-        nbt.setLong("positions", current.toLong());
-        nbt.setBoolean("on", on);
-        nbt.setInteger("rot", rotation.ordinal());
-        nbt.setInteger("speedup", speedup);
-        if (posStart != null)
-            nbt.setLong("posStart", posStart.toLong());
-        nbt.setInteger("my", maxY);
-        return nbt;
-
-    }
-
     public TileEntityTerrainScanner() {
         super(MAX);
-
     }
 
     public void onBlockActivated() {
@@ -215,13 +197,6 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             markDirty();
         }
         container().extractEnergy(Config.energyPerBlockTerrainScanner * multiplier, false);
-    }
-
-    @Override
-    public NBTTagCompound getUpdateTag() {
-        NBTTagCompound tag = new NBTTagCompound();
-        writeToNBT(tag);
-        return tag;
     }
 
 
