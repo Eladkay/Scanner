@@ -13,6 +13,7 @@ import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
@@ -29,7 +30,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     {
         this.scanner = scanner;
 
-        buttonClose = new Button(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate())
+        buttonClose = new Button(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.textComponent().getFormattedText())
         {
             @Override
             public void onClicked(GuiBase gui, IMouseButton button)
@@ -39,7 +40,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
             }
         };
 
-        buttonRefresh = new Button(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate())
+        buttonRefresh = new Button(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.textComponent().getFormattedText())
         {
             @Override
             public void onClicked(GuiBase gui, IMouseButton button)

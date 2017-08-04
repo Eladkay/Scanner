@@ -26,7 +26,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase
     {
         this.scanner = scanner;
 
-        buttonClose = new Button(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate())
+        buttonClose = new Button(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.textComponent().getFormattedText())
         {
             @Override
             public void onClicked(GuiBase gui, IMouseButton button)
@@ -36,7 +36,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase
             }
         };
 
-        buttonRefresh = new Button(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate())
+        buttonRefresh = new Button(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.textComponent().getFormattedText())
         {
             @Override
             public void onClicked(GuiBase gui, IMouseButton button)

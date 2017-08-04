@@ -42,6 +42,12 @@ public class BlockDimensionalCore extends BlockMod {
             }
 
             @Override
+            public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+                for (int i = 0; i < TYPE.getAllowedValues().size(); i++) subItems.add(new ItemStack(itemIn, 1, i));
+                super.getSubItems(itemIn, tab, subItems);
+            }
+
+            @Override
             public String getUnlocalizedName(ItemStack stack) {
                 return super.getUnlocalizedName(stack) + "_" + EnumDimensions.values()[stack.getMetadata()].getName();
             }

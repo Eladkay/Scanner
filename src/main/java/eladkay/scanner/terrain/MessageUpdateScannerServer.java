@@ -32,6 +32,10 @@ public class MessageUpdateScannerServer extends PacketBase {
         this.data = scanner.writeToNBT(new NBTTagCompound());
     }
 
+    public MessageUpdateScannerServer() {
+
+    }
+
 
     public static void send(TileEntity scanner) {
         boolean flag;

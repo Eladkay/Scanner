@@ -40,7 +40,6 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
 
     @Override
     public void writeCustomNBT(@NotNull NBTTagCompound cmp, boolean sync) {
-        System.out.println("aaaaaa" + queue);
         NBTTagList list = new NBTTagList();
         for (BlockPos pos : queue)
             list.appendTag(new NBTTagLong(pos.toLong()));
