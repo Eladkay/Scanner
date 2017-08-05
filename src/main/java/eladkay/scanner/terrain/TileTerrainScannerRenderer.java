@@ -31,7 +31,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			Vec3d start = new Vec3d(te.getPosStart().subtract(me));
 			Vec3d end = new Vec3d(te.getEnd().subtract(me));
 			start = new Vec3d(start.xCoord - 0.01, -me.getY(), start.zCoord - 0.01);
-			end = new Vec3d(end.xCoord + 0.01, 255, end.zCoord + 0.01);
+			end = new Vec3d(end.xCoord + 1 + 0.01, 255, end.zCoord + 1 + 0.01);
 
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x, y, z);
@@ -79,6 +79,15 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			buffer.pos(start.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(start.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 			buffer.pos(end.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
+
+			//double difference = (te.layerCompleteWorldTime - te.getWorld().getTotalWorldTime()) * 0.01;
+//
+			//if (difference < 100) {
+			//	buffer.pos(end.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+			//	buffer.pos(start.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+			//	buffer.pos(start.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
+			//	buffer.pos(end.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
+			//}
 
 			tess.draw();
 

@@ -1,22 +1,27 @@
 package eladkay.scanner.terrain;
 
+import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
 import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.Config;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.WtfException;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -93,6 +98,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     @Override
     public void update() {
         if (getWorld().isRemote) return; //Dont do stuff client side else we get ghosts
+
         queue = TileEntityScannerQueue.getNearbyQueue(getWorld(), this);
 
         EnumDimensions type = getWorld().provider.getDimension() == -1 ? NETHER : getWorld().provider.getDimension() == 1 ? END : OVERWORLD;
@@ -127,6 +133,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
             remoteWorld.getBlockState(current);
             IBlockState remote = remoteWorld.getBlockState(current);
+            SoundType sound = remote.getBlock().getSoundType(remote, world, current, null);
+            getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
             IBlockState local = getWorld().getBlockState(current);
             TileEntity remoteTE = remoteWorld.getTileEntity(current);
             BlockPos imm = current.toImmutable();
@@ -184,6 +192,10 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             }
             if (current.getZ() > end.getZ()) {
                 current.setPos(getPosStart().getX(), current.getY() + 1, getPosStart().getZ());
+                //layerCompleteWorldTime = world.getTotalWorldTime();
+                //layerCompleteY = current.getY();
+                PacketHandler.NETWORK.sendToAllAround(new PacketLayerCompleteParty(getPosStart(), getEnd(), current.getY()),
+                        new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 128));
                 markDirty();
             }
             if (current.getY() > maxY) {
@@ -201,6 +213,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             markDirty();
         }
         container().extractEnergy(Config.energyPerBlockTerrainScanner * multiplier, false);
+
     }
 
     @Nonnull

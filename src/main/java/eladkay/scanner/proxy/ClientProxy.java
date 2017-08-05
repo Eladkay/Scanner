@@ -16,12 +16,14 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.animation.FastTESR;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nullable;
 
@@ -42,6 +44,12 @@ public class ClientProxy extends CommonProxy {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTerrainScanner.class, new TileEntitySpecialRendererTerrainScanner());*/
         MinecraftForge.EVENT_BUS.register(this);
 
+    }
+
+    @SubscribeEvent
+    public void stitch(TextureStitchEvent event) {
+        event.getMap().registerSprite(new ResourceLocation(ScannerMod.MODID, "particles/sparkle_blurred"));
+        event.getMap().registerSprite(new ResourceLocation(ScannerMod.MODID, "particles/square"));
     }
 
     public static class TileRiftRenderer extends FastTESR<BlockDimensionalRift.TileDimensionalRift> {
