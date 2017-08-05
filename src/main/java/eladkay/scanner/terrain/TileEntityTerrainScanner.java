@@ -210,5 +210,9 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         return TileEntity.INFINITE_EXTENT_AABB;
     }
 
+    @Override
+    public double getMaxRenderDistanceSquared() {
+        return 100000;
+    }
 }
 

@@ -43,14 +43,14 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 
 			GlStateManager.depthMask(false);
 
-			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+			//GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 			GlStateManager.disableCull();
 			GlStateManager.enableAlpha();
 			GlStateManager.enableBlend();
 			GlStateManager.shadeModel(GL11.GL_SMOOTH);
 			GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE);
+			GlStateManager.disableTexture2D();
 			GlStateManager.color(1, 1, 1);
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 			Minecraft.getMinecraft().entityRenderer.disableLightmap();
 			GL14.glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
 
@@ -58,27 +58,27 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			VertexBuffer buffer = tess.getBuffer();
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-			Color color = Color.RED;
+			float alpha = te.on ? 0.15f : 0.5f;
 
+			Color color = new Color(1, 0, 0, alpha);
 			buffer.pos(start.xCoord, start.yCoord, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(end.xCoord, start.yCoord, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(end.xCoord, start.yCoord + 255, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 			buffer.pos(start.xCoord, start.yCoord + 255, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 
-			color = Color.BLUE;
-
+			color = new Color(0, 0, 1, alpha);
 			buffer.pos(start.xCoord, start.yCoord, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(start.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(start.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 			buffer.pos(start.xCoord, start.yCoord + 255, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 
-			color = Color.GREEN;
+			color = new Color(0, 1, 0, alpha);
 			buffer.pos(end.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(end.xCoord, start.yCoord, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(end.xCoord, start.yCoord + 255, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 			buffer.pos(end.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 
-			color = Color.YELLOW;
+			color = new Color(1, 1, 0, alpha);
 			buffer.pos(end.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(start.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(start.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
@@ -87,6 +87,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			tess.draw();
 
 			GL14.glBlendEquation(GL_FUNC_ADD);
+			GlStateManager.enableTexture2D();
 			GlStateManager.popMatrix();
 		}
 	}
