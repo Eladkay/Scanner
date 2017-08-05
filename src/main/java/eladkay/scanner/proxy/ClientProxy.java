@@ -6,6 +6,7 @@ import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.terrain.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -13,10 +14,12 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.animation.FastTESR;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
@@ -40,13 +43,13 @@ public class ClientProxy extends CommonProxy {
 
     }
 
-    public static class TileRiftRenderer extends TileEntitySpecialRenderer<BlockDimensionalRift.TileDimensionalRift> {
+    public static class TileRiftRenderer extends FastTESR<BlockDimensionalRift.TileDimensionalRift> {
         private IBakedModel modelRift = null, modelCore;
 
         @Override
-        public void renderTileEntityAt(BlockDimensionalRift.TileDimensionalRift te, double x, double y, double z, float partialTicks, int destroyStage) {
+        public void renderTileEntityFast(BlockDimensionalRift.TileDimensionalRift te, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
             super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
-
+            double percentOfRiftRemaining = te.ticks / BlockDimensionalRift.TileDimensionalRift.TICKS_TO_COMPLETION;
             IModel model = null;
             if (modelCore == null) {
                 try {
@@ -54,7 +57,7 @@ public class ClientProxy extends CommonProxy {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                modelCore = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM,
+                modelCore = model.bake(model.getDefaultState(), DefaultVertexFormats.BLOCK,
                         location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString()));
             }
             if (modelRift == null) {
@@ -63,7 +66,7 @@ public class ClientProxy extends CommonProxy {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                modelRift = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM,
+                modelRift = model.bake(model.getDefaultState(), DefaultVertexFormats.BLOCK,
                         location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString()));
             }
 
@@ -79,11 +82,14 @@ public class ClientProxy extends CommonProxy {
             GlStateManager.translate(x, y, z);
             bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-            Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightnessColor(modelCore, 1.0F, 1, 1, 1);
+            //Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightnessColorQuads(1, 1, 1, 1, modelCore.getQuads(ScannerMod.dimensionalCore.getDefaultState(), EnumFacing.DOWN,  te.getWorld().rand.nextLong()));
+            BlockPos pos = te.getPos();
+            buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+            Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModel(te.getWorld(), modelCore, ScannerMod.dimensionalCore.getDefaultState(), te.getPos(), buffer, true);
 
             GlStateManager.popMatrix();
-
         }
+
     }
 
 

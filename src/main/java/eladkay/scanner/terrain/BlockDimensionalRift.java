@@ -63,6 +63,11 @@ public class BlockDimensionalRift extends BlockModContainer {
     @TileRegister("rift")
     public static class TileDimensionalRift extends BaseTE implements ITickable {
 
+        @Override
+        public boolean hasFastRenderer() {
+            return true;
+        }
+
         public static final int TICKS_TO_COMPLETION = 20 * 60 * 10;
         public static final int CAPACITY = 1_000_000;
 
