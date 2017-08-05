@@ -60,28 +60,6 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     }
 
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        super.writeToNBT(compound);
-        Gson gson = new Gson();
-        HashMap<String, String> ret = new HashMap<>();
-        for (Map.Entry<ChunkPos, String> entry : mapping.entrySet())
-            ret.put(serialize(entry.getKey()), entry.getValue());
-        String json = gson.toJson(ret);
-        compound.setString("json", json);
-        compound.setInteger("type", type);
-        return compound;
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        Gson gson = new Gson();
-        HashMap<String, String> ret = gson.fromJson(compound.getString("json"), HashMap.class);
-        for (Map.Entry<String, String> entry : ret.entrySet())
-            mapping.put(deserialize(entry.getKey()), entry.getValue());
-        type = compound.getInteger("type");
-        super.readFromNBT(compound);
-    }
 
     @Nullable
     public String getMapping(int chunkX, int chunkY) {

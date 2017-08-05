@@ -52,6 +52,7 @@ public class ScannerMod {
     public static BlockBiomeScanner biomeScannerElite;
     public static BlockBiomeScanner biomeScannerUltimate;
     public static BlockDimensionalCore dimensionalCore;
+    public static BlockDimensionalRift rift;
     @Mod.Instance(MODID)
     public static ScannerMod instance;
     public static CreativeTabs tab;
@@ -73,7 +74,7 @@ public class ScannerMod {
         terrainScanner = new BlockTerrainScanner();
         scannerQueue = new BlockScannerQueue();
         dimensionalCore = new BlockDimensionalCore();
-
+        rift = new BlockDimensionalRift();
 
         //Biome Scanner Tiers
 

@@ -1,7 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/cube",
   "textures": {
-    "particle": "scanner:blocks/dimensionalCore_end",
-    "all": "scanner:blocks/dimensionalCore_end"
+    "particle": "scanner:blocks/q_top",
+    "down": "scanner:blocks/dimensionalCore_end",
+    "up": "scanner:blocks/dimensionalCore_endTop",
+    "north": "scanner:blocks/dimensionalCore_end",
+    "west": "scanner:blocks/dimensionalCore_end",
+    "east": "scanner:blocks/dimensionalCore_end",
+    "south": "scanner:blocks/dimensionalCore_end"
   }
 }
