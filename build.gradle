@@ -97,3 +97,11 @@ processResources {
         exclude 'mcmod.info'
     }
 }
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = compileJava.destinationDir
+        testOutputDir = compileTestJava.destinationDir
+    }
+}

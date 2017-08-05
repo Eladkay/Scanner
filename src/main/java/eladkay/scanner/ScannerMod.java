@@ -56,7 +56,7 @@ public class ScannerMod {
     @Mod.Instance(MODID)
     public static ScannerMod instance;
     public static CreativeTabs tab;
-    public static BlockAirey air;
+   // public static BlockAirey air;
     public static final String VERSION = "1.4.1";
 
     @Mod.EventHandler
@@ -68,7 +68,7 @@ public class ScannerMod {
                 return Item.getItemFromBlock(terrainScanner);
             }
         };
-        GameRegistry.register(air = new BlockAirey());
+        //GameRegistry.register(air = new BlockAirey());
 
         //Terrain Scanner and accessories
         terrainScanner = new BlockTerrainScanner();

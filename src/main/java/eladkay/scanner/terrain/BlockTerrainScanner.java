@@ -20,6 +20,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -80,20 +83,6 @@ public class BlockTerrainScanner extends BlockModContainer {
                 worldIn.setBlockState(p, Blocks.AIR.getDefaultState());
         }
     }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state0, EntityLivingBase placer, ItemStack stack) {
-        if (Config.showOutline) {
-            BlockPos start = pos.east().down(pos.getY());
-            for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
-                IBlockState state = worldIn.getBlockState(p);
-                if (state.getBlock() == Blocks.AIR)
-                    worldIn.setBlockState(p, ScannerMod.air.getDefaultState());
-            }
-        }
-        super.onBlockPlacedBy(worldIn, pos, state0, placer, stack);
-    }
-
 
     @Override
     public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
