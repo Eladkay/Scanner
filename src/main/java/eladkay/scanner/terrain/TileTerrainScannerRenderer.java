@@ -1,18 +1,13 @@
 package eladkay.scanner.terrain;
 
-import com.teamwizardry.librarianlib.client.fx.particle.ParticleBuilder;
-import com.teamwizardry.librarianlib.client.fx.particle.ParticleSpawner;
-import com.teamwizardry.librarianlib.common.util.math.interpolate.StaticInterp;
 import eladkay.scanner.Config;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.ParticleBubble;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
@@ -47,6 +42,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			GlStateManager.disableCull();
 			GlStateManager.enableAlpha();
 			GlStateManager.enableBlend();
+			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 			GlStateManager.shadeModel(GL11.GL_SMOOTH);
 			GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE);
 			GlStateManager.disableTexture2D();

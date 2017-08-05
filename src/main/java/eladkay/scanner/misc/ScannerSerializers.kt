@@ -1,10 +1,12 @@
 package eladkay.scanner.misc
 
+import com.teamwizardry.librarianlib.common.util.safeCast
 import com.teamwizardry.librarianlib.common.util.saving.serializers.Serializer
 import com.teamwizardry.librarianlib.common.util.saving.serializers.SerializerRegistry
 import com.teamwizardry.librarianlib.common.util.saving.serializers.builtin.Targets
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.ChunkPos
 
 class ScannerSerializers {
     init {
@@ -23,6 +25,23 @@ class ScannerSerializers {
             buf.writeInt(value.x)
             buf.writeInt(value.y)
             buf.writeInt(value.z)
+        }))
+
+        SerializerRegistry.register("minecraft:chunkpos", Serializer(ChunkPos::class.java))
+        SerializerRegistry["minecraft:chunkpos"]!!.register(Targets.NBT,
+                Targets.NBT.impl<ChunkPos>({ nbtBase, o, aBoolean -> ChunkPos(nbtBase.safeCast<NBTTagCompound>().getInteger("x"), nbtBase.safeCast<NBTTagCompound>().getInteger("z")) }
+                ) { `val`, syncing ->
+                    val tag = NBTTagCompound()
+                    tag.setInteger("x", `val`.chunkXPos)
+                    tag.setInteger("z", `val`.chunkZPos)
+                    tag
+                })
+        SerializerRegistry["minecraft:chunkpos"]?.register(Targets.BYTES, Targets.BYTES.impl<ChunkPos>
+        ({ buf, existing, sync ->
+            ChunkPos(buf.readInt(), buf.readInt())
+        }, { buf, value, sync ->
+            buf.writeInt(value.chunkXPos)
+            buf.writeInt(value.chunkZPos)
         }))
 
 //        SerializerRegistry.register("java:generator.q", Serializer(ArrayDeque::class.java))

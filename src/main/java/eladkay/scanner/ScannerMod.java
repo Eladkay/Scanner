@@ -30,6 +30,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -112,6 +113,11 @@ public class ScannerMod {
     public void fmlLifeCycle(FMLServerStartingEvent event) {
         event.registerServerCommand(new SpeedTickCommand());
         event.registerServerCommand(new TpToDim99Command());
+    }
+
+    @Mod.EventHandler
+    public void remap(FMLMissingMappingsEvent ev) {
+        ev.get().forEach(FMLMissingMappingsEvent.MissingMapping::ignore);
     }
 
     public static class WorldProviderOverworld extends WorldProvider {
