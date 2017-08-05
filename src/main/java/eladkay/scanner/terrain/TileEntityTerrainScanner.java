@@ -31,10 +31,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     @Save
     boolean on;
     @Save(saveName = "positions")
-    MutableBlockPos current = new MutableBlockPos(0, -1, 0);
+    final MutableBlockPos current = new MutableBlockPos(0, -1, 0);
     //BlockPos pos = null;
-    @Save(saveName = "rot")
-    public EnumRotation rotation = EnumRotation.POSX_POSZ;
     @Save(saveName = "speedup")
     public int speedup = 1;
     @Save
@@ -62,6 +60,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public void activate() {
         changeState(true);
         current.setPos(getPosStart().getX() + 1, 0, getPosStart().getZ());
+        markDirty();
     }
 
 
@@ -111,6 +110,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             return;
         }
         if (getWorld().isBlockPowered(getPos())) on = true;
+        markDirty();
         //System.out.println(queue);
         int multiplier = 0;
         for (int j = 0; j < speedup; j++) {
@@ -170,18 +170,18 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             });
 
             //Movement needs to happen BELOW oregen else things get weird and desynced
-            if (rotation.x > 0) current = new MutableBlockPos(current.east());
-            else new MutableBlockPos(current.west()); //X++
+            current.setPos(current.east());
+
             BlockPos end = this.getEnd(); //We do this lazy load do it can cache the right value
 
             if (current.getX() > end.getX()) {
-                if (rotation == EnumRotation.NEGX_POSZ || rotation == EnumRotation.POSX_POSZ)
-                    current = new MutableBlockPos(current.south());
-                else current = new MutableBlockPos(current.north());
+                current.setPos(current.south());
                 current.setPos(getPosStart().getX(), current.getY(), current.getZ());
+                markDirty();
             }
-            if (current.getZ() > end.getZ() && rotation.z > 0 || current.getZ() < end.getZ() && rotation.z < 0) {
+            if (current.getZ() > end.getZ()) {
                 current.setPos(getPosStart().getX(), current.getY() + 1, getPosStart().getZ());
+                markDirty();
             }
             if (current.getY() > maxY) {
                 if (queue != null && queue.queue.peek() != null) {
@@ -189,6 +189,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                     if (pos == null) throw new WtfException("How can this be???");
                     this.current.setPos(pos);
                     this.posStart = pos;
+                    markDirty();
 
                 } else changeState(false);
 

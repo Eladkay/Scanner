@@ -90,12 +90,8 @@ public class GuiTerrainScanner extends GuiContainer {
             else scanner.activate();
             PacketHandler.NETWORK.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             MessageUpdateScannerServer.send(scanner);
-        } else if (button == rotate) {
-            scanner.rotation = scanner.rotation.getNext();
-            if (scanner.on) scanner.deactivate();
-            scanner.current.setPos(scanner.getPos().getX(), 0, scanner.getPos().getZ());
-            MessageUpdateScannerServer.send(scanner);
         } else if (button == showMap) new GuiBuildRemotely(scanner).openGui();
+        scanner.markDirty();
     }
 
     private static final ResourceLocation ENERGY_BAR = new ResourceLocation("scanner:textures/gui/bar.png");
@@ -161,20 +157,6 @@ public class GuiTerrainScanner extends GuiContainer {
             if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
                 flag = true;
         showMap.visible = flag;
-        switch (scanner.rotation) {
-            case POSX_POSZ:
-                rotate.displayString = "Build on +x, +z";
-                break;
-            case POSX_NEGZ:
-                rotate.displayString = "Build on +x, -z";
-                break;
-            case NEGX_POSZ:
-                rotate.displayString = "Build on -x, +z";
-                break;
-            case NEGX_NEGZ:
-                rotate.displayString = "Build on -x, -z";
-                break;
-        }
         //drawMultiEnergyBar((this.width / 2) - 112, this.height / 2 - 15, mouseX, mouseY);
         /*drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         drawGuiContainerForegroundLayer(mouseX, mouseY);*/

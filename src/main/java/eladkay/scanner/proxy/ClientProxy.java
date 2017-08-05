@@ -48,7 +48,7 @@ public class ClientProxy extends CommonProxy {
 
         @Override
         public void renderTileEntityFast(BlockDimensionalRift.TileDimensionalRift te, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
-            super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
+            //super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
             double percentOfRiftRemaining = te.ticks / BlockDimensionalRift.TileDimensionalRift.TICKS_TO_COMPLETION;
             IModel model = null;
             if (modelCore == null) {

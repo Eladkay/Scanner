@@ -68,8 +68,9 @@ public class GuiScannerQueue extends GuiContainer {
             }
         } else if (button.id - 105 >= 0 && button.id - 105 <= TileEntityScannerQueue.CAPACITY) {
             scanner.scanner.posStart = scanner.get(button.id - 105);
-            scanner.scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
+            scanner.scanner.current.setPos(0, -1, 0);
             scanner.scanner.on = false;
+            scanner.scanner.markDirty();
         } else if (button.id - 205 >= 0 && button.id - 205 <= TileEntityScannerQueue.CAPACITY) {
             scanner.remove(scanner.get(button.id - 205));
         }
