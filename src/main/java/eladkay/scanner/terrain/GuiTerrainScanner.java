@@ -183,10 +183,10 @@ public class GuiTerrainScanner extends GuiContainer {
             drawCenteredString("EnderIO conduits and capacitor banks)", 90 + getKx(), 20 + getKy(), 4210752);
         }
         //this.fontRendererObj.drawString("Terrain Scanner", 45, 6, 4210752);
-        if (!"(0, -1, 0)".equals("(" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")"))
-            drawCenteredString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90 + getKx(), 35 + getKy(), 4210752);
+        if (!"(0, -1, 0)".equals("(" + scanner.currentPos.getX() + ", " + scanner.currentPos.getY() + ", " + scanner.currentPos.getZ() + ")"))
+            drawCenteredString("Current: (" + scanner.currentPos.getX() + ", " + scanner.currentPos.getY() + ", " + scanner.currentPos.getZ() + ")", 90 + getKx(), 35 + getKy(), 4210752);
         else drawCenteredString("Current block: Off", 90 + getKx(), 35 + getKy(), 4210752);
-        //this.fontRendererObj.drawString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 40, 20, 4210752);
+        //this.fontRendererObj.drawString("Current: (" + scanner.currentPos.getX() + ", " + scanner.currentPos.getY() + ", " + scanner.currentPos.getZ() + ")", 40, 20, 4210752);
         drawCenteredString("End block: (" + scanner.getEnd().getX() + ", " + scanner.maxY + ", " + scanner.getEnd().getZ() + ")", 90 + getKx(), 45 + getKy(), 4210752);
         //this.fontRendererObj.drawString("End: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 40, 35, 4210752);
         if (scanner.posStart != null)
@@ -200,7 +200,7 @@ public class GuiTerrainScanner extends GuiContainer {
             this.fontRendererObj.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
         }
 
-        if (scanner.queue != null)
+        if (scanner.queueTE != null)
             this.fontRendererObj.drawString("Scanner Queue attached", 30 + getKx(), 150 + getKy(), 4210752);
        /* boolean flag0 = false;
         if (mc.player.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)

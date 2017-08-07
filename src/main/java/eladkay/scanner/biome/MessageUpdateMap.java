@@ -43,7 +43,7 @@ public class MessageUpdateMap extends PacketBase {
         TileEntityBiomeScanner bs = (TileEntityBiomeScanner) player.getServerHandler().playerEntity.world.getTileEntity(new BlockPos(x, y, z));
         ChunkPos chunkPos = new ChunkPos(chunkX, chunkY);
         int powerCost = Config.minEnergyPerChunkBiomeScanner * Config.increase * bs.getDist(chunkPos);
-        bs.container().extractEnergy(powerCost, false);
+        bs.getContainer().extractEnergy(powerCost, false);
         bs.mapping.put(chunkPos, player.getServerHandler().playerEntity.world.getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkY * 16 + 8)).getBiomeName());
         bs.markDirty();
     }

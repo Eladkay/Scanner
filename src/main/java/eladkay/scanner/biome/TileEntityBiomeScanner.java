@@ -6,7 +6,7 @@ import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
 import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
-import eladkay.scanner.misc.BaseTE;
+import eladkay.scanner.misc.TileEnergyConsumer;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @TileRegister("biomeScanner")
-public class TileEntityBiomeScanner extends BaseTE implements ITickable {
+public class TileEntityBiomeScanner extends TileEnergyConsumer implements ITickable {
 
     @Save(saveName = "json")
     public HashMap<ChunkPos, String> mapping = new HashMap<>();

@@ -96,4 +96,9 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			GlStateManager.popMatrix();
 		}
 	}
+
+	@Override
+	public boolean isGlobalRenderer(TileEntityTerrainScanner te) {
+		return true;
+	}
 }

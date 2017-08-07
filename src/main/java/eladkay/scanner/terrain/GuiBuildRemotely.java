@@ -64,10 +64,10 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase
             return;
         }
 
-        scanner.container().extractEnergy(Config.remoteBuildCost, false);
+        scanner.getContainer().extractEnergy(Config.remoteBuildCost, false);
         scanner.on = false;
         scanner.posStart = new BlockPos(pos.chunkXPos << 4, 0, pos.chunkZPos << 4);
-        scanner.current.setPos(0, -1, 0);
+        scanner.currentPos.setPos(0, -1, 0);
         scanner.markDirty();
         PacketHandler.NETWORK.sendToServer(new MessageUpdateScannerServer(scanner));
     }

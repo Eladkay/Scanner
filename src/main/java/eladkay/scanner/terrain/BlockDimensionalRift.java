@@ -5,7 +5,7 @@ import com.teamwizardry.librarianlib.common.base.block.ItemModBlock;
 import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
 import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.ScannerMod;
-import eladkay.scanner.misc.BaseTE;
+import eladkay.scanner.misc.TileEnergyConsumer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
@@ -61,7 +61,7 @@ public class BlockDimensionalRift extends BlockModContainer {
     }
 
     @TileRegister("rift")
-    public static class TileDimensionalRift extends BaseTE implements ITickable {
+    public static class TileDimensionalRift extends TileEnergyConsumer implements ITickable {
 
         @Override
         public boolean hasFastRenderer() {

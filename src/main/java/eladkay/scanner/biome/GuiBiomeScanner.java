@@ -13,7 +13,6 @@ import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
@@ -72,7 +71,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
             return;
         }
 
-        scanner.container().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
+        scanner.getContainer().extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
         scanner.mapping.put(new ChunkPos(pos.chunkXPos, pos.chunkZPos), mc.world.getBiome(new BlockPos(pos.chunkXPos << 4, 64, pos.chunkZPos << 4)).getBiomeName());
         scanner.markDirty();
         PacketHandler.NETWORK.sendToServer(new MessageUpdateMap(scanner, pos.chunkXPos, pos.chunkZPos));

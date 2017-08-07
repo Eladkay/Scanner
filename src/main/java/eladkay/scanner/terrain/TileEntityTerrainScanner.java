@@ -5,12 +5,12 @@ import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
 import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.Config;
 import eladkay.scanner.compat.Oregistry;
-import eladkay.scanner.misc.BaseTE;
+import eladkay.scanner.misc.RandUtil;
+import eladkay.scanner.misc.TileEnergyConsumer;
 import eladkay.scanner.misc.WtfException;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -31,61 +31,57 @@ import java.util.concurrent.ThreadLocalRandom;
 import static eladkay.scanner.terrain.EnumDimensions.*;
 
 @TileRegister("terrainScanner")
-public class TileEntityTerrainScanner extends BaseTE implements ITickable {
+public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITickable {
 
-    public static final String PRESET = "{\"coordinateScale\":684.412,\"heightScale\":684.412,\"lowerLimitScale\":512.0,\"upperLimitScale\":512.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":80.0,\"mainNoiseScaleY\":160.0,\"mainNoiseScaleZ\":80.0,\"baseSize\":8.5,\"stretchY\":12.0,\"biomeDepthWeight\":1.0,\"biomeDepthOffset\":0.0,\"biomeScaleWeight\":1.0,\"biomeScaleOffset\":0.0,\"seaLevel\":63,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":8,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":4,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":4,\"riverSize\":4,\"dirtSize\":33,\"dirtCount\":10,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":33,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":33,\"graniteCount\":10,\"graniteMinHeight\":0,\"graniteMaxHeight\":80,\"dioriteSize\":33,\"dioriteCount\":10,\"dioriteMinHeight\":0,\"dioriteMaxHeight\":80,\"andesiteSize\":33,\"andesiteCount\":10,\"andesiteMinHeight\":0,\"andesiteMaxHeight\":80,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":0,\"coalMaxHeight\":128,\"ironSize\":9,\"ironCount\":20,\"ironMinHeight\":0,\"ironMaxHeight\":64,\"goldSize\":9,\"goldCount\":2,\"goldMinHeight\":0,\"goldMaxHeight\":32,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":0,\"redstoneMaxHeight\":16,\"diamondSize\":8,\"diamondCount\":1,\"diamondMinHeight\":0,\"diamondMaxHeight\":16,\"lapisSize\":7,\"lapisCount\":1,\"lapisCenterHeight\":16,\"lapisSpread\":16}";
-    private static final int MAX = Config.maxEnergyBufferTerrain;
-    transient TileEntityScannerQueue queue;
-    @Save
-    boolean on;
-    @Save(saveName = "positions")
-    final MutableBlockPos current = new MutableBlockPos(0, -1, 0);
-    //BlockPos pos = null;
-    @Save(saveName = "speedup")
-    public int speedup = 1;
-    @Save
-    public BlockPos posStart = null;
-    @Save(saveName = "my")
-    public int maxY = 127;
+	public static final String PRESET = "{\"coordinateScale\":684.412,\"heightScale\":684.412,\"lowerLimitScale\":512.0,\"upperLimitScale\":512.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":80.0,\"mainNoiseScaleY\":160.0,\"mainNoiseScaleZ\":80.0,\"baseSize\":8.5,\"stretchY\":12.0,\"biomeDepthWeight\":1.0,\"biomeDepthOffset\":0.0,\"biomeScaleWeight\":1.0,\"biomeScaleOffset\":0.0,\"seaLevel\":63,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":8,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":4,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":4,\"riverSize\":4,\"dirtSize\":33,\"dirtCount\":10,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":33,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":33,\"graniteCount\":10,\"graniteMinHeight\":0,\"graniteMaxHeight\":80,\"dioriteSize\":33,\"dioriteCount\":10,\"dioriteMinHeight\":0,\"dioriteMaxHeight\":80,\"andesiteSize\":33,\"andesiteCount\":10,\"andesiteMinHeight\":0,\"andesiteMaxHeight\":80,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":0,\"coalMaxHeight\":128,\"ironSize\":9,\"ironCount\":20,\"ironMinHeight\":0,\"ironMaxHeight\":64,\"goldSize\":9,\"goldCount\":2,\"goldMinHeight\":0,\"goldMaxHeight\":32,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":0,\"redstoneMaxHeight\":16,\"diamondSize\":8,\"diamondCount\":1,\"diamondMinHeight\":0,\"diamondMaxHeight\":16,\"lapisSize\":7,\"lapisCount\":1,\"lapisCenterHeight\":16,\"lapisSpread\":16}";
+	private static final int MAX = Config.maxEnergyBufferTerrain;
+	public transient TileEntityScannerQueue queueTE;
+	@Save
+	public boolean on;
+	@Save(saveName = "positions")
+	public final MutableBlockPos currentPos = new MutableBlockPos(0, -1, 0);
+	@Save(saveName = "speedup")
+	public int speedup = 1;
+	@Save
+	public BlockPos posStart = null;
+	@Save(saveName = "my")
+	public int maxY = 127;
 
-    @Nonnull
-    public BlockPos getPosStart() {
-        return posStart != null ? posStart : getPos();
-    }
+	@Nonnull
+	public BlockPos getPosStart() {
+		return posStart != null ? posStart : getPos();
+	}
 
+	public TileEntityTerrainScanner() {
+		super(MAX);
+	}
 
-    public TileEntityTerrainScanner() {
-        super(MAX);
-    }
+	public void onBlockActivated() {
+		if (currentPos.getY() < 0) {
+			currentPos.setPos(getPos().getX() + 1, 0, getPos().getZ());
+			changeState(true);
+		}
+	}
 
-    public void onBlockActivated() {
-        if (current.getY() < 0) {
-            current.setPos(getPos().getX() + 1, 0, getPos().getZ());
-            changeState(true);
-        }
-    }
+	public void activate() {
+		currentPos.setPos(getPosStart().getX() + 1, 0, getPosStart().getZ());
+		changeState(true);
+	}
 
-    public void activate() {
-        changeState(true);
-        current.setPos(getPosStart().getX() + 1, 0, getPosStart().getZ());
-        markDirty();
-    }
+	public void deactivate() {
+		changeState(false);
+	}
 
+	@Nonnull
+	public BlockPos getEnd() {
+		return getPosStart().add(15, maxY, 15);
+	}
 
-    public void deactivate() {
-        changeState(false);
-    }
-
-    @Nonnull
-    BlockPos getEnd() {
-        return getPosStart()./*east().*/add(15, maxY, 15);
-    }
-
-    void changeState(boolean state) {
-        on = state;
-        /*getWorld().setBlockState(pos, getWorld().getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state));
-        getWorld().setTileEntity(pos, this);*/
-        markDirty();
+	private void changeState(boolean state) {
+		on = state;
+		/*getWorld().setBlockState(pos, getWorld().getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state));
+		getWorld().setTileEntity(pos, this);*/
+		markDirty();
 
         /*try {
             getWorld().markAndNotifyBlock(getPos(), getWorld().getChunkFromBlockCoords(getPos()), getWorld().getBlockState(getPos()), getWorld().getBlockState(getPos()).withProperty(BlockTerrainScanner.ONOFF, state), 4);
@@ -93,139 +89,165 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         } catch (IllegalArgumentException ignored) {
         }
         getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());*/
-    }
+	}
 
-    @Override
-    public void update() {
-        if (getWorld().isRemote) return; //Dont do stuff client side else we get ghosts
+	@Override
+	public void update() {
 
-        queue = TileEntityScannerQueue.getNearbyQueue(getWorld(), this);
+		if (!getWorld().isRemote) {
+			queueTE = TileEntityScannerQueue.getNearbyTile(getWorld(), this, TileEntityScannerQueue.class);
+		}
 
-        EnumDimensions type = getWorld().provider.getDimension() == -1 ? NETHER : getWorld().provider.getDimension() == 1 ? END : OVERWORLD;
-        for (EnumFacing facing : EnumFacing.values()) {
-            IBlockState te = world.getBlockState(getPos().offset(facing));
-            if (te.getBlock() instanceof BlockDimensionalCore && te.getValue(BlockDimensionalCore.TYPE) != NONE)
-                type = te.getValue(BlockDimensionalCore.TYPE);
-        }
-        WorldServer remoteWorld;
-        try {
-            if (type == NETHER)
-                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
-            else if (type == END)
-                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
-            else
-                remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
-        } catch (NullPointerException lazy) {
-            return;
-        }
-        if (getWorld().isBlockPowered(getPos())) on = true;
-        markDirty();
-        //System.out.println(queue);
-        int multiplier = 0;
-        for (int j = 0; j < speedup; j++) {
-            if (!on || current == null)
-                return;
-            if (container().getEnergyStored() < Config.energyPerBlockTerrainScanner) {
-                //changeState(false);
-                return;
-            }
-            changeState(true);
+		// --- GET REMOTE WORLD --- //
+		WorldServer fakeWorld = null;
+		boolean somethingFailed = false;
+		{
+			EnumDimensions type = getWorld().provider.getDimension() == -1 ? NETHER : getWorld().provider.getDimension() == 1 ? END : OVERWORLD;
+			for (EnumFacing facing : EnumFacing.values()) {
+				IBlockState te = world.getBlockState(getPos().offset(facing));
+				if (te.getBlock() instanceof BlockDimensionalCore && te.getValue(BlockDimensionalCore.TYPE) != NONE)
+					type = te.getValue(BlockDimensionalCore.TYPE);
+			}
+			try {
+				if (type == NETHER)
+					fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
+				else if (type == END)
+					fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
+				else
+					fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+			} catch (NullPointerException lazy) {
+				somethingFailed = true;
+			}
+			if (fakeWorld == null) somethingFailed = true;
+		}
+		if (somethingFailed) return;
+		// --- GET REMOTE WORLD --- //
 
-            remoteWorld.getBlockState(current);
-            IBlockState remote = remoteWorld.getBlockState(current);
-            SoundType sound = remote.getBlock().getSoundType(remote, world, current, null);
-            getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
-            IBlockState local = getWorld().getBlockState(current);
-            TileEntity remoteTE = remoteWorld.getTileEntity(current);
-            BlockPos imm = current.toImmutable();
-            if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm))) {
-                getWorld().setBlockState(imm, remote, 2);
-                if (remoteTE != null) {
-                    NBTTagCompound tag = new NBTTagCompound();
-                    remoteTE.writeToNBT(tag);
-                    getWorld().getTileEntity(imm).writeToNBT(tag);
-                }
-                if (!remote.getBlock().isAir(remote, getWorld(), imm))
-                    multiplier++;
+		// Set on if powered by redstone
+		if (!getWorld().isRemote && getWorld().isBlockPowered(getPos())) on = true;
 
-            }
+		if (currentPos == null) return;
 
-            if (Config.genVanillaOres && getWorld().getBlockState(current).getBlock() == Blocks.STONE) {
-                if (current.getY() > 8) {
-                    int i = ThreadLocalRandom.current().nextInt(25);
-                    if (i == 0)
-                        getWorld().setBlockState(current, Blocks.COAL_ORE.getDefaultState(), 2);
-                    else if (i == 1)
-                        getWorld().setBlockState(current, Blocks.IRON_ORE.getDefaultState(), 2);
-                }
-                if (current.getY() > 8 && current.getY() < 16) {
-                    int i = ThreadLocalRandom.current().nextInt(150);
-                    if (i == 0)
-                        getWorld().setBlockState(current, Blocks.DIAMOND_ORE.getDefaultState(), 2);
-                    else if (i == 1)
-                        getWorld().setBlockState(current, Blocks.EMERALD_ORE.getDefaultState(), 2);
-                    else if (i == 2)
-                        getWorld().setBlockState(current, Blocks.REDSTONE_ORE.getDefaultState(), 2);
-                    else if (i == 3)
-                        getWorld().setBlockState(current, Blocks.LAPIS_ORE.getDefaultState(), 2);
-                }
-                if (current.getY() > 8 && current.getY() < 32) {
-                    int i = ThreadLocalRandom.current().nextInt(45);
-                    if (i == 0)
-                        getWorld().setBlockState(current, Blocks.GOLD_ORE.getDefaultState(), 2);
-                }
-            }
-            Oregistry.getEntryList().stream().filter(entry -> current.getY() < entry.maxY && current.getY() > entry.minY).forEach(entry -> {
-                int i = ThreadLocalRandom.current().nextInt(entry.rarity);
-                if (i == 0) getWorld().setBlockState(current, entry.ore, 2);
-            });
+		int multiplier = 0;
+		for (int tick = 0; tick < speedup; tick++) {
 
-            //Movement needs to happen BELOW oregen else things get weird and desynced
-            current.setPos(current.east());
+			if (!on) return;
 
-            BlockPos end = this.getEnd(); //We do this lazy load do it can cache the right value
+			if (getContainer().getEnergyStored() < Config.energyPerBlockTerrainScanner) return;
 
-            if (current.getX() > end.getX()) {
-                current.setPos(current.south());
-                current.setPos(getPosStart().getX(), current.getY(), current.getZ());
-                markDirty();
-            }
-            if (current.getZ() > end.getZ()) {
-                current.setPos(getPosStart().getX(), current.getY() + 1, getPosStart().getZ());
-                //layerCompleteWorldTime = world.getTotalWorldTime();
-                //layerCompleteY = current.getY();
-                PacketHandler.NETWORK.sendToAllAround(new PacketLayerCompleteParty(getPosStart(), getEnd(), current.getY()),
-                        new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 128));
-                markDirty();
-            }
-            if (current.getY() > maxY) {
-                if (queue != null && queue.queue.peek() != null) {
-                    BlockPos pos = queue.pop();
-                    if (pos == null) throw new WtfException("How can this be???");
-                    this.current.setPos(pos);
-                    this.posStart = pos;
-                    markDirty();
+			//remoteWorld.getBlockState(currentPos);
+			IBlockState fakeState = fakeWorld.getBlockState(currentPos);
+			IBlockState currentState = getWorld().getBlockState(currentPos);
+			TileEntity fakeTE = fakeWorld.getTileEntity(currentPos);
 
-                } else changeState(false);
+			BlockPos currentPosImm = currentPos.toImmutable();
 
-            }
+			SoundType sound = fakeState.getBlock().getSoundType(fakeState, world, currentPos, null);
 
-            markDirty();
-        }
-        container().extractEnergy(Config.energyPerBlockTerrainScanner * multiplier, false);
+			// --- PLACE NEW BLOCK HERE --- //
+			{
+				if (!world.isRemote && currentState.getBlock().isReplaceable(getWorld(), currentPosImm) && currentState.getBlock().isAir(currentState, getWorld(), currentPosImm)) {
+					boolean success = getWorld().setBlockState(currentPosImm, fakeState);
+					if (success) {
+						getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
 
-    }
+						if (fakeTE != null) {
+							NBTTagCompound tag = new NBTTagCompound();
+							fakeTE.writeToNBT(tag);
 
-    @Nonnull
-    @SideOnly(Side.CLIENT)
-    @Override
-    public AxisAlignedBB getRenderBoundingBox() {
-        return TileEntity.INFINITE_EXTENT_AABB;
-    }
+							TileEntity freshTE = getWorld().getTileEntity(currentPosImm);
+							if (freshTE != null) freshTE.writeToNBT(tag);
+						}
+						if (!fakeState.getBlock().isAir(fakeState, getWorld(), currentPosImm))
+							multiplier++;
 
-    @Override
-    public double getMaxRenderDistanceSquared() {
-        return 100000;
-    }
+						markDirty();
+					}
+				}
+			}
+			// --- PLACE NEW BLOCK HERE --- //
+
+			// --- SET ORES HERE --- //
+			{
+				if (!world.isRemote) {
+					if (Config.genVanillaOres && getWorld().getBlockState(currentPos).getBlock() == Blocks.STONE) {
+						if (currentPos.getY() > 8) {
+							int i = RandUtil.nextInt(25);
+							if (i == 0)
+								getWorld().setBlockState(currentPos, Blocks.COAL_ORE.getDefaultState());
+							else if (i == 1)
+								getWorld().setBlockState(currentPos, Blocks.IRON_ORE.getDefaultState());
+						}
+						if (currentPos.getY() > 8 && currentPos.getY() < 16) {
+							int i = RandUtil.nextInt(250);
+							if (i == 0)
+								getWorld().setBlockState(currentPos, Blocks.DIAMOND_ORE.getDefaultState());
+							else if (i == 1)
+								getWorld().setBlockState(currentPos, Blocks.EMERALD_ORE.getDefaultState());
+							else if (i == 2)
+								getWorld().setBlockState(currentPos, Blocks.REDSTONE_ORE.getDefaultState());
+							else if (i == 3)
+								getWorld().setBlockState(currentPos, Blocks.LAPIS_ORE.getDefaultState());
+						}
+						if (currentPos.getY() > 8 && currentPos.getY() < 32) {
+							int i = RandUtil.nextInt(45);
+							if (i == 0) getWorld().setBlockState(currentPos, Blocks.GOLD_ORE.getDefaultState());
+						}
+					}
+					Oregistry.getEntryList().stream().filter(entry -> currentPos.getY() < entry.maxY && currentPos.getY() > entry.minY).forEach(entry -> {
+						int i = ThreadLocalRandom.current().nextInt(entry.rarity);
+						if (i == 0) getWorld().setBlockState(currentPos, entry.ore, 2);
+					});
+				}
+				markDirty();
+			}
+			// --- SET ORES HERE --- //
+
+			// --- MOVE CURSOR HERE --- //
+			{
+				currentPos.move(EnumFacing.EAST);
+
+				BlockPos end = getEnd();
+
+				if (currentPos.getX() > end.getX()) {
+					currentPos.setPos(currentPos.south());
+					currentPos.setPos(getPosStart().getX(), currentPos.getY(), currentPos.getZ());
+				}
+				if (currentPos.getZ() > end.getZ()) {
+					currentPos.setPos(getPosStart().getX(), currentPos.getY() + 1, getPosStart().getZ());
+					PacketHandler.NETWORK.sendToAllAround(new PacketLayerCompleteParty(getPosStart(), getEnd(), currentPos.getY()),
+							new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 128));
+				}
+				if (currentPos.getY() > maxY) {
+					if (queueTE != null && queueTE.queue.peek() != null) {
+						BlockPos pos = queueTE.pop();
+						if (pos == null) throw new WtfException("How can this be???");
+						this.currentPos.setPos(pos);
+						this.posStart = pos;
+
+					} else changeState(false);
+
+				}
+				markDirty();
+			}
+			// --- MOVE CURSOR HERE --- //
+		}
+
+		// Draw energy
+		if (!world.isRemote)
+			getContainer().extractEnergy(Config.energyPerBlockTerrainScanner * multiplier, false);
+	}
+
+	@Nonnull
+	@SideOnly(Side.CLIENT)
+	@Override
+	public AxisAlignedBB getRenderBoundingBox() {
+		return TileEntity.INFINITE_EXTENT_AABB;
+	}
+
+	@Override
+	public double getMaxRenderDistanceSquared() {
+		return 100000;
+	}
 }
 

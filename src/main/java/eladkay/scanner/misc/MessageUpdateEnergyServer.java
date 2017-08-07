@@ -6,11 +6,9 @@ import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import com.teamwizardry.librarianlib.common.util.autoregister.PacketRegister;
 import com.teamwizardry.librarianlib.common.util.saving.Save;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -45,7 +43,7 @@ public class MessageUpdateEnergyServer extends PacketBase {
     @Override
     public void handle(MessageContext player) {
         World server = player.getServerHandler().playerEntity.world;
-        BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(x, y, z));
+        TileEnergyConsumer base = (TileEnergyConsumer) server.getTileEntity(new BlockPos(x, y, z));
         if (base != null)
             PacketHandler.NETWORK.sendToAll(new MessageUpdateEnergy(x, y, z, base.getEnergyStored(null), server.provider.getDimension()));
         try {

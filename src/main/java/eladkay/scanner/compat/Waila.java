@@ -2,7 +2,7 @@ package eladkay.scanner.compat;
 
 import com.teamwizardry.librarianlib.common.network.PacketHandler;
 import eladkay.scanner.biome.BlockBiomeScanner;
-import eladkay.scanner.misc.BaseTE;
+import eladkay.scanner.misc.TileEnergyConsumer;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.terrain.BlockDimensionalRift;
 import eladkay.scanner.terrain.BlockTerrainScanner;
@@ -10,7 +10,6 @@ import mcp.mobius.waila.api.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -44,11 +43,11 @@ public class Waila {
         @Override
         public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
             TileEntity tileEntity = accessor.getTileEntity();
-            if (!(tileEntity instanceof BaseTE)) return currenttip;
-            if (((BaseTE) tileEntity).container() == null) return currenttip;
+            if (!(tileEntity instanceof TileEnergyConsumer)) return currenttip;
+            if (((TileEnergyConsumer) tileEntity).getContainer() == null) return currenttip;
             PacketHandler.NETWORK.sendToServer(new MessageUpdateEnergyServer(accessor.getPosition().getX(), accessor.getPosition().getY(), accessor.getPosition().getZ()));
-            int energy = ((BaseTE) tileEntity).getEnergyStored(accessor.getSide());
-            int max = ((BaseTE) tileEntity).getMaxEnergyStored(accessor.getSide());
+            int energy = ((TileEnergyConsumer) tileEntity).getEnergyStored(accessor.getSide());
+            int max = ((TileEnergyConsumer) tileEntity).getMaxEnergyStored(accessor.getSide());
             /*int energy = accessor.getNBTData().getInteger("energy");
             int max = accessor.getNBTData().getInteger("max");*/
             currenttip.add("Energy: " + energy + "/" + max);
@@ -62,7 +61,7 @@ public class Waila {
 
         @Override
         public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
-            BaseTE scanner = (BaseTE) te;
+            TileEnergyConsumer scanner = (TileEnergyConsumer) te;
             tag.setInteger("energy", scanner.getEnergyStored(null));
             tag.setInteger("max", scanner.getMaxEnergyStored(null));
             return tag;
@@ -75,7 +74,7 @@ public class Waila {
          * Callback used to override the default Waila lookup system.</br>
          * Will be used if the implementing class is registered via {@link IWailaRegistrar}.{@link registerStackProvider}.</br>
          *
-         * @param accessor Contains most of the relevant information about the current environment.
+         * @param accessor Contains most of the relevant information about the currentPos environment.
          * @param config   Current configuration of Waila.
          * @return null if override is not required, an ItemStack otherwise.
          */
@@ -91,7 +90,7 @@ public class Waila {
          *
          * @param itemStack  Current block scanned, in ItemStack form.
          * @param currenttip Current list of tooltip lines (might have been processed by other providers and might be processed by other providers).
-         * @param accessor   Contains most of the relevant information about the current environment.
+         * @param accessor   Contains most of the relevant information about the currentPos environment.
          * @param config     Current configuration of Waila.
          * @return Modified input currenttip
          */
@@ -107,7 +106,7 @@ public class Waila {
          *
          * @param itemStack  Current block scanned, in ItemStack form.
          * @param currenttip Current list of tooltip lines (might have been processed by other providers and might be processed by other providers).
-         * @param accessor   Contains most of the relevant information about the current environment.
+         * @param accessor   Contains most of the relevant information about the currentPos environment.
          * @param config     Current configuration of Waila.
          * @return Modified input currenttip
          */
@@ -124,7 +123,7 @@ public class Waila {
          *
          * @param itemStack  Current block scanned, in ItemStack form.
          * @param currenttip Current list of tooltip lines (might have been processed by other providers and might be processed by other providers).
-         * @param accessor   Contains most of the relevant information about the current environment.
+         * @param accessor   Contains most of the relevant information about the currentPos environment.
          * @param config     Current configuration of Waila.
          * @return Modified input currenttip
          */
@@ -138,7 +137,7 @@ public class Waila {
          * Will be used if the implementing class is registered via {@link IWailaRegistrar}.{@link registerNBTProvider} server and client side.</br>
          * You are supposed to always return the modified input NBTTagCompound tag.</br>
          *
-         * @param player The player requesting data synchronization (The owner of the current connection).
+         * @param player The player requesting data synchronization (The owner of the currentPos connection).
          * @param te     The TileEntity targeted for synchronization.
          * @param tag    Current synchronization tag (might have been processed by other providers and might be processed by other providers).
          * @param world  TileEntity's World.

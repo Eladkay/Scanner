@@ -63,8 +63,8 @@ class ScannerSerializers {
 //                while (array.size > list.tagCount())
 //                    array.pop()
 //
-//                list.forEachIndexed<NBTTagCompound> { i, container ->
-//                    val tag = container.getTag("-")
+//                list.forEachIndexed<NBTTagCompound> { i, getContainer ->
+//                    val tag = getContainer.getTag("-")
 //                    val v = if (tag == null) null else subSerializer().read(tag, array.filterIndexed { index, any -> index == i}.getOrNull(0), syncing)
 //                    if (i >= array.size) {
 //                        array.add(v)
@@ -80,11 +80,11 @@ class ScannerSerializers {
 //                val list = NBTTagList()
 //
 //                for (i in 0..value.size - 1) {
-//                    val container = NBTTagCompound()
-//                    list.appendTag(container)
+//                    val getContainer = NBTTagCompound()
+//                    list.appendTag(getContainer)
 //                    val v = value.filterIndexed { index, any -> index == i}.getOrNull(0)
 //                    if (v != null) {
-//                        container.setTag("-", subSerializer().write(v, syncing))
+//                        getContainer.setTag("-", subSerializer().write(v, syncing))
 //                    }
 //                }
 //

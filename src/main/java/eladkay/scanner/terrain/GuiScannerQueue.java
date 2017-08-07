@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GuiScannerQueue extends GuiContainer {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standardBackground.png");
-    private final TileEntityScannerQueue scanner;
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("queueTE:textures/gui/standardBackground.png");
+    private final TileEntityScannerQueue queue;
     private GuiTextField coordinates;
     private GuiButton push;
     private List<GuiButton> buttonsBuild = Lists.newArrayList(bufferBuild);
@@ -34,14 +34,14 @@ public class GuiScannerQueue extends GuiContainer {
         for (int i = 0; i < bufferRemove.length; i++) bufferRemove[i] = new GuiButton(k++, 0, 0, 50, 10, "Remove");
     }
 
-    public GuiScannerQueue(TileEntityScannerQueue scanner) {
+    public GuiScannerQueue(TileEntityScannerQueue queue) {
         super(new Container() {
             @Override
             public boolean canInteractWith(EntityPlayer playerIn) {
                 return true;
             }
         });
-        this.scanner = scanner;
+        this.queue = queue;
     }
 
     @Override
@@ -61,22 +61,22 @@ public class GuiScannerQueue extends GuiContainer {
         if (button == push) {
             try {
                 String[] split = coordinates.getText().replace("(", "").replace(")", "").replace(" ", "").split(",");
-                if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1])).toLong()))
-                    scanner.push(new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1])));
+                if (!queue.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1])).toLong()))
+                    queue.push(new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1])));
             } catch (Exception e) {
                 //ignored
             }
         } else if (button.id - 105 >= 0 && button.id - 105 <= TileEntityScannerQueue.CAPACITY) {
-            scanner.scanner.posStart = scanner.get(button.id - 105);
-            scanner.scanner.current.setPos(0, -1, 0);
-            scanner.scanner.on = false;
-            scanner.scanner.markDirty();
+            queue.scanner.posStart = queue.get(button.id - 105);
+            queue.scanner.currentPos.setPos(0, -1, 0);
+            queue.scanner.on = false;
+            queue.scanner.markDirty();
         } else if (button.id - 205 >= 0 && button.id - 205 <= TileEntityScannerQueue.CAPACITY) {
-            scanner.remove(scanner.get(button.id - 205));
+            queue.remove(queue.get(button.id - 205));
         }
     }
 
-    private static final ResourceLocation ENERGY_BAR = new ResourceLocation("scanner:textures/gui/bar.png");
+    private static final ResourceLocation ENERGY_BAR = new ResourceLocation("queueTE:textures/gui/bar.png");
 
     private static boolean isInRect(int x, int y, int xSize, int ySize, int mouseX, int mouseY) {
         return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
@@ -131,8 +131,8 @@ public class GuiScannerQueue extends GuiContainer {
         for (GuiButton btn : buttonsBuild) btn.visible = false;
         for (GuiButton btn : buttonsRemove) btn.visible = false;
         int i = 0;
-        for (int j = 0; j < scanner.size(); j++) {
-            BlockPos pos = scanner.get(j);
+        for (int j = 0; j < queue.size(); j++) {
+            BlockPos pos = queue.get(j);
             if (pos == null) continue;
             GuiButton btnBuild = buttonsBuild.get(j);
             btnBuild.visible = true;
@@ -147,20 +147,20 @@ public class GuiScannerQueue extends GuiContainer {
             drawCenteredString("(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")", 90 + getKx(), 20 + getKy() + i, 4210752);
             i += 10;
         }
-        /*if (scanner.scanner != null && scanner.flag)
+        /*if (queueTE.queueTE != null && queueTE.flag)
             drawCenteredString("Biome Scanner attached", 85 + getKx(), 140 + getKy(), 4210752);
         else {
             drawCenteredString("Attach Ultimate Biome Scanner", 85 + getKx(), 128 + getKy(), 4210752);
             drawCenteredString("to Terrain Scanner to view map", 85 + getKx(), 138 + getKy(), 4210752);
         }*/
-        if (scanner.scanner != null)
+        if (queue.scanner != null)
             drawCenteredString("Terrain Scanner attached", 85 + getKx(), 150 + getKy(), 4210752);
         else drawCenteredString("Terrain Scanner not attached", 85 + getKx(), 150 + getKy(), 4210752);
        /* boolean flag0 = false;
         if (mc.player.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
-            this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);*/
+            this.fontRendererObj.drawString("Debug: (" + queueTE.getPos().east().add(15, 255, 15).getX() + ", " + queueTE.getPos().east().getY() + ", " + queueTE.getPos().east().getZ() + ")", 20, 60, 4210752);*/
         /*if (Config.maxSpeedup > 0)
-            this.fontRendererObj.drawString("Speedup (blocks per tick): " + scanner.speedup, 20, 120, 4210752);*/
+            this.fontRendererObj.drawString("Speedup (blocks per tick): " + queueTE.speedup, 20, 120, 4210752);*/
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {

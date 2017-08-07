@@ -38,10 +38,10 @@ public class MessageUpdateEnergy extends PacketBase {
     @Override
     public void handle(MessageContext player) {
         World server = ScannerMod.proxy.getWorld();
-        BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(x, y, z));
+        TileEnergyConsumer base = (TileEnergyConsumer) server.getTileEntity(new BlockPos(x, y, z));
         //System.out.println(Minecraft.getMinecraft().world.getBlockState(new BlockPos(message.x, message.y, message.z)).getBlock());
         //System.out.println(new BlockPos(message.x, message.y, message.z));
-        if (base != null && base.container() != null)
-            base.container().setEnergyStored(energy);
+        if (base != null && base.getContainer() != null)
+            base.getContainer().setEnergyStored(energy);
     }
 }
