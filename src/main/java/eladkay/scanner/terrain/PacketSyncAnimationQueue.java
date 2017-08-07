@@ -37,7 +37,8 @@ public class PacketSyncAnimationQueue extends PacketBase {
 	@SaveMethodSetter(saveName = "manual_saver")
 	private void manualSaveSetter(NBTTagCompound compound) {
 		if (compound.hasKey("anim_queue")) {
-			animationQueue.clear();
+
+			animationQueue = new ArrayList<>();
 			NBTTagList list = compound.getTagList("anim_queue", Constants.NBT.TAG_COMPOUND);
 			for (int i = 0; i < list.tagCount(); i++) {
 				PlaceObject object = new PlaceObject();

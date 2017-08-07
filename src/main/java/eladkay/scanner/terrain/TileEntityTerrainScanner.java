@@ -148,8 +148,8 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 					animationQueue.remove(object);
 				} else object.tick();
 			}
-			//PacketHandler.NETWORK.sendToAll(new PacketSyncAnimationQueue(getPos(), animationQueue));
-			world.notifyBlockUpdate(getPos(), world.getBlockState(getPos()), world.getBlockState(getPos()), 3);
+			PacketHandler.NETWORK.sendToAll(new PacketSyncAnimationQueue(getPos(), animationQueue));
+			//world.notifyBlockUpdate(getPos(), world.getBlockState(getPos()), world.getBlockState(getPos()), 3);
 			markDirty();
 		}
 		// --- TICK ANIMATION QUEUE --- //
