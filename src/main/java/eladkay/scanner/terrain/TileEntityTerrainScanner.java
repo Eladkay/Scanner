@@ -5,13 +5,18 @@ import com.teamwizardry.librarianlib.common.util.autoregister.TileRegister;
 import com.teamwizardry.librarianlib.common.util.saving.Save;
 import eladkay.scanner.Config;
 import eladkay.scanner.compat.Oregistry;
+import eladkay.scanner.misc.PlaceObject;
 import eladkay.scanner.misc.RandUtil;
 import eladkay.scanner.misc.TileEnergyConsumer;
 import eladkay.scanner.misc.WtfException;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -20,12 +25,17 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static eladkay.scanner.terrain.EnumDimensions.*;
@@ -38,8 +48,8 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 	public transient TileEntityScannerQueue queueTE;
 	@Save
 	public boolean on;
-	@Save(saveName = "positions")
-	public final MutableBlockPos currentPos = new MutableBlockPos(0, -1, 0);
+	@Nonnull
+	public MutableBlockPos currentPos = new MutableBlockPos(0, -1, 0);
 	@Save(saveName = "speedup")
 	public int speedup = 1;
 	@Save
@@ -49,16 +59,48 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 	@Save
 	public int layerBlocksPlace = 0;
-	@Save
-	public int currentY = 0;
+
+	public ArrayList<PlaceObject> animationQueue = new ArrayList<>();
+
+	public TileEntityTerrainScanner() {
+		super(MAX);
+	}
+
+	@Override
+	public void writeCustomNBT(@NotNull NBTTagCompound cmp, boolean sync) {
+		super.writeCustomNBT(cmp, sync);
+		cmp.setLong("current_pos", currentPos.toLong());
+
+		NBTTagList list = new NBTTagList();
+
+		ArrayList<PlaceObject> temp = new ArrayList<>(animationQueue);
+		for (int i = 0; i < animationQueue.size(); i++) {
+			list.appendTag(temp.get(i).serializeNBT());
+		}
+		cmp.setTag("anim_queue", list);
+	}
+
+	@Override
+	public void readCustomNBT(@NotNull NBTTagCompound cmp) {
+		super.readCustomNBT(cmp);
+
+		if (cmp.hasKey("current_pos"))
+			currentPos = new MutableBlockPos(BlockPos.fromLong(cmp.getLong("current_pos")));
+
+		if (cmp.hasKey("anim_queue")) {
+			animationQueue.clear();
+			NBTTagList list = cmp.getTagList("anim_queue", Constants.NBT.TAG_COMPOUND);
+			for (int i = 0; i < list.tagCount(); i++) {
+				PlaceObject object = new PlaceObject();
+				object.deserializeNBT(list.getCompoundTagAt(i));
+				animationQueue.add(object);
+			}
+		}
+	}
 
 	@Nonnull
 	public BlockPos getPosStart() {
 		return posStart != null ? posStart : getPos();
-	}
-
-	public TileEntityTerrainScanner() {
-		super(MAX);
 	}
 
 	public void onBlockActivated() {
@@ -98,6 +140,19 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 	@Override
 	public void update() {
+		// --- TICK ANIMATION QUEUE --- //
+		{
+			ArrayList<PlaceObject> temp = new ArrayList<>(animationQueue);
+			for (PlaceObject object : temp) {
+				if (object.expired) {
+					animationQueue.remove(object);
+				} else object.tick();
+			}
+			//PacketHandler.NETWORK.sendToAll(new PacketSyncAnimationQueue());
+			world.notifyBlockUpdate(getPos(), world.getBlockState(getPos()), world.getBlockState(getPos()), 3);
+			markDirty();
+		}
+		// --- TICK ANIMATION QUEUE --- //
 
 		if (!getWorld().isRemote) {
 			queueTE = TileEntityScannerQueue.getNearbyTile(getWorld(), this, TileEntityScannerQueue.class);
@@ -131,8 +186,6 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 		// Set on if powered by redstone
 		if (!getWorld().isRemote && getWorld().isBlockPowered(getPos())) on = true;
 
-		if (currentPos == null) return;
-
 		int multiplier = 0;
 		for (int tick = 0; tick < speedup; tick++) {
 
@@ -147,27 +200,15 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 			BlockPos currentPosImm = currentPos.toImmutable();
 
-			SoundType sound = fakeState.getBlock().getSoundType(fakeState, world, currentPos, null);
-
 			// --- PLACE NEW BLOCK HERE --- //
 			{
 				if (!world.isRemote && currentState.getBlock().isReplaceable(getWorld(), currentPosImm) && currentState.getBlock().isAir(currentState, getWorld(), currentPosImm)) {
-					boolean success = getWorld().setBlockState(currentPosImm, fakeState);
-					if (success) {
-						getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
 
-						if (fakeTE != null) {
-							NBTTagCompound tag = new NBTTagCompound();
-							fakeTE.writeToNBT(tag);
+					PlaceObject object = new PlaceObject(getWorld(), fakeState, currentPosImm, fakeTE, getWorld().getTotalWorldTime());
+					animationQueue.add(object);
 
-							TileEntity freshTE = getWorld().getTileEntity(currentPosImm);
-							if (freshTE != null) freshTE.writeToNBT(tag);
-						}
-						if (!fakeState.getBlock().isAir(fakeState, getWorld(), currentPosImm))
-							multiplier++;
-
-						markDirty();
-					}
+					multiplier++;
+					markDirty();
 				}
 			}
 			// --- PLACE NEW BLOCK HERE --- //
@@ -222,13 +263,9 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 				if (currentPos.getZ() > end.getZ()) {
 					currentPos.setPos(getPosStart().getX(), currentPos.getY() + 1, getPosStart().getZ());
 					layerBlocksPlace = 0;
-					currentY = currentPos.getY();
-					//PacketHandler.NETWORK.sendToAllAround(new PacketLayerCompleteParty(getPosStart(), getEnd(), currentPos.getY()),
-					//		new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 128));
 				}
 				if (currentPos.getY() > maxY) {
 					layerBlocksPlace = 0;
-					currentY = 0;
 					if (queueTE != null && queueTE.queue.peek() != null) {
 						BlockPos pos = queueTE.pop();
 						if (pos == null) throw new WtfException("How can this be???");
