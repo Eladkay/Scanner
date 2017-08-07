@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GuiScannerQueue extends GuiContainer {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("queueTE:textures/gui/standardBackground.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standardBackground.png");
     private final TileEntityScannerQueue queue;
     private GuiTextField coordinates;
     private GuiButton push;
@@ -76,7 +76,7 @@ public class GuiScannerQueue extends GuiContainer {
         }
     }
 
-    private static final ResourceLocation ENERGY_BAR = new ResourceLocation("queueTE:textures/gui/bar.png");
+    private static final ResourceLocation ENERGY_BAR = new ResourceLocation("scanner:textures/gui/bar.png");
 
     private static boolean isInRect(int x, int y, int xSize, int ySize, int mouseX, int mouseY) {
         return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
@@ -147,7 +147,7 @@ public class GuiScannerQueue extends GuiContainer {
             drawCenteredString("(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")", 90 + getKx(), 20 + getKy() + i, 4210752);
             i += 10;
         }
-        /*if (queueTE.queueTE != null && queueTE.flag)
+        /*if (scanner.scanner != null && scanner.flag)
             drawCenteredString("Biome Scanner attached", 85 + getKx(), 140 + getKy(), 4210752);
         else {
             drawCenteredString("Attach Ultimate Biome Scanner", 85 + getKx(), 128 + getKy(), 4210752);
@@ -158,9 +158,9 @@ public class GuiScannerQueue extends GuiContainer {
         else drawCenteredString("Terrain Scanner not attached", 85 + getKx(), 150 + getKy(), 4210752);
        /* boolean flag0 = false;
         if (mc.player.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
-            this.fontRendererObj.drawString("Debug: (" + queueTE.getPos().east().add(15, 255, 15).getX() + ", " + queueTE.getPos().east().getY() + ", " + queueTE.getPos().east().getZ() + ")", 20, 60, 4210752);*/
+            this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);*/
         /*if (Config.maxSpeedup > 0)
-            this.fontRendererObj.drawString("Speedup (blocks per tick): " + queueTE.speedup, 20, 120, 4210752);*/
+            this.fontRendererObj.drawString("Speedup (blocks per tick): " + scanner.speedup, 20, 120, 4210752);*/
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {

@@ -47,6 +47,11 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 	@Save(saveName = "my")
 	public int maxY = 127;
 
+	@Save
+	public int layerBlocksPlace = 0;
+	@Save
+	public int currentY = 0;
+
 	@Nonnull
 	public BlockPos getPosStart() {
 		return posStart != null ? posStart : getPos();
@@ -207,26 +212,29 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 			{
 				currentPos.move(EnumFacing.EAST);
 
+				layerBlocksPlace++;
 				BlockPos end = getEnd();
 
 				if (currentPos.getX() > end.getX()) {
-					currentPos.setPos(currentPos.south());
+					currentPos.move(EnumFacing.SOUTH);
 					currentPos.setPos(getPosStart().getX(), currentPos.getY(), currentPos.getZ());
 				}
 				if (currentPos.getZ() > end.getZ()) {
 					currentPos.setPos(getPosStart().getX(), currentPos.getY() + 1, getPosStart().getZ());
-					PacketHandler.NETWORK.sendToAllAround(new PacketLayerCompleteParty(getPosStart(), getEnd(), currentPos.getY()),
-							new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 128));
+					layerBlocksPlace = 0;
+					currentY = currentPos.getY();
+					//PacketHandler.NETWORK.sendToAllAround(new PacketLayerCompleteParty(getPosStart(), getEnd(), currentPos.getY()),
+					//		new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 128));
 				}
 				if (currentPos.getY() > maxY) {
+					layerBlocksPlace = 0;
+					currentY = 0;
 					if (queueTE != null && queueTE.queue.peek() != null) {
 						BlockPos pos = queueTE.pop();
 						if (pos == null) throw new WtfException("How can this be???");
 						this.currentPos.setPos(pos);
 						this.posStart = pos;
-
 					} else changeState(false);
-
 				}
 				markDirty();
 			}

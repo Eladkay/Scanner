@@ -27,7 +27,7 @@ public class BlockScannerQueue extends BlockModContainer {
         return new ItemModBlock(this) {
             @Override
             public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-                tooltip.add("Provides a buffer of chunks and allows you to queueTE up chunks for scanning.");
+                tooltip.add("Provides a buffer of chunks and allows you to queue up chunks for scanning.");
                 tooltip.add("Place next to Terrain Scanner.");
                 super.addInformation(stack, playerIn, tooltip, advanced);
             }

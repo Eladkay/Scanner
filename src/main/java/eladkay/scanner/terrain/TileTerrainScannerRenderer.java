@@ -42,19 +42,33 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			GlStateManager.disableCull();
 			GlStateManager.enableAlpha();
 			GlStateManager.enableBlend();
-			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 			GlStateManager.shadeModel(GL11.GL_SMOOTH);
 			GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE);
 			GlStateManager.disableTexture2D();
 			GlStateManager.color(1, 1, 1);
 			Minecraft.getMinecraft().entityRenderer.disableLightmap();
-			GL14.glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
 
 			Tessellator tess = Tessellator.getInstance();
 			VertexBuffer buffer = tess.getBuffer();
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+			{
+				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+				Color color = new Color(0f, 1f, 1f, 0.5f);
+				double layerY = (te.currentY - te.getPos().getY() + 0.5) + (te.layerBlocksPlace / 256.0);
+
+				buffer.pos(start.xCoord - 3, layerY, start.zCoord - 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+				buffer.pos(start.xCoord - 3, layerY, end.zCoord + 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+				buffer.pos(end.xCoord + 3, layerY, end.zCoord + 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+				buffer.pos(end.xCoord + 3, layerY, start.zCoord - 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+
+				tess.draw();
+			}
+
+			GL14.glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
 
 			float alpha = te.on ? 0.15f : 0.5f;
+
+			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
 			Color color = new Color(1, 0, 0, alpha);
 			buffer.pos(start.xCoord, start.yCoord, start.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
@@ -79,15 +93,6 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			buffer.pos(start.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
 			buffer.pos(start.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
 			buffer.pos(end.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
-
-			//double difference = (te.layerCompleteWorldTime - te.getWorld().getTotalWorldTime()) * 0.01;
-//
-			//if (difference < 100) {
-			//	buffer.pos(end.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-			//	buffer.pos(start.xCoord, start.yCoord, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-			//	buffer.pos(start.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
-			//	buffer.pos(end.xCoord, start.yCoord + 255, end.zCoord).color(color.getRed(), color.getGreen(), color.getBlue(), 0).endVertex();
-			//}
 
 			tess.draw();
 
