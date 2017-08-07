@@ -41,13 +41,15 @@ public class PlaceObject implements INBTSerializable<NBTTagCompound> {
 		if (tick < maxTick) tick++;
 		else {
 			expired = true;
-			world.setBlockState(pos, state);
-			//SoundType sound = state.getBlock().getSoundType(state, world, currentPos, null);
-			//getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
+			if (!world.isRemote) {
+				world.setBlockState(pos, state);
+				//SoundType sound = state.getBlock().getSoundType(state, world, currentPos, null);
+				//getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
 
-			if (tileNBT != null) {
-				TileEntity freshTE = world.getTileEntity(pos);
-				if (freshTE != null) freshTE.writeToNBT(tileNBT);
+				if (tileNBT != null) {
+					TileEntity freshTE = world.getTileEntity(pos);
+					if (freshTE != null) freshTE.writeToNBT(tileNBT);
+				}
 			}
 		}
 	}

@@ -148,7 +148,7 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 					animationQueue.remove(object);
 				} else object.tick();
 			}
-			//PacketHandler.NETWORK.sendToAll(new PacketSyncAnimationQueue());
+			//PacketHandler.NETWORK.sendToAll(new PacketSyncAnimationQueue(getPos(), animationQueue));
 			world.notifyBlockUpdate(getPos(), world.getBlockState(getPos()), world.getBlockState(getPos()), 3);
 			markDirty();
 		}
@@ -202,7 +202,7 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 			// --- PLACE NEW BLOCK HERE --- //
 			{
-				if (!world.isRemote && currentState.getBlock().isReplaceable(getWorld(), currentPosImm) && currentState.getBlock().isAir(currentState, getWorld(), currentPosImm)) {
+				if (currentState.getBlock().isReplaceable(getWorld(), currentPosImm) && currentState.getBlock().isAir(currentState, getWorld(), currentPosImm)) {
 
 					PlaceObject object = new PlaceObject(getWorld(), fakeState, currentPosImm, fakeTE, getWorld().getTotalWorldTime());
 					animationQueue.add(object);
