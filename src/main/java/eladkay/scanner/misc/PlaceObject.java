@@ -1,6 +1,7 @@
 package eladkay.scanner.misc;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
@@ -13,7 +14,7 @@ import javax.annotation.Nullable;
 
 public class PlaceObject implements INBTSerializable<NBTTagCompound> {
 
-	public static final int maxTick = 100;
+	public static final double maxTick = 50;
 
 	private World world;
 	public IBlockState state;
@@ -33,25 +34,37 @@ public class PlaceObject implements INBTSerializable<NBTTagCompound> {
 			this.tileNBT = tile.serializeNBT();
 	}
 
+	public PlaceObject(World world, IBlockState state, BlockPos pos, @Nullable NBTTagCompound tile, long worldTime) {
+		this.world = world;
+		this.state = state;
+		this.pos = pos;
+		this.worldTime = worldTime;
+		if (tile != null)
+			this.tileNBT = tile;
+	}
+
 	public PlaceObject() {
 	}
 
 	public void tick() {
 		if (expired) return;
-		if (tick < maxTick) tick++;
-		else {
+		if (world.getTotalWorldTime() - worldTime > maxTick) {
 			expired = true;
-			if (!world.isRemote) {
-				world.setBlockState(pos, state, 2);
+			if (!world.isRemote && world.isAirBlock(pos)) {
+				world.setBlockState(pos, state);
 				//SoundType sound = state.getBlock().getSoundType(state, world, currentPos, null);
 				//getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
 
-				if (tileNBT != null) {
-					TileEntity freshTE = world.getTileEntity(pos);
-					if (freshTE != null) freshTE.writeToNBT(tileNBT);
+			}
+			if (tileNBT != null) {
+				TileEntity freshTE = world.getTileEntity(pos);
+				if (freshTE != null) {
+					freshTE.writeToNBT(tileNBT);
+					freshTE.markDirty();
 				}
 			}
 		}
+
 	}
 
 	@Override

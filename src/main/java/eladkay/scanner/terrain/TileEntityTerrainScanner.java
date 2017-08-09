@@ -51,6 +51,8 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 	@Save
 	public int layerBlocksPlace = 0;
+	@Save
+	public int currentY = 0;
 
 	public ArrayList<PlaceObject> animationQueue = new ArrayList<>();
 
@@ -140,8 +142,6 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 					animationQueue.remove(object);
 				} else object.tick();
 			}
-			PacketHandler.NETWORK.sendToAll(new PacketSyncAnimationQueue(getPos(), animationQueue));
-			//world.notifyBlockUpdate(getPos(), world.getBlockState(getPos()), world.getBlockState(getPos()), 3);
 			markDirty();
 		}
 		// --- TICK ANIMATION QUEUE --- //
@@ -152,27 +152,25 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 		// --- GET REMOTE WORLD --- //
 		WorldServer fakeWorld = null;
-		boolean somethingFailed = false;
-		{
-			EnumDimensions type = getWorld().provider.getDimension() == -1 ? NETHER : getWorld().provider.getDimension() == 1 ? END : OVERWORLD;
-			for (EnumFacing facing : EnumFacing.values()) {
-				IBlockState te = world.getBlockState(getPos().offset(facing));
-				if (te.getBlock() instanceof BlockDimensionalCore && te.getValue(BlockDimensionalCore.TYPE) != NONE)
-					type = te.getValue(BlockDimensionalCore.TYPE);
+		if (!getWorld().isRemote) {
+			{
+				EnumDimensions type = getWorld().provider.getDimension() == -1 ? NETHER : getWorld().provider.getDimension() == 1 ? END : OVERWORLD;
+				for (EnumFacing facing : EnumFacing.values()) {
+					IBlockState te = world.getBlockState(getPos().offset(facing));
+					if (te.getBlock() instanceof BlockDimensionalCore && te.getValue(BlockDimensionalCore.TYPE) != NONE)
+						type = te.getValue(BlockDimensionalCore.TYPE);
+				}
+				try {
+					if (type == NETHER)
+						fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
+					else if (type == END)
+						fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
+					else
+						fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+				} catch (NullPointerException ignored) {
+				}
 			}
-			try {
-				if (type == NETHER)
-					fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
-				else if (type == END)
-					fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
-				else
-					fakeWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
-			} catch (NullPointerException lazy) {
-				somethingFailed = true;
-			}
-			if (fakeWorld == null) somethingFailed = true;
 		}
-		if (somethingFailed) return;
 		// --- GET REMOTE WORLD --- //
 
 		// Set on if powered by redstone
@@ -186,28 +184,29 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 			if (getContainer().getEnergyStored() < Config.energyPerBlockTerrainScanner) return;
 
 			//remoteWorld.getBlockState(currentPos);
-			IBlockState fakeState = fakeWorld.getBlockState(currentPos);
-			IBlockState currentState = getWorld().getBlockState(currentPos);
-			TileEntity fakeTE = fakeWorld.getTileEntity(currentPos);
+			if (!getWorld().isRemote && fakeWorld != null) {
+				IBlockState fakeState = fakeWorld.getBlockState(currentPos);
+				IBlockState currentState = getWorld().getBlockState(currentPos);
+				TileEntity fakeTE = fakeWorld.getTileEntity(currentPos);
 
-			BlockPos currentPosImm = currentPos.toImmutable();
+				BlockPos currentPosImm = currentPos.toImmutable();
 
-			// --- PLACE NEW BLOCK HERE --- //
-			{
-				if (currentState.getBlock().isReplaceable(getWorld(), currentPosImm) && currentState.getBlock().isAir(currentState, getWorld(), currentPosImm)) {
+				// --- PLACE NEW BLOCK HERE --- //
+				{
+					if (currentState.getBlock().isReplaceable(getWorld(), currentPosImm) && currentState.getBlock().isAir(currentState, getWorld(), currentPosImm)) {
 
-					PlaceObject object = new PlaceObject(getWorld(), fakeState, currentPosImm, fakeTE, getWorld().getTotalWorldTime());
-					animationQueue.add(object);
+						PlaceObject object = new PlaceObject(getWorld(), fakeState, currentPosImm, fakeTE, getWorld().getTotalWorldTime());
+						animationQueue.add(object);
+						PacketHandler.NETWORK.sendToAll(new PacketSyncAnimationQueue(getPos(), currentPosImm, fakeState, fakeTE, getWorld().getTotalWorldTime()));
 
-					multiplier++;
-					markDirty();
+						multiplier++;
+						markDirty();
+					}
 				}
-			}
-			// --- PLACE NEW BLOCK HERE --- //
+				// --- PLACE NEW BLOCK HERE --- //
 
-			// --- SET ORES HERE --- //
-			{
-				if (!world.isRemote) {
+				// --- SET ORES HERE --- //
+				{
 					if (Config.genVanillaOres && getWorld().getBlockState(currentPos).getBlock() == Blocks.STONE) {
 						if (currentPos.getY() > 8) {
 							int i = RandUtil.nextInt(25);
@@ -236,8 +235,8 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 						int i = ThreadLocalRandom.current().nextInt(entry.rarity);
 						if (i == 0) getWorld().setBlockState(currentPos, entry.ore, 2);
 					});
+					markDirty();
 				}
-				markDirty();
 			}
 			// --- SET ORES HERE --- //
 
@@ -254,6 +253,7 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 				}
 				if (currentPos.getZ() > end.getZ()) {
 					currentPos.setPos(getPosStart().getX(), currentPos.getY() + 1, getPosStart().getZ());
+					currentY = currentPos.getY();
 					layerBlocksPlace = 0;
 				}
 				if (currentPos.getY() > maxY) {
