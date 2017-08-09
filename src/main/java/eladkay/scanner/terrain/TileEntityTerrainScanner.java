@@ -59,6 +59,8 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 	@Save
 	public int layerBlocksPlace = 0;
+	@Save
+	public int currentY = 0;
 
 	public ArrayList<PlaceObject> animationQueue = new ArrayList<>();
 
@@ -259,6 +261,7 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 				}
 				if (currentPos.getZ() > end.getZ()) {
 					currentPos.setPos(getPosStart().getX(), currentPos.getY() + 1, getPosStart().getZ());
+					currentY = currentPos.getY();
 					layerBlocksPlace = 0;
 				}
 				if (currentPos.getY() > maxY) {

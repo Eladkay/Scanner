@@ -171,17 +171,18 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 				Tessellator tess = Tessellator.getInstance();
 				VertexBuffer buffer = tess.getBuffer();
 
+				// LAYER
 				{
-					//buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-					//Color color = new Color(0f, 0f, 1f, 0.5f);
-					//double layerY = (te.currentPos.getY() - te.getPos().getY() + 0.5) + (te.layerBlocksPlace / 256.0);
-//
-					//buffer.pos(start.xCoord - 3, layerY, start.zCoord - 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-					//buffer.pos(start.xCoord - 3, layerY, end.zCoord + 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-					//buffer.pos(end.xCoord + 3, layerY, end.zCoord + 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-					//buffer.pos(end.xCoord + 3, layerY, start.zCoord - 3).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-//
-					//tess.draw();
+					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+					Color color = new Color(0f, 0f, 1f, 0.5f);
+					double layerY = (te.currentY - te.getPos().getY() - 0.2) + (te.layerBlocksPlace / 256.0);
+
+					buffer.pos(start.xCoord - 2, layerY, start.zCoord - 2).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+					buffer.pos(start.xCoord - 2, layerY, end.zCoord + 2).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+					buffer.pos(end.xCoord + 2, layerY, end.zCoord + 2).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+					buffer.pos(end.xCoord + 2, layerY, start.zCoord - 2).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
+
+					tess.draw();
 				}
 
 				float alpha = te.on ? 0.15f : 0.5f;
