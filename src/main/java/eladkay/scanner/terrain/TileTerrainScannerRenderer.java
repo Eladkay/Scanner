@@ -1,11 +1,10 @@
 package eladkay.scanner.terrain;
 
-import com.teamwizardry.librarianlib.common.util.math.interpolate.position.InterpLine;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.PlaceObject;
+import net.minecraft.block.BlockAir;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -54,6 +53,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 					GlStateManager.translate(posOffset.getX(), posOffset.getY(), posOffset.getZ());
 					double m = 256.0 * (1 - MathHelper.sqrt(1 - Math.pow(1 - ((double) object.tick / (double) PlaceObject.maxTick), 2)));
 					GlStateManager.translate(0, m, 0);
+					if (object.state.getBlock() instanceof BlockAir) continue;
 					Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightnessColor(Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(object.state), 1.0F, 1, 1, 1);
 					GlStateManager.translate(0, -m, 0);
 					GlStateManager.translate(-posOffset.getX(), -posOffset.getY(), -posOffset.getZ());

@@ -9,33 +9,25 @@ import eladkay.scanner.misc.PlaceObject;
 import eladkay.scanner.misc.RandUtil;
 import eladkay.scanner.misc.TileEnergyConsumer;
 import eladkay.scanner.misc.WtfException;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static eladkay.scanner.terrain.EnumDimensions.*;
@@ -69,7 +61,7 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 	@Override
 	public void writeCustomNBT(@NotNull NBTTagCompound cmp, boolean sync) {
 		super.writeCustomNBT(cmp, sync);
-		cmp.setLong("current_pos", currentPos.toLong());
+		cmp.setLong("current", currentPos.toLong());
 
 		NBTTagList list = new NBTTagList();
 
@@ -84,8 +76,8 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 	public void readCustomNBT(@NotNull NBTTagCompound cmp) {
 		super.readCustomNBT(cmp);
 
-		if (cmp.hasKey("current_pos"))
-			currentPos = new MutableBlockPos(BlockPos.fromLong(cmp.getLong("current_pos")));
+		if (cmp.hasKey("current"))
+			currentPos = new MutableBlockPos(BlockPos.fromLong(cmp.getLong("current")));
 
 		if (cmp.hasKey("anim_queue")) {
 			animationQueue.clear();
@@ -269,7 +261,7 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 					if (queueTE != null && queueTE.queue.peek() != null) {
 						BlockPos pos = queueTE.pop();
 						if (pos == null) throw new WtfException("How can this be???");
-						this.currentPos.setPos(pos);
+						this.currentPos.setPos(new BlockPos(pos.getX() << 4, 0, pos.getZ() << 4));
 						this.posStart = pos;
 					} else changeState(false);
 				}

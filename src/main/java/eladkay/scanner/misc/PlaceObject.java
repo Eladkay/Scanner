@@ -42,7 +42,7 @@ public class PlaceObject implements INBTSerializable<NBTTagCompound> {
 		else {
 			expired = true;
 			if (!world.isRemote) {
-				world.setBlockState(pos, state);
+				world.setBlockState(pos, state, 2);
 				//SoundType sound = state.getBlock().getSoundType(state, world, currentPos, null);
 				//getWorld().playSound(getPos().getX(), getPos().getY(), getPos().getZ(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.getVolume(), sound.getPitch(), false);
 

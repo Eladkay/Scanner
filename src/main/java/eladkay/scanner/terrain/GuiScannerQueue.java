@@ -46,10 +46,10 @@ public class GuiScannerQueue extends GuiContainer {
 
     @Override
     public void initGui() {
-        coordinates = new GuiTextField(101, mc.fontRendererObj, (this.width / 2) - 50, this.height / 2 + 15, 100, 20);
+        coordinates = new GuiTextField(101, mc.fontRendererObj, (this.width / 2) - 50, this.height / 2 + 30, 100, 20);
         coordinates.setText("");
         this.coordinates.setMaxStringLength(2000);
-        push = new GuiButton(102, (this.width / 2) - 50, this.height / 2 - 10, 100, 20, "Add");
+        push = new GuiButton(102, (this.width / 2) - 50, this.height / 2 + 10, 100, 20, "Add");
         buttonList.add(push);
         buttonList.addAll(buttonsBuild);
         buttonList.addAll(buttonsRemove);
@@ -127,10 +127,11 @@ public class GuiScannerQueue extends GuiContainer {
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         drawCenteredString("Scanner Queue (Capacity: " + TileEntityScannerQueue.CAPACITY + ")", 90 + getKx(), 6 + getKy(), 4210752); //
+        drawCenteredString("Format: (chunkX, chunkZ)", 90 + getKx(), 16 + getKy(), 4210752); //
 
         for (GuiButton btn : buttonsBuild) btn.visible = false;
         for (GuiButton btn : buttonsRemove) btn.visible = false;
-        int i = 0;
+        int i = 10;
         for (int j = 0; j < queue.size(); j++) {
             BlockPos pos = queue.get(j);
             if (pos == null) continue;
