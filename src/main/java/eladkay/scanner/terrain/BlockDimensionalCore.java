@@ -1,6 +1,7 @@
 package eladkay.scanner.terrain;
 
 import com.teamwizardry.librarianlib.common.base.block.BlockMod;
+import com.teamwizardry.librarianlib.common.base.block.BlockModContainer;
 import com.teamwizardry.librarianlib.common.base.block.ItemModBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -27,7 +28,7 @@ import java.util.List;
 
 import static eladkay.scanner.ScannerMod.tab;
 
-public class BlockDimensionalCore extends BlockMod {
+public class BlockDimensionalCore extends BlockModContainer {
 
     @Nullable
     @Override

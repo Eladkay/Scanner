@@ -2,31 +2,22 @@ package eladkay.scanner.terrain;
 
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.proxy.ClientProxy;
-import net.darkhax.tesla.lib.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.awt.Color.red;
 
 public class TileDimensionalRiftRenderer extends TileEntitySpecialRenderer<BlockDimensionalRift.TileDimensionalRift> {
 
@@ -106,7 +97,7 @@ public class TileDimensionalRiftRenderer extends TileEntitySpecialRenderer<Block
 		}
 		{
 			int r = 255, g = 255, b = 255, a = (int) (s * 255);
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+			// buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				modelFrom.getQuads(null, facing, 0).forEach(q -> {
 					buffer.addVertexData(q.getVertexData());
