@@ -6,6 +6,8 @@ import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.terrain.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -13,11 +15,12 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nullable;
 
-public class ClientProxy extends CommonProxy {
+public class ClientProxy extends CommonProxy implements IResourceManagerReloadListener{
     private static final String IP = "http://eladkay.pw/scanner/ScannerCallback.php";
     private static boolean sentCallback = false;
 
@@ -30,6 +33,7 @@ public class ClientProxy extends CommonProxy {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.dimensionalCore), 3, new ModelResourceLocation("scanner:dimensionalCore_none", "inventory"));
         ClientRegistry.bindTileEntitySpecialRenderer(BlockDimensionalRift.TileDimensionalRift.class, new TileEntitySRRift());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTerrainScanner.class, new TileTerrainScannerRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(BlockDimensionalRift.TileDimensionalRift.class, new TileDimensionalRiftRenderer());
        /* if(Config.showOutline)
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTerrainScanner.class, new TileEntitySpecialRendererTerrainScanner());*/
         MinecraftForge.EVENT_BUS.register(this);
@@ -62,5 +66,18 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void openGuiScannerQueue(TileEntityScannerQueue tileEntity) {
         Minecraft.getMinecraft().displayGuiScreen(new GuiScannerQueue(tileEntity));
+    }
+
+    @Override
+    public void onResourceManagerReload(IResourceManager resourceManager) {
+        MinecraftForge.EVENT_BUS.post(new ResourceReloadEvent(resourceManager));
+    }
+
+    public static class ResourceReloadEvent extends Event {
+        public final IResourceManager resourceManager;
+
+        public ResourceReloadEvent(IResourceManager manager) {
+            resourceManager = manager;
+        }
     }
 }

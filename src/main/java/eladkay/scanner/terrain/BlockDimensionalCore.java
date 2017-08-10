@@ -14,6 +14,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -27,6 +28,7 @@ import java.util.List;
 import static eladkay.scanner.ScannerMod.tab;
 
 public class BlockDimensionalCore extends BlockMod {
+
     @Nullable
     @Override
     public ItemBlock createItemForm() {
@@ -84,6 +86,11 @@ public class BlockDimensionalCore extends BlockMod {
         setCreativeTab(tab);
         setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));
 
+    }
+
+    @Override
+    public TileEntity createTileEntity(World world, IBlockState state) {
+        return new TileDimensionalCore();
     }
 
     @Override

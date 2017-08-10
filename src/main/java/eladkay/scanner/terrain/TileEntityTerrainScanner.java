@@ -56,6 +56,15 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 	public ArrayList<PlaceObject> animationQueue = new ArrayList<>();
 
+	@Save
+	public double currentAngle = -1;
+	@Save
+	public double angleTick = 0;
+	@Save
+	public boolean angleShouldTick = false;
+	@Save
+	public double animTime = 30;
+
 	public TileEntityTerrainScanner() {
 		super(MAX);
 	}
@@ -69,6 +78,7 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 		ArrayList<PlaceObject> temp = new ArrayList<>(animationQueue);
 		for (int i = 0; i < animationQueue.size(); i++) {
+			if (i >= animationQueue.size()) continue;
 			list.appendTag(temp.get(i).serializeNBT());
 		}
 		cmp.setTag("anim_queue", list);
@@ -134,6 +144,26 @@ public class TileEntityTerrainScanner extends TileEnergyConsumer implements ITic
 
 	@Override
 	public void update() {
+		{
+			double angleSep = 2.0 * Math.PI / (animationQueue.size());
+
+			if (currentAngle == -1) {
+				currentAngle = angleSep;
+				angleTick = animTime;
+			}
+
+			if (currentAngle < angleSep) {
+				if (!angleShouldTick) angleShouldTick = true;
+			}
+			if (angleTick < animTime) {
+				angleTick++;
+				currentAngle = currentAngle + (angleTick / animTime) * (angleSep - currentAngle);
+			} else {
+				angleShouldTick = false;
+				angleTick = 0;
+			}
+			markDirty();
+		}
 		// --- TICK ANIMATION QUEUE --- //
 		{
 			ArrayList<PlaceObject> temp = new ArrayList<>(animationQueue);

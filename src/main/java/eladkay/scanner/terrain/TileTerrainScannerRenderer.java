@@ -1,25 +1,39 @@
 package eladkay.scanner.terrain;
 
+import com.teamwizardry.librarianlib.client.core.ClientTickHandler;
+import com.teamwizardry.librarianlib.client.fx.particle.ParticleBuilder;
+import com.teamwizardry.librarianlib.client.fx.particle.ParticleSpawner;
+import com.teamwizardry.librarianlib.client.fx.particle.functions.InterpColorFade;
+import com.teamwizardry.librarianlib.client.fx.particle.functions.InterpColorHSV;
+import com.teamwizardry.librarianlib.client.fx.particle.functions.InterpFadeInOut;
+import com.teamwizardry.librarianlib.common.util.math.interpolate.StaticInterp;
 import com.teamwizardry.librarianlib.common.util.math.interpolate.position.InterpBezier3D;
 import com.teamwizardry.librarianlib.common.util.math.interpolate.position.InterpLine;
 import eladkay.scanner.Config;
+import eladkay.scanner.ScannerMod;
 import eladkay.scanner.misc.PlaceObject;
+import eladkay.scanner.misc.RandUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fluids.IFluidBlock;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
+import java.util.function.BiConsumer;
 
 import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -27,8 +41,6 @@ import static org.lwjgl.opengl.GL14.GL_FUNC_ADD;
 import static org.lwjgl.opengl.GL14.GL_FUNC_REVERSE_SUBTRACT;
 
 public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEntityTerrainScanner> {
-
-	private static int mode = 0;
 
 	@Override
 	public void renderTileEntityAt(TileEntityTerrainScanner te, double x, double y, double z, float partialTicks, int destroyStage) {
@@ -59,7 +71,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 					if (object.state.getMaterial() == Material.AIR) continue;
 
 					BlockPos posOffset = object.pos.subtract(me);
-					double t = (te.getWorld().getTotalWorldTime() - object.worldTime) / (double) PlaceObject.maxTick;
+					double t = (te.getWorld().getTotalWorldTime() - object.worldTime) / PlaceObject.maxTick;
 					double m = 256.0 * (1 - MathHelper.sqrt(1 - Math.pow(1 - (t), 2)));
 
 					GlStateManager.translate(posOffset.getX(), posOffset.getY(), posOffset.getZ());
@@ -86,7 +98,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 					Vec3d vec = new Vec3d(x1, y1, z1);
 
 					GlStateManager.translate(0.5, 0.5, 0.5);
-					GlStateManager.scale(m, m, m);
+					GlStateManager.scale(m / 2, m / 2, m / 2);
 					GlStateManager.translate(-0.5, -0.5, -0.5);
 
 					GlStateManager.translate(vec.xCoord, vec.yCoord, vec.zCoord);
@@ -123,7 +135,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 
 					BlockPos posOffset = object.pos.subtract(me);
 					double t = (te.getWorld().getTotalWorldTime() - object.worldTime) / PlaceObject.maxTick;
-					double m = -256 * (1 - MathHelper.sqrt(1 - Math.pow(1 - (t), 2))) ;
+					double m = -256 * (1 - MathHelper.sqrt(1 - Math.pow(1 - (t), 2)));
 
 					GlStateManager.translate(posOffset.getX(), posOffset.getY(), posOffset.getZ());
 					GlStateManager.translate(0, m, 0);
@@ -139,7 +151,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 
 					BlockPos posOffset = object.pos.subtract(me);
 					double t = (te.getWorld().getTotalWorldTime() - object.worldTime) / PlaceObject.maxTick;
-					double m = -1 * (1 - MathHelper.sqrt(1 - Math.pow(1 - (t), 2))) ;
+					double m = -1 * (1 - MathHelper.sqrt(1 - Math.pow(1 - (t), 2)));
 
 					GlStateManager.translate(posOffset.getX(), posOffset.getY(), posOffset.getZ());
 					GlStateManager.translate(0, m, 0);
@@ -151,6 +163,59 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 			}
 			GlStateManager.popMatrix();
 		}
+
+		{
+			if (te.on) {
+				ParticleBuilder builder = new ParticleBuilder(10);
+				builder.setRender(new ResourceLocation(ScannerMod.MODID, "particles/sparkle_blurred"));
+				builder.setCollision(true);
+				ParticleSpawner.spawn(builder, te.getWorld(), new StaticInterp<>(new Vec3d(te.getPos()).addVector(0.5, 0.5, 0.5)), 5, 0, (aFloat, particleBuilder) -> {
+					particleBuilder.setScale(RandUtil.nextFloat());
+					particleBuilder.setMotion(new Vec3d(RandUtil.nextDouble(-0.03, 0.03), RandUtil.nextDouble(-0.03, 0.03), RandUtil.nextDouble(-0.03, 0.03)));
+					particleBuilder.setAlphaFunction(new InterpFadeInOut(1, 1));
+					particleBuilder.setLifetime(RandUtil.nextInt(20, 30));
+					particleBuilder.setPositionOffset(new Vec3d(RandUtil.nextDouble(-0.25, 0.25), RandUtil.nextDouble(-0.25, 0.25), RandUtil.nextDouble(-0.25, 0.25)));
+					particleBuilder.setColorFunction(new InterpColorHSV(Color.CYAN, Color.BLUE));
+				});
+			}
+		}
+
+		// RENDER BLOCK ON TOP
+		//{
+		//	for (PlaceObject object : te.animationQueue) {
+		//		if (object.state.getMaterial() == Material.AIR || object.state.getBlock() instanceof IFluidBlock) return;
+		//		GlStateManager.pushMatrix();
+		//		GlStateManager.translate(x, y, z);
+//
+		//		GlStateManager.enableAlpha();
+		//		GlStateManager.enableBlend();
+		//		GlStateManager.enableLighting();
+		//		GlStateManager.enableRescaleNormal();
+		//		GlStateManager.color(1, 1, 1);
+		//		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		//		bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+//
+		//		double t = (te.getWorld().getTotalWorldTime() - object.worldTime) / PlaceObject.maxTick;
+//
+		//		double startingAngle = (partialTicks + ClientTickHandler.getTicks()) * Math.PI / 120;
+		//		double angleSep = 2.0 * Math.PI / (te.animationQueue.size());
+		//		double angle = startingAngle + (te.animationQueue.indexOf(object)) * te.currentAngle;
+		//		double x1 = 2 * MathHelper.cos((float) angle);
+		//		double y1 = 2 * MathHelper.sin((float) angle);
+//
+		//		GlStateManager.translate(0.25, 1, 0.25);
+		//		GlStateManager.scale(0.5, 0.5, 0.5);
+		//		GlStateManager.translate(1, 0, 0);
+		//		GlStateManager.rotate((float) angle, 0, 1, 0);
+//
+		//		Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightnessColor(Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(object.state), 1.0F, 1, 1, 1);
+//
+		//		GlStateManager.translate(-1, 0, 0);
+		//		GlStateManager.scale(1, 1, 1);
+		//		GlStateManager.translate(-0.25, -1, -0.25);
+		//		GlStateManager.popMatrix();
+		//	}
+		//}
 
 		{
 			if (Config.showOutline) {
