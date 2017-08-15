@@ -52,7 +52,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 		start = new Vec3d(start.xCoord - 0.01, -me.getY(), start.zCoord - 0.01);
 		end = new Vec3d(end.xCoord + 1 + 0.01, 255, end.zCoord + 1 + 0.01);
 
-		double mode = 3;
+		double mode = 1;
 		{
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x, y, z);
@@ -76,7 +76,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 
 					GlStateManager.translate(posOffset.getX(), posOffset.getY(), posOffset.getZ());
 					GlStateManager.translate(0, m, 0);
-					GlStateManager.scale(m, m, m);
+					//GlStateManager.scale(m, m, m);
 					Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightnessColor(Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(object.state), 1.0F, 1, 1, 1);
 					GlStateManager.translate(0, -m, 0);
 					GlStateManager.translate(-posOffset.getX(), -posOffset.getY(), -posOffset.getZ());
@@ -98,7 +98,7 @@ public class TileTerrainScannerRenderer extends TileEntitySpecialRenderer<TileEn
 					Vec3d vec = new Vec3d(x1, y1, z1);
 
 					GlStateManager.translate(0.5, 0.5, 0.5);
-					GlStateManager.scale(m / 2, m / 2, m / 2);
+					GlStateManager.scale(m, m, m );
 					GlStateManager.translate(-0.5, -0.5, -0.5);
 
 					GlStateManager.translate(vec.xCoord, vec.yCoord, vec.zCoord);

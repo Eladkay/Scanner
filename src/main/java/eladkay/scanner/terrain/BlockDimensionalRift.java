@@ -68,7 +68,7 @@ public class BlockDimensionalRift extends BlockModContainer {
 //            return true;
 //        }
 
-        public static final int TICKS_TO_COMPLETION = 20 * 60 * 10;
+        public static final int TICKS_TO_COMPLETION = 20 * 10;
         public static final int CAPACITY = 1_000_000;
 
         public TileDimensionalRift() {

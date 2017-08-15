@@ -1,18 +1,17 @@
 package eladkay.scanner.terrain;
 
 import eladkay.scanner.ScannerMod;
+import eladkay.scanner.misc.IsolatedBlock;
 import eladkay.scanner.proxy.ClientProxy;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -21,7 +20,7 @@ import org.lwjgl.opengl.GL11;
 
 public class TileDimensionalRiftRenderer extends TileEntitySpecialRenderer<BlockDimensionalRift.TileDimensionalRift> {
 
-	private IBakedModel modelFrom, modelTo;
+	private IBakedModel modelFrom, modelTo, modelBlack;
 
 	public TileDimensionalRiftRenderer() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -31,6 +30,7 @@ public class TileDimensionalRiftRenderer extends TileEntitySpecialRenderer<Block
 	public void reload(ClientProxy.ResourceReloadEvent event) {
 		modelFrom = null;
 		modelTo = null;
+		modelBlack = null;
 	}
 
 	private void getBakedModels() {
@@ -53,6 +53,15 @@ public class TileDimensionalRiftRenderer extends TileEntitySpecialRenderer<Block
 			modelTo = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM,
 					location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString()));
 		}
+		if (modelBlack == null) {
+			try {
+				model = ModelLoaderRegistry.getModel(new ResourceLocation(ScannerMod.MODID, "block/black"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			modelBlack = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM,
+					location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString()));
+		}
 	}
 
 	@Override
@@ -60,54 +69,55 @@ public class TileDimensionalRiftRenderer extends TileEntitySpecialRenderer<Block
 		super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
 
 		GlStateManager.pushMatrix();
+		GlStateManager.enableCull();
+		GlStateManager.disableAlpha();
 		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		getBakedModels();
-
-		bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		GlStateManager.enableLighting();
+		GlStateManager.enableRescaleNormal();
+		GlStateManager.color(1, 1, 1);
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		if (Minecraft.isAmbientOcclusionEnabled()) GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		else GlStateManager.shadeModel(GL11.GL_FLAT);
 
+		bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		getBakedModels();
+
 		GlStateManager.translate(x, y, z);
-		GlStateManager.disableRescaleNormal();
-		GlStateManager.depthMask(false);
-		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
 
 		float s = (float) te.ticks / (float) BlockDimensionalRift.TileDimensionalRift.TICKS_TO_COMPLETION;
 
-		GlStateManager.color(1, 1, 1, 1);
-
+		Minecraft mc = Minecraft.getMinecraft();
 		Tessellator tes = Tessellator.getInstance();
 		VertexBuffer buffer = tes.getBuffer();
-		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-		Minecraft mc = Minecraft.getMinecraft();
-		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		BlockRendererDispatcher dispatcher = mc.getBlockRendererDispatcher();
+
+		IsolatedBlock block = new IsolatedBlock(te.getWorld().getBlockState(te.getPos()), null);
 		{
-			int r = 255, g = 255, b = 255, a = (int) (s * 255);
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
-			for (EnumFacing facing : EnumFacing.VALUES) {
-				modelFrom.getQuads(null, facing, 0).forEach(q -> {
-					buffer.addVertexData(q.getVertexData());
-					for (int i = 1; i <= 4; i++) {
-						buffer.putColorRGBA(buffer.getColorIndex(i), r, g, b, a);
-					}
-				});
-			}
+			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+			dispatcher.getBlockModelRenderer().renderModel(block, modelBlack, te.getWorld().getBlockState(te.getPos()), IsolatedBlock.POS, buffer, false, MathHelper.getPositionRandom(IsolatedBlock.POS));
+			mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			tes.draw();
 		}
 		{
-			int r = 255, g = 255, b = 255, a = (int) (s * 255);
-			// buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
-			for (EnumFacing facing : EnumFacing.VALUES) {
-				modelFrom.getQuads(null, facing, 0).forEach(q -> {
-					buffer.addVertexData(q.getVertexData());
-					for (int i = 1; i <= 4; i++) {
-						buffer.putColorRGBA(buffer.getColorIndex(i), r, g, b, a);
-					}
-				});
+			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+			dispatcher.getBlockModelRenderer().renderModel(block, modelTo, te.getWorld().getBlockState(te.getPos()), IsolatedBlock.POS, buffer, false, MathHelper.getPositionRandom(IsolatedBlock.POS));
+			for (int i = 0; i < buffer.getVertexCount(); i++) {
+				int idx = buffer.getColorIndex(i + 1);
+				buffer.putColorRGBA(idx, 255, 255, 255, (int) (s * 255));
 			}
+			mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			tes.draw();
 		}
-		tes.draw();
+		{
+			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+			dispatcher.getBlockModelRenderer().renderModel(block, modelFrom, te.getWorld().getBlockState(te.getPos()), IsolatedBlock.POS, buffer, false, MathHelper.getPositionRandom(IsolatedBlock.POS));
+			for (int i = 0; i < buffer.getVertexCount(); i++) {
+				int idx = buffer.getColorIndex(i + 1);
+				buffer.putColorRGBA(idx, 255, 255, 255, (int) ((1 - s) * 255));
+			}
+			mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			tes.draw();
+		}
 		GlStateManager.depthMask(true);
 		GlStateManager.disableBlend();
 		GlStateManager.popMatrix();
