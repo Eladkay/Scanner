@@ -8,7 +8,6 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -26,7 +25,7 @@ public class BlockScannerQueue extends BlockDirectional implements ITileEntityPr
         setRegistryName(ScannerMod.MODID + ":scanner_queue");
         setUnlocalizedName("scannerQueue");
         setCreativeTab(tab);
-        setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));
+        setHardness(5);
     }
 
     @Override
@@ -45,7 +44,6 @@ public class BlockScannerQueue extends BlockDirectional implements ITileEntityPr
         return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing());
     }
 
-    @SuppressWarnings("NullableProblems")
     public IBlockState getStateFromMeta(int meta) {
         EnumFacing enumfacing = EnumFacing.getFront(meta);
         if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
@@ -58,7 +56,6 @@ public class BlockScannerQueue extends BlockDirectional implements ITileEntityPr
         return state.getValue(FACING).getIndex();
     }
 
-    @SuppressWarnings("NullableProblems")
     public IBlockState withRotation(@Nonnull IBlockState state, Rotation rot) {
         return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
     }
@@ -67,6 +64,5 @@ public class BlockScannerQueue extends BlockDirectional implements ITileEntityPr
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, FACING);
     }
-
 
 }

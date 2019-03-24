@@ -30,7 +30,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         setRegistryName(ScannerMod.MODID + ":terrain_scanner");
         setUnlocalizedName("terrainScanner");
         setCreativeTab(tab);
-        setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));
+        setHardness(5);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState bs) {
-        //We need to do this always in case the config has changed seince the block as added.
+        //We need to do this always in case the config has changed since the block as added.
         BlockPos start = pos.east().down(pos.getY());
         for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
             IBlockState state = worldIn.getBlockState(p);
@@ -57,7 +57,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {   //We need to do this always in case the config has changed seince the block as added.
+    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {   //We need to do this always in case the config has changed since the block as added.
         BlockPos start = pos.east().down(pos.getY());
         for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
             IBlockState state = worldIn.getBlockState(p);
@@ -68,14 +68,14 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state0, EntityLivingBase placer, ItemStack stack) {
-        if (Config.showOutline) {
+        /*if (Config.showOutline) {
             BlockPos start = pos.east().down(pos.getY());
             for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
                 IBlockState state = worldIn.getBlockState(p);
                 if (state.getBlock() == Blocks.AIR)
                     worldIn.setBlockState(p, ScannerMod.air.getDefaultState());
             }
-        }
+        }*/
         super.onBlockPlacedBy(worldIn, pos, state0, placer, stack);
     }
 

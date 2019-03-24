@@ -1,94 +1,178 @@
 package eladkay.scanner.terrain;
 
-import com.feed_the_beast.ftbl.api.gui.IGui;
-import com.feed_the_beast.ftbl.api.gui.IMouseButton;
-import com.feed_the_beast.ftbl.lib.MouseButton;
-import com.feed_the_beast.ftbl.lib.gui.*;
-import com.feed_the_beast.ftbl.lib.gui.misc.GuiConfigs;
-import com.feed_the_beast.ftbl.lib.gui.misc.ThreadReloadChunkSelector;
-import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
+import com.feed_the_beast.ftblib.lib.client.CachedVertexData;
+import com.feed_the_beast.ftblib.lib.util.misc.MouseButton;
+import com.feed_the_beast.ftblib.lib.gui.*;
+import com.feed_the_beast.ftblib.lib.gui.misc.*;
+import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import eladkay.scanner.Config;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import org.lwjgl.opengl.GL11;
+import com.feed_the_beast.ftblib.lib.icon.Color4I;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class GuiBuildRemotely extends GuiLM {
-    public static GuiBuildRemotely instance;
-    public final int startX, startZ;
-    private final ButtonLM buttonRefresh, buttonClose;
-    private final MapButton mapButtons[];
-    private final PanelLM panelButtons;
-    private final TileEntityTerrainScanner scanner;
-    private byte currentSelectionMode = -1;
 
-    public GuiBuildRemotely(TileEntityTerrainScanner scanner) {
-        super(GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16);
+public class GuiBuildRemotely extends GuiChunkSelectorBase {
+
+    protected enum Corner
+    {
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        TOP_LEFT
+    }
+
+    public static final int TILE_SIZE = 12;
+    private static final CachedVertexData GRID = new CachedVertexData(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+
+    static
+    {
+        GRID.color.set(128, 128, 128, 50);
+
+        for (int x = 0; x <= ChunkSelectorMap.TILES_GUI - 1; x++)
+        {
+            GRID.pos(x * TILE_SIZE, -6D);
+            GRID.pos(x * TILE_SIZE, (ChunkSelectorMap.TILES_GUI * TILE_SIZE)-6, 0D);
+        }
+
+        for (int y = 0; y <= ChunkSelectorMap.TILES_GUI - 1; y++)
+        {
+            GRID.pos(-6D, y * TILE_SIZE, 0D);
+            GRID.pos((ChunkSelectorMap.TILES_GUI * TILE_SIZE)-6, y * TILE_SIZE, 0D);
+        }
+    }
+
+    public class MapButton extends Button
+    {
+        public final GuiBuildRemotely gui;
+        public final ChunkPos chunkPos;
+        public final int index;
+        private boolean isSelected = false;
+
+        private MapButton(GuiBuildRemotely g, int i)
+        {
+            super(g);
+            gui = g;
+            index = i;
+            setPosAndSize(((index % 14) * TILE_SIZE) + 6, ((index / 14) * TILE_SIZE) + 6, TILE_SIZE, TILE_SIZE);
+            chunkPos = new ChunkPos(gui.startX + (i % 14), gui.startZ + (i / 14));
+        }
+
+        @Override
+        public void onClicked(MouseButton button)
+        {
+            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
+            if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
+                return;
+
+            scanner.container.extractEnergy(Config.remoteBuildCost, false);
+            scanner.on = false;
+            // todo make a better solution to getting vegetation to work.
+            scanner.posStart = new BlockPos((chunkPos.x * 16)+8, 0, (chunkPos.z * 16)+8);
+            scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
+            scanner.markDirty();
+            NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
+
+            GuiHelper.playClickSound();
+            currentSelectionMode = 1;
+
+        }
+
+        @Override
+        public void addMouseOverText(List<String> list)
+        {
+            list.add("Click to scan!");
+            list.add("Power cost: " + Config.remoteBuildCost);
+            list.add(chunkPos.toString());
+            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
+            if (scanner.posStart != null && scanner.posStart.getX() == (chunkPos.x * 16)+8 && scanner.posStart.getZ() == (chunkPos.z * 16)+8)
+                list.add("Already building!");
+            else if (scanner.getEnergyStored(null) < Config.remoteBuildCost) list.add("Insufficient power!");
+        }
+
+        @Override
+        public void draw(Theme theme, int x, int y, int w, int h)
+        {
+            if (!isSelected && gui.currentSelectionMode != -1 && gui.isMouseOver(this))
+            {
+                isSelected = true;
+            }
+
+            if (isSelected || gui.isMouseOver(this))
+            {
+                Color4I.WHITE.withAlpha(33).draw(x, y, TILE_SIZE, TILE_SIZE);
+            }
+        }
+    }
+
+    public int startX, startZ;
+    private final MapButton[] mapButtons;
+    private final Panel panelButtons;
+    private final TileEntityTerrainScanner scanner;
+    public int currentSelectionMode = -1;
+
+    public GuiBuildRemotely(TileEntityTerrainScanner scanner)
+    {
 
         this.scanner = scanner;
 
-        startX = MathHelperLM.chunk(mc.player.posX) - 7;
-        startZ = MathHelperLM.chunk(mc.player.posZ) - 7;
+        startX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
+        startZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
 
-        buttonClose = new ButtonLM(0, 0, 16, 16, GuiLang.BUTTON_CLOSE.translate()) {
+        panelButtons = new Panel(this)
+        {
             @Override
-            public void onClicked(IGui gui, IMouseButton button) {
-                GuiHelper.playClickSound();
-                closeGui();
+            public void addWidgets()
+            {
+                addCornerButtons(panelButtons);
+            }
+
+            @Override
+            public void alignWidgets()
+            {
+                int h = align(WidgetLayout.VERTICAL);
+                int w = 0;
+
+                for (Widget widget : widgets)
+                {
+                    w = Math.max(w, widget.width);
+                }
+
+                panelButtons.setPosAndSize(getGui().width + 2, -2, w, h);
             }
         };
 
-        buttonRefresh = new ButtonLM(0, 16, 16, 16, GuiLang.BUTTON_REFRESH.translate()) {
-            @Override
-            public void onClicked(IGui gui, IMouseButton button) {
-                ThreadReloadChunkSelector.reloadArea(mc.world, startX, startZ);
-            }
-        };
+        mapButtons = new MapButton[14 * 14];
 
-        panelButtons = new PanelLM(0, 0, 16, 0) {
-            @Override
-            public void addWidgets() {
-                add(buttonClose);
-                add(buttonRefresh);
-
-                setHeight(getWidgets().size() * 16);
-            }
-
-            @Override
-            public int getAX() {
-                return getScreenWidth() - 16;
-            }
-
-            @Override
-            public int getAY() {
-                return 0;
-            }
-        };
-
-        mapButtons = new MapButton[GuiConfigs.CHUNK_SELECTOR_TILES_GUI * GuiConfigs.CHUNK_SELECTOR_TILES_GUI];
-
-        for (int i = 0; i < mapButtons.length; i++) {
-            mapButtons[i] = new MapButton(0, 0, i);
+        for (int i = 0; i < mapButtons.length; i++)
+        {
+            mapButtons[i] = new MapButton(this, i);
         }
     }
 
     @Override
-    public void onInit() {
-        buttonRefresh.onClicked(this, MouseButton.LEFT);
+    public boolean onInit()
+    {
+        ChunkSelectorMap.getMap().resetMap(startX, startZ);
+        return true;
     }
 
     @Override
-    public void addWidgets() {
-        for (MapButton b : mapButtons) {
+    public void addWidgets()
+    {
+        for (MapButton b : mapButtons)
+        {
             add(b);
         }
 
@@ -96,159 +180,144 @@ public class GuiBuildRemotely extends GuiLM {
     }
 
     @Override
-    public void drawBackground() {
-        super.drawBackground();
+    public void alignWidgets()
+    {
+        setSize((ChunkSelectorMap.TILES_GUI * TILE_SIZE) - 6, (ChunkSelectorMap.TILES_GUI * TILE_SIZE) - 6);
+        panelButtons.alignWidgets();
+    }
 
-        GlStateManager.color(0F, 0F, 0F, 1F);
-        GuiHelper.drawBlankRect(posX - 2, posY - 2, getWidth() + 4, getHeight() + 4);
-        //drawBlankRect((xSize - 128) / 2, (ySize - 128) / 2, zLevel, 128, 128);
+    @Override
+    public void drawBackground(Theme theme, int x, int y, int w, int h)
+    {
+        int currentStartX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
+        int currentStartZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
+
+        if (currentStartX != startX || currentStartZ != startZ)
+        {
+            startX = currentStartX;
+            startZ = currentStartZ;
+
+            for (int i = 0; i < mapButtons.length; i++)
+            {
+                mapButtons[i] = new MapButton(this, i);
+            }
+
+            ChunkSelectorMap.getMap().resetMap(startX, startZ);
+        }
+
+        GlStateManager.color(1F, 1F, 1F, 1F);
+        Color4I.BLACK.draw(x - 2, y - 2, w + 10, h + 10);
+
+        ChunkSelectorMap.getMap().drawMap(this, x, y, startX, startZ);
+
         GlStateManager.color(1F, 1F, 1F, 1F);
 
-        ThreadReloadChunkSelector.updateTexture();
-        GlStateManager.bindTexture(ThreadReloadChunkSelector.getTextureID());
-        GuiHelper.drawTexturedRect(posX, posY, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D, 0D, GuiConfigs.CHUNK_SELECTOR_UV, GuiConfigs.CHUNK_SELECTOR_UV);
-
-        GlStateManager.color(1F, 1F, 1F, 1F);
-        GlStateManager.enableTexture2D();
-
-        for (MapButton mapButton : mapButtons) {
-            mapButton.renderWidget(this);
+        for (MapButton mapButton : mapButtons)
+        {
+            mapButton.draw(theme, mapButton.getX(), mapButton.getY(), mapButton.width, mapButton.height);
         }
 
         GlStateManager.disableTexture2D();
         GlStateManager.glLineWidth(1F);
-        GlStateManager.color(1F, 1F, 1F, 1F);
-        int gridR = 128, gridG = 128, gridB = 128, gridA = 50;
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
-        int gridX = mapButtons[0].getAX();
-        int gridY = mapButtons[0].getAY();
-
-        for (int x = 0; x <= GuiConfigs.CHUNK_SELECTOR_TILES_GUI; x++) {
-            buffer.pos(gridX + x * 16, gridY, 0D).color(gridR, gridG, gridB, gridA).endVertex();
-            buffer.pos(gridX + x * 16, gridY + GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
-        }
-
-        for (int y = 0; y <= GuiConfigs.CHUNK_SELECTOR_TILES_GUI; y++) {
-            buffer.pos(gridX, gridY + y * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
-            buffer.pos(gridX + GuiConfigs.CHUNK_SELECTOR_TILES_GUI * 16, gridY + y * 16, 0D).color(gridR, gridG, gridB, gridA).endVertex();
-        }
-
-        tessellator.draw();
-        GlStateManager.enableTexture2D();
-
-        int cx = MathHelperLM.chunk(mc.player.posX);
-        int cy = MathHelperLM.chunk(mc.player.posZ);
-
-        if (cx >= startX && cy >= startZ && cx < startX + GuiConfigs.CHUNK_SELECTOR_TILES_GUI && cy < startZ + GuiConfigs.CHUNK_SELECTOR_TILES_GUI) {
-            double x = ((cx - startX) * 16D + MathHelperLM.wrap(mc.player.posX, 16D));
-            double y = ((cy - startZ) * 16D + MathHelperLM.wrap(mc.player.posZ, 16D));
-
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(posX + x, posY + y, 0D);
-            /*GlStateManager.pushMatrix();
-            //GlStateManager.rotate((int)((ep.rotationYaw + 180F) / (180F / 8F)) * (180F / 8F), 0F, 0F, 1F);
-            GlStateManager.rotate(mc.player.rotationYaw + 180F, 0F, 0F, 1F);
-            FTBLibClient.setTexture(GuiConfigs.TEX_ENTITY);
-            GlStateManager.color(1F, 1F, 1F, mc.player.isSneaking() ? 0.4F : 0.7F);
-            GuiHelper.drawTexturedRect(-8, -8, 16, 16, 0D, 0D, 1D, 1D);
-            GlStateManager.popMatrix();*/
-            GuiHelper.drawPlayerHead(mc.player.getName(), -2, -2, 4, 4);
-            GlStateManager.popMatrix();
-        }
-
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.setTranslation(mapButtons[0].getX(), mapButtons[0].getY(), 0D);
+        //GlStateManager.color(1F, 1F, 1F, GuiScreen.isCtrlKeyDown() ? 0.2F : 0.7F);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
+        if (!isKeyDown(Keyboard.KEY_TAB))
+        {
+            drawArea(tessellator, buffer);
+        }
+
+        GRID.draw(tessellator, buffer);
+        buffer.setTranslation(0D, 0D, 0D);
+        GlStateManager.enableTexture2D();
+        GlStateManager.color(1F, 1F, 1F, 1F);
     }
 
     @Override
-    public void mouseReleased(IGui gui) {
-        super.mouseReleased(gui);
+    public void mouseReleased(MouseButton button)
+    {
+        super.mouseReleased(button);
 
-        if (currentSelectionMode != -1) {
+        if (currentSelectionMode != -1)
+        {
             Collection<ChunkPos> c = new ArrayList<>();
 
-
-            for (MapButton b : mapButtons) {
-                if (b.isSelected) {
+            for (MapButton b : mapButtons)
+            {
+                if (b.isSelected)
+                {
                     c.add(b.chunkPos);
                     b.isSelected = false;
                 }
             }
 
-            //new MessageClaimedChunksModify(startX, startZ, currentSelectionMode, c).sendToServer();
+            onChunksSelected(c);
             currentSelectionMode = -1;
         }
     }
 
     @Override
-    public void drawForeground() {
-        super.drawForeground();
+    public void drawForeground(Theme theme, int x, int y, int w, int h)
+    {
+        int lineSpacing = theme.getFontHeight() + 1;
+        List<String> tempTextList = new ArrayList<>();
+        addCornerText(tempTextList, Corner.BOTTOM_RIGHT);
+
+        for (int i = 0; i < tempTextList.size(); i++)
+        {
+            String s = tempTextList.get(i);
+            theme.drawString(s, getScreen().getScaledWidth() - theme.getStringWidth(s) - 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
+        }
+
+        tempTextList.clear();
+
+        addCornerText(tempTextList, Corner.BOTTOM_LEFT);
+
+        for (int i = 0; i < tempTextList.size(); i++)
+        {
+            theme.drawString(tempTextList.get(i), 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
+        }
+
+        tempTextList.clear();
+
+        addCornerText(tempTextList, Corner.TOP_LEFT);
+
+        for (int i = 0; i < tempTextList.size(); i++)
+        {
+            theme.drawString(tempTextList.get(i), 2, 2 + i * lineSpacing, Theme.SHADOW);
+        }
+
+        super.drawForeground(theme, x, y, w, h);
     }
 
-    private class MapButton extends ButtonLM {
-        private final ChunkPos chunkPos;
-        private final int index;
-        private boolean isSelected = false;
-
-        private MapButton(int x, int y, int i) {
-            super(x, y, 16, 16);
-            posX += (i % GuiConfigs.CHUNK_SELECTOR_TILES_GUI) * getWidth();
-            posY += (i / GuiConfigs.CHUNK_SELECTOR_TILES_GUI) * getHeight();
-            chunkPos = new ChunkPos(startX + (i % GuiConfigs.CHUNK_SELECTOR_TILES_GUI), startZ + (i / GuiConfigs.CHUNK_SELECTOR_TILES_GUI));
-            index = i;
-        }
-
-        @Override
-        public void onClicked(IGui gui, IMouseButton button) {
-            //do stuff
-            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
-            if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
-                return;
-
-            scanner.container.extractEnergy(Config.remoteBuildCost, false);
-            scanner.on = false;
-            scanner.posStart = new BlockPos(chunkPos.chunkXPos * 16, 0, chunkPos.chunkZPos * 16);
-            scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
-            scanner.markDirty();
-            NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
-
-            GuiHelper.playClickSound();
-            currentSelectionMode = 1;
-        }
-
-        @Override
-        public void addMouseOverText(IGui gui, List<String> l) {
-            l.add("Click to scan!");
-            l.add("Power cost: " + Config.remoteBuildCost);
-            l.add(chunkPos.toString());
-            NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
-            if (scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16)
-                l.add("Already building!");
-            else if (scanner.getEnergyStored(null) < Config.remoteBuildCost) l.add("Insufficient power!");
-        }
-
-        @Override
-        public void renderWidget(IGui gui) {
-            int ax = getAX();
-            int ay = getAY();
-
-            if ((isSelected || gui.isMouseOver(this)) && !(scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16)) {
-                GlStateManager.color(1F, 1F, 1F, 0.27F);
-                GuiHelper.drawBlankRect(ax, ay, 16, 16);
-                GlStateManager.color(1F, 1F, 1F, 1F);
-            } else if (scanner.posStart != null && scanner.posStart.getX() == chunkPos.chunkXPos * 16 && scanner.posStart.getZ() == chunkPos.chunkZPos * 16) {
-                GlStateManager.color(0F, 1F, 0F, 0.27F);
-                GuiHelper.drawBlankRect(ax, ay, 16, 16);
-                GlStateManager.color(1F, 1F, 1F, 1F);
-            }
-
-            if (!isSelected && currentSelectionMode != -1 && isMouseOver(this)) {
-                isSelected = true;
-            }
-        }
+    public int getSelectionMode(MouseButton button)
+    {
+        return -1;
     }
+
+    public void onChunksSelected(Collection<ChunkPos> chunks)
+    {
+    }
+
+    public void drawArea(Tessellator tessellator, BufferBuilder buffer)
+    {
+    }
+
+    public void addCornerButtons(Panel panel)
+    {
+    }
+
+    public void addCornerText(List<String> list, Corner corner)
+    {
+    }
+
+    public void addButtonText(MapButton button, List<String> list)
+    {
+    }
+
+
 }

@@ -46,7 +46,7 @@ public class GuiScannerQueue extends GuiContainer {
 
     @Override
     public void initGui() {
-        coordinates = new GuiTextField(101, mc.fontRendererObj, (this.width / 2) - 50, this.height / 2 + 15, 100, 20);
+        coordinates = new GuiTextField(101, mc.fontRenderer, (this.width / 2) - 50, this.height / 2 + 15, 100, 20);
         coordinates.setText("");
         this.coordinates.setMaxStringLength(2000);
         push = new GuiButton(102, (this.width / 2) - 50, this.height / 2 - 10, 100, 20, "Add");
@@ -122,7 +122,7 @@ public class GuiScannerQueue extends GuiContainer {
     }
 
     public void drawCenteredString(String text, int x, int y, int color) {
-        fontRendererObj.drawString(text, x - fontRendererObj.getStringWidth(text) / 2, y, color);
+        fontRenderer.drawString(text, x - fontRenderer.getStringWidth(text) / 2, y, color);
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
@@ -136,13 +136,13 @@ public class GuiScannerQueue extends GuiContainer {
             if (pos == null) continue;
             GuiButton btnBuild = buttonsBuild.get(j);
             btnBuild.visible = true;
-            btnBuild.xPosition = (this.width / 2) - 83;
-            btnBuild.yPosition = this.height / 2 - 65 + i;
+            btnBuild.x = (this.width / 2) - 83;
+            btnBuild.y = this.height / 2 - 65 + i;
 
             GuiButton btnRemove = buttonsRemove.get(j);
             btnRemove.visible = true;
-            btnRemove.xPosition = (this.width / 2) + 35;
-            btnRemove.yPosition = this.height / 2 - 65 + i;
+            btnRemove.x = (this.width / 2) + 35;
+            btnRemove.y = this.height / 2 - 65 + i;
 
             drawCenteredString("(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")", 90 + getKx(), 20 + getKy() + i, 4210752);
             i += 10;

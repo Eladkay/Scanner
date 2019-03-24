@@ -44,7 +44,7 @@ public class MessageUpdateEnergyServer extends MessageBase<MessageUpdateEnergySe
      */
     @Override
     public void handleServerSide(MessageUpdateEnergyServer message, MessageContext player) {
-        World server = player.getServerHandler().playerEntity.world;
+        World server = player.getServerHandler().player.world;
         BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(message.x, message.y, message.z));
         if (base != null)
             NetworkHelper.tellEveryone(new MessageUpdateEnergy(message.x, message.y, message.z, base.getEnergyStored(null), server.provider.getDimension()));

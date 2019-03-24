@@ -1,6 +1,7 @@
 package eladkay.scanner.terrain;
 
 import eladkay.scanner.Config;
+import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.WtfException;
@@ -24,13 +25,14 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public static final String PRESET = "{\"coordinateScale\":684.412,\"heightScale\":684.412,\"lowerLimitScale\":512.0,\"upperLimitScale\":512.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":80.0,\"mainNoiseScaleY\":160.0,\"mainNoiseScaleZ\":80.0,\"baseSize\":8.5,\"stretchY\":12.0,\"biomeDepthWeight\":1.0,\"biomeDepthOffset\":0.0,\"biomeScaleWeight\":1.0,\"biomeScaleOffset\":0.0,\"seaLevel\":63,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":8,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":4,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":4,\"riverSize\":4,\"dirtSize\":33,\"dirtCount\":10,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":33,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":33,\"graniteCount\":10,\"graniteMinHeight\":0,\"graniteMaxHeight\":80,\"dioriteSize\":33,\"dioriteCount\":10,\"dioriteMinHeight\":0,\"dioriteMaxHeight\":80,\"andesiteSize\":33,\"andesiteCount\":10,\"andesiteMinHeight\":0,\"andesiteMaxHeight\":80,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":0,\"coalMaxHeight\":128,\"ironSize\":9,\"ironCount\":20,\"ironMinHeight\":0,\"ironMaxHeight\":64,\"goldSize\":9,\"goldCount\":2,\"goldMinHeight\":0,\"goldMaxHeight\":32,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":0,\"redstoneMaxHeight\":16,\"diamondSize\":8,\"diamondCount\":1,\"diamondMinHeight\":0,\"diamondMaxHeight\":16,\"lapisSize\":7,\"lapisCount\":1,\"lapisCenterHeight\":16,\"lapisSpread\":16}";
     private static final int MAX = Config.maxEnergyBufferTerrain;
     TileEntityScannerQueue queue;
+    TileEntityBiomeScanner biomeScanner;
     boolean on;
     MutableBlockPos current = new MutableBlockPos(0, -1, 0);
     //BlockPos pos = null;
     public EnumRotation rotation = EnumRotation.POSX_POSZ;
     public int speedup = 1;
     public BlockPos posStart = null;
-    public int maxY = 127;
+    public int maxY = 255;
 
     @Nonnull
     public BlockPos getPosStart() {
@@ -109,6 +111,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public void update() {
         if (getWorld().isRemote) return; //Dont do stuff client side else we get ghosts
         queue = TileEntityScannerQueue.getNearbyQueue(getWorld(), this);
+        biomeScanner = TileEntityBiomeScanner.getNearbyBiomeScanner(getWorld(), this);
 
         if (getWorld().isBlockPowered(getPos())) on = true;
         //System.out.println(queue);
@@ -123,11 +126,11 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             WorldServer remoteWorld;
             try {
                 if (getWorld().provider.getDimension() == -1)
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(Config.dimid + 1);
                 else if (getWorld().provider.getDimension() == 1)
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(Config.dimid + 2);
                 else
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(Config.dimid);
             } catch (NullPointerException lazy) {
                 return;
             }
@@ -182,7 +185,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             //Movement needs to happen BELOW oregen else things get weird and desynced
             if (rotation.x > 0) current = new MutableBlockPos(current.east());
             else new MutableBlockPos(current.west()); //X++
-            BlockPos end = this.getEnd(); //We do this lazy load do it can cache the right value
+            BlockPos end = this.getEnd(); //We do this lazy load so it can cache the right value
 
             if (current.getX() > end.getX()) {
                 if (rotation == EnumRotation.NEGX_POSZ || rotation == EnumRotation.POSX_POSZ)
@@ -196,6 +199,16 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             if (current.getY() > maxY) {
                 if (queue != null && queue.queue.peek() != null) {
                     BlockPos pos = queue.pop();
+                    if (pos == null) throw new WtfException("How can this be???");
+                    this.current.setPos(pos);
+                    this.posStart = pos;
+
+                } else changeState(false);
+
+            }
+            if (current.getY() > maxY) {
+                if (biomeScanner != null && biomeScanner.biomeScanner.peek() != null) {
+                    BlockPos pos = biomeScanner.pop();
                     if (pos == null) throw new WtfException("How can this be???");
                     this.current.setPos(pos);
                     this.posStart = pos;
@@ -218,4 +231,3 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
 
 }
-

@@ -1,11 +1,11 @@
 package eladkay.scanner.biome;
 
+import eladkay.scanner.ScannerMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -24,18 +24,22 @@ public class BlockBiomeScanner extends Block implements ITileEntityProvider {
             case 0:
             default:
                 setUnlocalizedName("biomeScannerBasic");
+                setRegistryName("biome_scanner_basic");
                 break;
             case 1:
                 setUnlocalizedName("biomeScannerAdv");
+                setRegistryName("biome_scanner_adv");
                 break;
             case 2:
                 setUnlocalizedName("biomeScannerElite");
+                setRegistryName("biome_scanner_elite");
                 break;
             case 3:
                 setUnlocalizedName("biomeScannerUltimate");
+                setRegistryName("biome_scanner_ultimate");
         }
         setCreativeTab(tab);
-        setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));
+        setHardness(5);
     }
 
     @Override

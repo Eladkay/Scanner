@@ -57,7 +57,7 @@ public class MessageUpdateScanner extends MessageBase<MessageUpdateScanner> {
     @Override
     public void handleServerSide(MessageUpdateScanner message, MessageContext player) {
 
-        TileEntity bs = player.getServerHandler().playerEntity.world.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        TileEntity bs = player.getServerHandler().player.world.getTileEntity(new BlockPos(message.x, message.y, message.z));
         bs.readFromNBT(message.data);
         bs.markDirty();
     }
