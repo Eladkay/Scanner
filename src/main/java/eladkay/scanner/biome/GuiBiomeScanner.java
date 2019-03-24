@@ -316,18 +316,23 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase {
 
 
     public void onChunksSelected(Collection<ChunkPos> chunks) {
+        //Intentional Empty Method
     }
 
     public void drawArea(Tessellator tessellator, BufferBuilder buffer) {
+        //Intentional Empty Method
     }
 
     public void addCornerButtons(Panel panel) {
+        //Intentional Empty Method
     }
 
     public void addCornerText(List<String> list, Corner corner) {
+        //Intentional Empty Method
     }
 
     public void addButtonText(MapButton button, List<String> list) {
+        //Intentional Empty Method
     }
 
 }
