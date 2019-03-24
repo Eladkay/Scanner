@@ -28,10 +28,15 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class GuiBiomeScanner extends GuiChunkSelectorBase
-{
-    protected enum Corner
-    {
+public class GuiBiomeScanner extends GuiChunkSelectorBase {
+
+    public int startX, startZ;
+    private final MapButton[] mapButtons;
+    private final Panel panelButtons;
+    private final TileEntityBiomeScanner scanner;
+    public int currentSelectionMode = -1;
+
+    protected enum Corner {
         BOTTOM_LEFT,
         BOTTOM_RIGHT,
         TOP_LEFT
@@ -143,23 +148,15 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
 
         @Override
         public void draw(Theme theme, int x, int y, int w, int h) {
-            if (!isSelected && gui.currentSelectionMode != -1 && gui.isMouseOver(this))
-            {
+            if (!isSelected && gui.currentSelectionMode != -1 && gui.isMouseOver(this)) {
                 isSelected = true;
             }
 
-            if (isSelected || gui.isMouseOver(this))
-            {
+            if (isSelected || gui.isMouseOver(this)) {
                 Color4I.WHITE.withAlpha(33).draw(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
     }
-
-    public int startX, startZ;
-    private final MapButton[] mapButtons;
-    private final Panel panelButtons;
-    private final TileEntityBiomeScanner scanner;
-    public int currentSelectionMode = -1;
 
     public GuiBiomeScanner(TileEntityBiomeScanner scanner) {
 
@@ -168,8 +165,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         startX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
         startZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
 
-        panelButtons = new Panel(this)
-        {
+        panelButtons = new Panel(this) {
             @Override
             public void addWidgets()
             {
@@ -177,13 +173,11 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
             }
 
             @Override
-            public void alignWidgets()
-            {
+            public void alignWidgets() {
                 int h = align(WidgetLayout.VERTICAL);
                 int w = 0;
 
-                for (Widget widget : widgets)
-                {
+                for (Widget widget : widgets) {
                     w = Math.max(w, widget.width);
                 }
 
@@ -193,8 +187,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
 
         mapButtons = new MapButton[ChunkSelectorMap.TILES_GUI * ChunkSelectorMap.TILES_GUI];
 
-        for (int i = 0; i < mapButtons.length; i++)
-        {
+        for (int i = 0; i < mapButtons.length; i++) {
             mapButtons[i] = new MapButton(this, i);
         }
     }
@@ -222,18 +215,15 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     }
 
     @Override
-    public void drawBackground(Theme theme, int x, int y, int w, int h)
-    {
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {
         int currentStartX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
         int currentStartZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
 
-        if (currentStartX != startX || currentStartZ != startZ)
-        {
+        if (currentStartX != startX || currentStartZ != startZ) {
             startX = currentStartX;
             startZ = currentStartZ;
 
-            for (int i = 0; i < mapButtons.length; i++)
-            {
+            for (int i = 0; i < mapButtons.length; i++) {
                 mapButtons[i] = new MapButton(this, i);
             }
 
@@ -247,8 +237,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
 
         GlStateManager.color(1F, 1F, 1F, 1F);
 
-        for (MapButton mapButton : mapButtons)
-        {
+        for (MapButton mapButton : mapButtons) {
             mapButton.draw(theme, mapButton.getX(), mapButton.getY(), mapButton.width, mapButton.height);
         }
 
@@ -261,8 +250,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         //GlStateManager.color(1F, 1F, 1F, GuiScreen.isCtrlKeyDown() ? 0.2F : 0.7F);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
-        if (!isKeyDown(Keyboard.KEY_TAB))
-        {
+        if (!isKeyDown(Keyboard.KEY_TAB)) {
             drawArea(tessellator, buffer);
         }
 
@@ -273,18 +261,14 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     }
 
     @Override
-    public void mouseReleased(MouseButton button)
-    {
+    public void mouseReleased(MouseButton button) {
         super.mouseReleased(button);
 
-        if (currentSelectionMode != -1)
-        {
+        if (currentSelectionMode != -1) {
             Collection<ChunkPos> c = new ArrayList<>();
 
-            for (MapButton b : mapButtons)
-            {
-                if (b.isSelected)
-                {
+            for (MapButton b : mapButtons) {
+                if (b.isSelected) {
                     c.add(b.chunkPos);
                     b.isSelected = false;
                 }
@@ -296,14 +280,12 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     }
 
     @Override
-    public void drawForeground(Theme theme, int x, int y, int w, int h)
-    {
+    public void drawForeground(Theme theme, int x, int y, int w, int h) {
         int lineSpacing = theme.getFontHeight() + 1;
         List<String> tempTextList = new ArrayList<>();
         addCornerText(tempTextList, Corner.BOTTOM_RIGHT);
 
-        for (int i = 0; i < tempTextList.size(); i++)
-        {
+        for (int i = 0; i < tempTextList.size(); i++) {
             String s = tempTextList.get(i);
             theme.drawString(s, getScreen().getScaledWidth() - theme.getStringWidth(s) - 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
         }
@@ -312,8 +294,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
 
         addCornerText(tempTextList, Corner.BOTTOM_LEFT);
 
-        for (int i = 0; i < tempTextList.size(); i++)
-        {
+        for (int i = 0; i < tempTextList.size(); i++) {
             theme.drawString(tempTextList.get(i), 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
         }
 
@@ -321,8 +302,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
 
         addCornerText(tempTextList, Corner.TOP_LEFT);
 
-        for (int i = 0; i < tempTextList.size(); i++)
-        {
+        for (int i = 0; i < tempTextList.size(); i++) {
             theme.drawString(tempTextList.get(i), 2, 2 + i * lineSpacing, Theme.SHADOW);
         }
 
@@ -335,25 +315,19 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     }
 
 
-    public void onChunksSelected(Collection<ChunkPos> chunks)
-    {
+    public void onChunksSelected(Collection<ChunkPos> chunks) {
     }
 
-    public void drawArea(Tessellator tessellator, BufferBuilder buffer)
-    {
+    public void drawArea(Tessellator tessellator, BufferBuilder buffer) {
     }
 
-    public void addCornerButtons(Panel panel)
-    {
+    public void addCornerButtons(Panel panel) {
     }
 
-    public void addCornerText(List<String> list, Corner corner)
-    {
+    public void addCornerText(List<String> list, Corner corner) {
     }
 
-    /*
-    public void addButtonText(MapButton button, List<String> list)
-    {
+    public void addButtonText(MapButton button, List<String> list) {
     }
-    */
+
 }

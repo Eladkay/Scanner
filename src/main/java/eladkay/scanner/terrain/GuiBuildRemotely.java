@@ -26,6 +26,12 @@ import java.util.List;
 
 public class GuiBuildRemotely extends GuiChunkSelectorBase {
 
+    public int startX, startZ;
+    private final MapButton[] mapButtons;
+    private final Panel panelButtons;
+    private final TileEntityTerrainScanner scanner;
+    public int currentSelectionMode = -1;
+
     protected enum Corner
     {
         BOTTOM_LEFT,
@@ -53,15 +59,14 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
         }
     }
 
-    public class MapButton extends Button
-    {
+    public class MapButton extends Button {
         public final GuiBuildRemotely gui;
         public final ChunkPos chunkPos;
         public final int index;
         private boolean isSelected = false;
 
-        private MapButton(GuiBuildRemotely g, int i)
-        {
+        private MapButton(GuiBuildRemotely g, int i) {
+
             super(g);
             gui = g;
             index = i;
@@ -70,8 +75,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
         }
 
         @Override
-        public void onClicked(MouseButton button)
-        {
+        public void onClicked(MouseButton button) {
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
                 return;
@@ -90,8 +94,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
         }
 
         @Override
-        public void addMouseOverText(List<String> list)
-        {
+        public void addMouseOverText(List<String> list) {
             list.add("Click to scan!");
             list.add("Power cost: " + Config.remoteBuildCost);
             list.add(chunkPos.toString());
@@ -102,36 +105,25 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
         }
 
         @Override
-        public void draw(Theme theme, int x, int y, int w, int h)
-        {
-            if (!isSelected && gui.currentSelectionMode != -1 && gui.isMouseOver(this))
-            {
+        public void draw(Theme theme, int x, int y, int w, int h) {
+            if (!isSelected && gui.currentSelectionMode != -1 && gui.isMouseOver(this)) {
                 isSelected = true;
             }
 
-            if (isSelected || gui.isMouseOver(this))
-            {
+            if (isSelected || gui.isMouseOver(this)) {
                 Color4I.WHITE.withAlpha(33).draw(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
     }
 
-    public int startX, startZ;
-    private final MapButton[] mapButtons;
-    private final Panel panelButtons;
-    private final TileEntityTerrainScanner scanner;
-    public int currentSelectionMode = -1;
-
-    public GuiBuildRemotely(TileEntityTerrainScanner scanner)
-    {
+    public GuiBuildRemotely(TileEntityTerrainScanner scanner) {
 
         this.scanner = scanner;
 
         startX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
         startZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
 
-        panelButtons = new Panel(this)
-        {
+        panelButtons = new Panel(this) {
             @Override
             public void addWidgets()
             {
@@ -139,13 +131,11 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
             }
 
             @Override
-            public void alignWidgets()
-            {
+            public void alignWidgets() {
                 int h = align(WidgetLayout.VERTICAL);
                 int w = 0;
 
-                for (Widget widget : widgets)
-                {
+                for (Widget widget : widgets) {
                     w = Math.max(w, widget.width);
                 }
 
@@ -162,17 +152,14 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
     }
 
     @Override
-    public boolean onInit()
-    {
+    public boolean onInit() {
         ChunkSelectorMap.getMap().resetMap(startX, startZ);
         return true;
     }
 
     @Override
-    public void addWidgets()
-    {
-        for (MapButton b : mapButtons)
-        {
+    public void addWidgets() {
+        for (MapButton b : mapButtons) {
             add(b);
         }
 
@@ -180,25 +167,21 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
     }
 
     @Override
-    public void alignWidgets()
-    {
+    public void alignWidgets() {
         setSize((ChunkSelectorMap.TILES_GUI * TILE_SIZE) - 6, (ChunkSelectorMap.TILES_GUI * TILE_SIZE) - 6);
         panelButtons.alignWidgets();
     }
 
     @Override
-    public void drawBackground(Theme theme, int x, int y, int w, int h)
-    {
+    public void drawBackground(Theme theme, int x, int y, int w, int h) {
         int currentStartX = MathUtils.chunk(Minecraft.getMinecraft().player.posX) - ChunkSelectorMap.TILES_GUI2;
         int currentStartZ = MathUtils.chunk(Minecraft.getMinecraft().player.posZ) - ChunkSelectorMap.TILES_GUI2;
 
-        if (currentStartX != startX || currentStartZ != startZ)
-        {
+        if (currentStartX != startX || currentStartZ != startZ) {
             startX = currentStartX;
             startZ = currentStartZ;
 
-            for (int i = 0; i < mapButtons.length; i++)
-            {
+            for (int i = 0; i < mapButtons.length; i++) {
                 mapButtons[i] = new MapButton(this, i);
             }
 
@@ -212,8 +195,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
 
         GlStateManager.color(1F, 1F, 1F, 1F);
 
-        for (MapButton mapButton : mapButtons)
-        {
+        for (MapButton mapButton : mapButtons) {
             mapButton.draw(theme, mapButton.getX(), mapButton.getY(), mapButton.width, mapButton.height);
         }
 
@@ -226,8 +208,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
         //GlStateManager.color(1F, 1F, 1F, GuiScreen.isCtrlKeyDown() ? 0.2F : 0.7F);
         GlStateManager.color(1F, 1F, 1F, 1F);
 
-        if (!isKeyDown(Keyboard.KEY_TAB))
-        {
+        if (!isKeyDown(Keyboard.KEY_TAB)) {
             drawArea(tessellator, buffer);
         }
 
@@ -238,18 +219,14 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
     }
 
     @Override
-    public void mouseReleased(MouseButton button)
-    {
+    public void mouseReleased(MouseButton button) {
         super.mouseReleased(button);
 
-        if (currentSelectionMode != -1)
-        {
+        if (currentSelectionMode != -1) {
             Collection<ChunkPos> c = new ArrayList<>();
 
-            for (MapButton b : mapButtons)
-            {
-                if (b.isSelected)
-                {
+            for (MapButton b : mapButtons) {
+                if (b.isSelected) {
                     c.add(b.chunkPos);
                     b.isSelected = false;
                 }
@@ -261,14 +238,12 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
     }
 
     @Override
-    public void drawForeground(Theme theme, int x, int y, int w, int h)
-    {
+    public void drawForeground(Theme theme, int x, int y, int w, int h) {
         int lineSpacing = theme.getFontHeight() + 1;
         List<String> tempTextList = new ArrayList<>();
         addCornerText(tempTextList, Corner.BOTTOM_RIGHT);
 
-        for (int i = 0; i < tempTextList.size(); i++)
-        {
+        for (int i = 0; i < tempTextList.size(); i++) {
             String s = tempTextList.get(i);
             theme.drawString(s, getScreen().getScaledWidth() - theme.getStringWidth(s) - 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
         }
@@ -277,8 +252,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
 
         addCornerText(tempTextList, Corner.BOTTOM_LEFT);
 
-        for (int i = 0; i < tempTextList.size(); i++)
-        {
+        for (int i = 0; i < tempTextList.size(); i++) {
             theme.drawString(tempTextList.get(i), 2, getScreen().getScaledHeight() - (tempTextList.size() - i) * lineSpacing, Theme.SHADOW);
         }
 
@@ -286,8 +260,7 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
 
         addCornerText(tempTextList, Corner.TOP_LEFT);
 
-        for (int i = 0; i < tempTextList.size(); i++)
-        {
+        for (int i = 0; i < tempTextList.size(); i++) {
             theme.drawString(tempTextList.get(i), 2, 2 + i * lineSpacing, Theme.SHADOW);
         }
 
@@ -299,24 +272,19 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
         return -1;
     }
 
-    public void onChunksSelected(Collection<ChunkPos> chunks)
-    {
+    public void onChunksSelected(Collection<ChunkPos> chunks) {
     }
 
-    public void drawArea(Tessellator tessellator, BufferBuilder buffer)
-    {
+    public void drawArea(Tessellator tessellator, BufferBuilder buffer) {
     }
 
-    public void addCornerButtons(Panel panel)
-    {
+    public void addCornerButtons(Panel panel) {
     }
 
-    public void addCornerText(List<String> list, Corner corner)
-    {
+    public void addCornerText(List<String> list, Corner corner) {
     }
 
-    public void addButtonText(MapButton button, List<String> list)
-    {
+    public void addButtonText(MapButton button, List<String> list) {
     }
 
 
