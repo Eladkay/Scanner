@@ -11,7 +11,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import static eladkay.scanner.ScannerMod.tab;
+import static eladkay.scanner.ScannerMod.TAB;
 
 public class BlockBiomeScanner extends Block implements ITileEntityProvider {
     int type;
@@ -37,7 +37,7 @@ public class BlockBiomeScanner extends Block implements ITileEntityProvider {
                 setUnlocalizedName("biomeScannerUltimate");
                 setRegistryName("biome_scanner_ultimate");
         }
-        setCreativeTab(tab);
+        setCreativeTab(TAB);
         setHardness(5);
     }
 

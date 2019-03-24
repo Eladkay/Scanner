@@ -18,8 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import static eladkay.scanner.ScannerMod.tab;
+import static eladkay.scanner.ScannerMod.TAB;
 
 public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     public static PropertyBool ONOFF = PropertyBool.create("state");
@@ -28,7 +27,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         super(Material.IRON);
         setRegistryName(ScannerMod.MODID + ":terrain_scanner");
         setUnlocalizedName("terrainScanner");
-        setCreativeTab(tab);
+        setCreativeTab(TAB);
         setHardness(5);
     }
 

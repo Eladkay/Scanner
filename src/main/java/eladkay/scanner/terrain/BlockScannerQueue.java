@@ -14,17 +14,15 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
 import javax.annotation.Nonnull;
-
-import static eladkay.scanner.ScannerMod.tab;
+import static eladkay.scanner.ScannerMod.TAB;
 
 public class BlockScannerQueue extends BlockDirectional implements ITileEntityProvider {
     public BlockScannerQueue() {
         super(Material.IRON);
         setRegistryName(ScannerMod.MODID + ":scanner_queue");
         setUnlocalizedName("scannerQueue");
-        setCreativeTab(tab);
+        setCreativeTab(TAB);
         setHardness(5);
     }
 
