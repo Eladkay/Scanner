@@ -1,6 +1,5 @@
 package eladkay.scanner.terrain;
 
-import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;

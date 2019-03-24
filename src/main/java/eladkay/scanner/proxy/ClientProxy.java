@@ -9,7 +9,6 @@ import eladkay.scanner.terrain.TileEntityScannerQueue;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 

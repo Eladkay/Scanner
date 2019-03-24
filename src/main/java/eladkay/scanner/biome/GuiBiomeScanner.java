@@ -22,7 +22,6 @@ import org.lwjgl.opengl.GL11;
 import com.feed_the_beast.ftblib.lib.icon.Color4I;
 import org.lwjgl.input.Keyboard;
 import net.minecraft.client.gui.GuiScreen;
-import static eladkay.scanner.ScannerMod.logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,8 +57,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         }
     }
 
-    public class MapButton extends Button
-    {
+    public class MapButton extends Button {
         public final GuiBiomeScanner gui;
         public final ChunkPos chunkPos;
         public final int index;
@@ -81,8 +79,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
 
         }
 
-        private MapButton(GuiBiomeScanner g, int i)
-        {
+        private MapButton(GuiBiomeScanner g, int i) {
             super(g);
             gui = g;
             index = i;
@@ -91,8 +88,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         }
 
         @Override
-        public void onClicked(MouseButton button)
-        {
+        public void onClicked(MouseButton button) {
             int distance = calcDist(chunkPos);
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             if (scanner.getMapping(chunkPos.x, chunkPos.z) != null || scanner.getEnergyStored(null) < Config.minEnergyPerChunkBiomeScanner * Config.increase * distance)
@@ -117,8 +113,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         }
 
         @Override
-        public void addMouseOverText(List<String> l)
-        {
+        public void addMouseOverText(List<String> l) {
             //int distance = scanner.getDist(chunkPos);
 
             int distance = calcDist(chunkPos);
@@ -147,8 +142,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         }
 
         @Override
-        public void draw(Theme theme, int x, int y, int w, int h)
-        {
+        public void draw(Theme theme, int x, int y, int w, int h) {
             if (!isSelected && gui.currentSelectionMode != -1 && gui.isMouseOver(this))
             {
                 isSelected = true;
@@ -167,8 +161,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     private final TileEntityBiomeScanner scanner;
     public int currentSelectionMode = -1;
 
-    public GuiBiomeScanner(TileEntityBiomeScanner scanner)
-    {
+    public GuiBiomeScanner(TileEntityBiomeScanner scanner) {
 
         this.scanner = scanner;
 
@@ -207,15 +200,13 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     }
 
     @Override
-    public boolean onInit()
-    {
+    public boolean onInit() {
         ChunkSelectorMap.getMap().resetMap(startX, startZ);
         return true;
     }
 
     @Override
-    public void addWidgets()
-    {
+    public void addWidgets() {
         for (MapButton b : mapButtons)
         {
             add(b);
@@ -225,8 +216,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     }
 
     @Override
-    public void alignWidgets()
-    {
+    public void alignWidgets() {
         setSize((ChunkSelectorMap.TILES_GUI * TILE_SIZE), (ChunkSelectorMap.TILES_GUI * TILE_SIZE));
         panelButtons.alignWidgets();
     }
@@ -344,6 +334,7 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
         return -1;
     }
 
+
     public void onChunksSelected(Collection<ChunkPos> chunks)
     {
     }
@@ -360,7 +351,9 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase
     {
     }
 
+    /*
     public void addButtonText(MapButton button, List<String> list)
     {
     }
+    */
 }

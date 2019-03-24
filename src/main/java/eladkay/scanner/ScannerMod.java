@@ -10,8 +10,6 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
@@ -34,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = ScannerMod.MODID, name = "Scanner", version = ScannerMod.VERSION)
 public class ScannerMod {
     public static final String MODID = "scanner";
-    private static final boolean TESTING = false;
+    //private static final boolean TESTING = false;
     public static final Logger logger = LogManager.getLogger(ScannerMod.MODID);
 
     @SidedProxy(serverSide = "eladkay.scanner.proxy.CommonProxy", clientSide = "eladkay.scanner.proxy.ClientProxy")
@@ -56,7 +54,7 @@ public class ScannerMod {
     public static final String VERSION = "1.6.2";
 
     @Mod.EventHandler
-    public void PreInit(FMLPreInitializationEvent event) {
+    public void preInit(FMLPreInitializationEvent event) {
         instance = this;
 
         /*if (TESTING) {

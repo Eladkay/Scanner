@@ -1,6 +1,5 @@
 package eladkay.scanner.biome;
 
-import eladkay.scanner.ScannerMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;

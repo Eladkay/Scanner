@@ -1,7 +1,6 @@
 package eladkay.scanner.terrain;
 
 import eladkay.scanner.Config;
-import eladkay.scanner.ScannerMod;
 import eladkay.scanner.init.ModBlocks;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
@@ -21,8 +20,6 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static eladkay.scanner.ScannerMod.logger;
 
 /**
  * Things this should do:
@@ -136,7 +133,7 @@ public class GuiTerrainScanner extends GuiContainer {
                 }
                 list.add(color + "" + percentage + "%" + TextFormatting.GRAY + " Charged");
             }
-            net.minecraftforge.fml.client.config.GuiUtils.drawHoveringText(list, mouseX, mouseY, width, height, -1, mc.fontRenderer);
+            GuiUtils.drawHoveringText(list, mouseX, mouseY, width, height, -1, mc.fontRenderer);
             GlStateManager.disableLighting();
         }
     }

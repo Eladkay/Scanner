@@ -63,7 +63,7 @@ public class MessageUpdateScanner extends MessageBase<MessageUpdateScanner> {
     }
 
     public static void send(TileEntity scanner) {
-        boolean flag = true;
+        boolean flag;
         try {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
                 FMLServerHandler.instance().getClientToServerNetworkManager();

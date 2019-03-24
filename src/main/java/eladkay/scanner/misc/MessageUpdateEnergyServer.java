@@ -48,14 +48,14 @@ public class MessageUpdateEnergyServer extends MessageBase<MessageUpdateEnergySe
         BaseTE base = (BaseTE) server.getTileEntity(new BlockPos(message.x, message.y, message.z));
         if (base != null)
             NetworkHelper.tellEveryone(new MessageUpdateEnergy(message.x, message.y, message.z, base.getEnergyStored(null), server.provider.getDimension()));
-        try {
+        /*try {
             for (BlockPos pos : Lists.newArrayList(EnumFacing.values()).stream().map((it) -> new BlockPos(message.x, message.y, message.z).offset(it)).collect(Collectors.toList())) {
                 //server.scheduleBlockUpdate(pos, server.getBlockState(pos).getBlock(), 1, 50000);
                 //server.notifyBlockUpdate(pos, server.getBlockState(pos), server.getBlockState(pos), 3);
             }
         } catch (Exception e) {
             //NO-OP
-        }
+        }*/
 
     }
 

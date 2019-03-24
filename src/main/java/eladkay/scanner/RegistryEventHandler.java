@@ -15,8 +15,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import static eladkay.scanner.ScannerMod.logger;
-
 
 @Mod.EventBusSubscriber
 public class RegistryEventHandler {
