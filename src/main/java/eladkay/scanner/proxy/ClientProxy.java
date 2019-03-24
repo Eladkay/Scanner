@@ -8,11 +8,7 @@ import eladkay.scanner.terrain.GuiTerrainScanner;
 import eladkay.scanner.terrain.TileEntityScannerQueue;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.item.Item;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -30,17 +26,17 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init() {
         super.init();
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.terrainScanner), 0, new ModelResourceLocation("scanner:terrain_scanner", "inventory"));
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.scannerQueue), 0, new ModelResourceLocation("scanner:scanner_queue", "inventory"));
+        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.terrainScanner), 0, new ModelResourceLocation("scanner:terrain_scanner", "inventory"));
+        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.scannerQueue), 0, new ModelResourceLocation("scanner:scanner_queue", "inventory"));
 
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerBasic), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerAdv), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerElite), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerUltimate), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
+        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerBasic), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
+        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerAdv), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
+        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerElite), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
+        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ScannerMod.biomeScannerUltimate), 0, new ModelResourceLocation("scanner:biome_scanner", "inventory"));
 
        /* if(Config.showOutline)
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTerrainScanner.class, new TileEntitySpecialRendererTerrainScanner());*/
-        MinecraftForge.EVENT_BUS.register(this);
+        //MinecraftForge.EVENT_BUS.register(this);
 
     }
 

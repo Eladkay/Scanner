@@ -1,6 +1,5 @@
 package eladkay.scanner.terrain;
 
-import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -19,8 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import static eladkay.scanner.ScannerMod.tab;
+import static eladkay.scanner.ScannerMod.TAB;
 
 public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     public static PropertyBool ONOFF = PropertyBool.create("state");
@@ -29,8 +27,8 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         super(Material.IRON);
         setRegistryName(ScannerMod.MODID + ":terrain_scanner");
         setUnlocalizedName("terrainScanner");
-        setCreativeTab(tab);
-        setHardness(Blocks.IRON_BLOCK.getBlockHardness(null, null, null));
+        setCreativeTab(TAB);
+        setHardness(5);
     }
 
     @Override
@@ -46,7 +44,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState bs) {
-        //We need to do this always in case the config has changed seince the block as added.
+        //We need to do this always in case the config has changed since the block as added.
         BlockPos start = pos.east().down(pos.getY());
         for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
             IBlockState state = worldIn.getBlockState(p);
@@ -57,7 +55,7 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {   //We need to do this always in case the config has changed seince the block as added.
+    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {   //We need to do this always in case the config has changed since the block as added.
         BlockPos start = pos.east().down(pos.getY());
         for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
             IBlockState state = worldIn.getBlockState(p);
@@ -68,14 +66,14 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state0, EntityLivingBase placer, ItemStack stack) {
-        if (Config.showOutline) {
+        /*if (Config.showOutline) {
             BlockPos start = pos.east().down(pos.getY());
             for (BlockPos p : BlockPos.MutableBlockPos.getAllInBoxMutable(start, start.add(15, 255, 15))) {
                 IBlockState state = worldIn.getBlockState(p);
                 if (state.getBlock() == Blocks.AIR)
                     worldIn.setBlockState(p, ScannerMod.air.getDefaultState());
             }
-        }
+        }*/
         super.onBlockPlacedBy(worldIn, pos, state0, placer, stack);
     }
 

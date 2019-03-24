@@ -1,23 +1,31 @@
 package eladkay.scanner.biome;
 
-import com.feed_the_beast.ftbl.lib.math.MathHelperLM;
+import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import com.google.gson.Gson;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
 import eladkay.scanner.misc.BaseEnergyContainer;
 import eladkay.scanner.misc.BaseTE;
+import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
 public class TileEntityBiomeScanner extends BaseTE implements ITickable {
+    public Queue<BlockPos> biomeScanner = new ArrayDeque<>();
 
     public HashMap<ChunkPos, String> mapping = new HashMap<>();
     public int type;
@@ -27,7 +35,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     }
 
     private static String serialize(ChunkPos pos) {
-        return pos.chunkXPos + "/" + pos.chunkZPos;
+        return pos.x + "/" + pos.z;
     }
 
     public static ChunkPos deserialize(String s) {
@@ -37,6 +45,21 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     BaseEnergyContainer container() {
         return container;
+    }
+
+    @Nullable
+    public static TileEntityBiomeScanner getNearbyBiomeScanner(World world, TileEntityTerrainScanner scanner) {
+        for (EnumFacing facing : EnumFacing.values()) {
+            TileEntity te = world.getTileEntity(scanner.getPos().offset(facing));
+            if (te instanceof TileEntityBiomeScanner) return (TileEntityBiomeScanner) te;
+            //else System.out.println(te != null ? te.getClass() : "No te here!");
+        }
+        return null;
+    }
+
+    @Nullable
+    public BlockPos pop() {
+        return biomeScanner.poll();
     }
 
     public void onBlockActivated(EntityPlayer player) {
@@ -85,7 +108,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     @Nullable
     public String getMapping(int chunkX, int chunkY) {
         for (Map.Entry<ChunkPos, String> entry : mapping.entrySet())
-            if (entry.getKey().chunkXPos == chunkX && entry.getKey().chunkZPos == chunkY) return entry.getValue();
+            if (entry.getKey().x == chunkX && entry.getKey().z == chunkY) return entry.getValue();
         return null;
     }
 
@@ -96,8 +119,8 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     }
 
     public int getDist(ChunkPos chunkPos) {
-        double d0 = pos.getX() - MathHelperLM.unchunk(chunkPos.chunkXPos);
-        double d1 = pos.getZ() - MathHelperLM.unchunk(chunkPos.chunkZPos);
+        double d0 = this.pos.getX() - MathUtils.chunk(chunkPos.x);
+        double d1 = this.pos.getZ() - MathUtils.chunk(chunkPos.z);
         return (int) (MathHelper.sqrt(d0 * d0 + d1 * d1) / 16D);
     }
 }

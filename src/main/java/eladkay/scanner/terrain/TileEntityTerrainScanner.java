@@ -1,6 +1,7 @@
 package eladkay.scanner.terrain;
 
 import eladkay.scanner.Config;
+import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.WtfException;
@@ -30,7 +31,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public EnumRotation rotation = EnumRotation.POSX_POSZ;
     public int speedup = 1;
     public BlockPos posStart = null;
-    public int maxY = 127;
+    public int maxY = 255;
 
     @Nonnull
     public BlockPos getPosStart() {
@@ -109,6 +110,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public void update() {
         if (getWorld().isRemote) return; //Dont do stuff client side else we get ghosts
         queue = TileEntityScannerQueue.getNearbyQueue(getWorld(), this);
+        TileEntityBiomeScanner biomeScanner = TileEntityBiomeScanner
+            .getNearbyBiomeScanner(getWorld(), this);
 
         if (getWorld().isBlockPowered(getPos())) on = true;
         //System.out.println(queue);
@@ -123,11 +126,11 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             WorldServer remoteWorld;
             try {
                 if (getWorld().provider.getDimension() == -1)
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 1);
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(Config.dimid + 1);
                 else if (getWorld().provider.getDimension() == 1)
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid + 2);
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(Config.dimid + 2);
                 else
-                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(Config.dimid);
+                    remoteWorld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(Config.dimid);
             } catch (NullPointerException lazy) {
                 return;
             }
@@ -182,7 +185,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             //Movement needs to happen BELOW oregen else things get weird and desynced
             if (rotation.x > 0) current = new MutableBlockPos(current.east());
             else new MutableBlockPos(current.west()); //X++
-            BlockPos end = this.getEnd(); //We do this lazy load do it can cache the right value
+            BlockPos end = this.getEnd(); //We do this lazy load so it can cache the right value
 
             if (current.getX() > end.getX()) {
                 if (rotation == EnumRotation.NEGX_POSZ || rotation == EnumRotation.POSX_POSZ)
@@ -196,6 +199,16 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             if (current.getY() > maxY) {
                 if (queue != null && queue.queue.peek() != null) {
                     BlockPos pos = queue.pop();
+                    if (pos == null) throw new WtfException("How can this be???");
+                    this.current.setPos(pos);
+                    this.posStart = pos;
+
+                } else changeState(false);
+
+            }
+            if (current.getY() > maxY) {
+                if (biomeScanner != null && biomeScanner.biomeScanner.peek() != null) {
+                    BlockPos pos = biomeScanner.pop();
                     if (pos == null) throw new WtfException("How can this be???");
                     this.current.setPos(pos);
                     this.posStart = pos;
@@ -218,4 +231,3 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
 
 }
-

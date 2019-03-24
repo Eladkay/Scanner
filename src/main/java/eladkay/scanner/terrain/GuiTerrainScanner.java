@@ -1,7 +1,7 @@
 package eladkay.scanner.terrain;
 
 import eladkay.scanner.Config;
-import eladkay.scanner.ScannerMod;
+import eladkay.scanner.init.ModBlocks;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.Minecraft;
@@ -28,6 +28,7 @@ import java.util.List;
  * Speedup (check!)
  * Stop/start (check!)
  */
+// todo Fix gui size in relation to JEI
 public class GuiTerrainScanner extends GuiContainer {
     private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standard_background.png");
     private final TileEntityTerrainScanner scanner;
@@ -132,7 +133,7 @@ public class GuiTerrainScanner extends GuiContainer {
                 }
                 list.add(color + "" + percentage + "%" + TextFormatting.GRAY + " Charged");
             }
-            net.minecraftforge.fml.client.config.GuiUtils.drawHoveringText(list, mouseX, mouseY, width, height, -1, mc.fontRendererObj);
+            GuiUtils.drawHoveringText(list, mouseX, mouseY, width, height, -1, mc.fontRenderer);
             GlStateManager.disableLighting();
         }
     }
@@ -158,8 +159,11 @@ public class GuiTerrainScanner extends GuiContainer {
         toggleMode.displayString = scanner.on ? "Turn off" : "Turn on";
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
-            if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
+            if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate) {
+
                 flag = true;
+
+            }
         showMap.visible = flag;
         switch (scanner.rotation) {
             case POSX_POSZ:
@@ -175,6 +179,12 @@ public class GuiTerrainScanner extends GuiContainer {
                 rotate.displayString = "Build on -x, -z";
                 break;
         }
+        /*
+        if (scanner.biomeScanner != null){
+                flag = true;
+        }
+        showMap.visible = flag;
+        */
         //drawMultiEnergyBar((this.width / 2) - 112, this.height / 2 - 15, mouseX, mouseY);
         /*drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         drawGuiContainerForegroundLayer(mouseX, mouseY);*/
@@ -189,7 +199,7 @@ public class GuiTerrainScanner extends GuiContainer {
     }
 
     public void drawCenteredString(String text, int x, int y, int color) {
-        fontRendererObj.drawString(text, x - fontRendererObj.getStringWidth(text) / 2, y, color);
+        fontRenderer.drawString(text, x - fontRenderer.getStringWidth(text) / 2, y, color);
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
@@ -211,15 +221,22 @@ public class GuiTerrainScanner extends GuiContainer {
             drawCenteredString("Remote start: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90 + getKx(), 55 + getKy(), 4210752);
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
-            if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ScannerMod.biomeScannerUltimate)
+            if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate)
                 flag = true;
         if (!flag) {
-            this.fontRendererObj.drawString("Place ultimate biome scanner", 15 + getKx(), 65 + getKy(), 4210752);
-            this.fontRendererObj.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
+            this.fontRenderer.drawString("Place ultimate biome scanner", 15 + getKx(), 65 + getKy(), 4210752);
+            this.fontRenderer.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
         }
 
+        /*
+        if (scanner.biomeScanner == null){
+                this.fontRenderer.drawString("Place ultimate biome scanner", 15 + getKx(), 65 + getKy(), 4210752);
+                this.fontRenderer.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
+        }
+        */
+
         if (scanner.queue != null)
-            this.fontRendererObj.drawString("Scanner Queue attached", 30 + getKx(), 150 + getKy(), 4210752);
+            this.fontRenderer.drawString("Scanner Queue attached", 30 + getKx(), 150 + getKy(), 4210752);
        /* boolean flag0 = false;
         if (mc.player.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
             this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);*/

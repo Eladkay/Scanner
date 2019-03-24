@@ -29,7 +29,7 @@ public class Config {
         maxEnergyBufferTerrain = config.get("Scanner", "maxEnergyBufferTerrain", 300000, "The energy buffer of the Terrain Scanner").getInt();
         dimid = config.get("Scanner", "dimid", 99, "The ID for the fake overworld dimension").getInt();
         showOutline = config.get("Scanner", "showOutline", true, "Should the Terrain Scanner show its area of effect outline with shiny particles").getBoolean();
-        genVanillaOres = config.get("Scanner", "genVanillaOres", true, "Should the terrain scanner automatically generate vanilla ores? MineTweakered ores will always be spawned.").getBoolean();
+        genVanillaOres = config.get("Scanner", "genVanillaOres", false, "Should the terrain scanner automatically generate vanilla ores? MineTweakered ores will always be spawned.").getBoolean();
 
         minEnergyPerChunkBiomeScanner = config.get("Scanner", "energyPerChunk", 10000, "The base amount of energy required for the Biome Scanner to scan one chunk.").getInt();
         maxEnergyBufferBiome = config.get("Scanner", "maxEnergyBufferBiome", 1000000, "The energy buffer of the Biome Scanner").getInt();

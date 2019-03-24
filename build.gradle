@@ -1,80 +1,83 @@
-// For those who want the bleeding edge
 buildscript {
     repositories {
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
+        maven { url = "https://files.minecraftforge.net/maven" }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "1.3.3c"
+
+version = "1.6.2"
 group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "scanner"
 
-minecraft {
-    version = "1.11.2-13.20.0.2223"
-    runDir = "run"
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
 
+minecraft {
+    version = "1.12.2-14.23.5.2808"
+    runDir = "run"
+    
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
     // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not allways work.
+    // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20170118"
+    mappings = "snapshot_20171003"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
 repositories {
-    maven { url "http://maven.epoxide.xyz" }
-    maven { url "http://mobiusstrip.eu/maven" }
+    maven { url "http://maven.mcmoddev.com" }
+    maven { url "http://tehnut.info/maven" }
     maven { url "http://chickenbones.net/maven/" }
     maven {
-
-        url 'http://maven.epoxide.xyz'
+        url = "http://maven.bluexin.be/repository/snapshots/"
     }
-    ivy {
-        name "LatMod"
-        artifactPattern "http://mods.latmod.com/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"
+    maven {
+        name = "CoFH Maven"
+        url = "http://maven.covers1624.net"
     }
-    ivy {
-        name "CraftTweaker"
-        artifactPattern "https://addons-origin.cursecdn.com/files/2338/490/[module]-[revision](-[classifier]).[ext]"
+    maven { // CraftTweaker
+        name 'jared maven'
+        url "http://maven.blamejared.com/"
     }
-
-    ivy {
-        name "EnderCore"
-        artifactPattern "https://addons-origin.cursecdn.com/files/2340/651/[module]-[revision](-[classifier]).[ext]"
-    }
-    ivy {
-        name "EnderIO"
-        artifactPattern "https://addons-origin.cursecdn.com/files/2340/734/[module]-[revision](-[classifier]).[ext]"
-    }
-
+    maven { url = "http://maven.tterrag.com" }
+    maven { url "https://maven.latmod.com/" }
+    maven {
+    // location of the maven that hosts JEI files
+    name = "Progwml6 maven"
+    url = "http://dvs1.progwml6.com/files/maven"
+   }
+   maven {
+    // location of a maven mirror for JEI files, as a fallback
+    name = "ModMaven"
+    url = "modmaven.k-4u.nl"
+   }
 }
 
 dependencies {
-    //compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-//    compile "LatMod:FTBLib:1.10.2-3.2.1"
-//    compile "LatMod:FTBUtilities:1.10.2-3.2.1"
-    compile "LatMod:RedstoneFlux:1.2.0"
-    //compile "CraftTweaker:CraftTweaker:1.10.2-3.0.13"
+    deobfProvided "mezz.jei:jei_1.12.2:4.15.0.268:api"
+    runtime "mezz.jei:jei_1.12.2:4.15.0.268"
+    //deobfCompile "com.feed_the_beast.mods:FTBLib:5.4.1.87"
+    compile files("libs/FTBLib-5.4.1.87.jar")
+    deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+    //compile 'LatMod:FTBLib:1.1x-3.6.5:api'
+    deobfCompile "cofh:RedstoneFlux:1.12-2.1.0.6:universal"
+    deobfCompile("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.13.514")
+    deobfCompile("com.blamejared:MTLib:3.0.4.8")
     //compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22:universal"
-    /*compile "EnderCore:EnderCore:1.10.2-0.4.1.64-beta"
-    compile "EnderIO:EnderIO:1.10.2-3.1.156"*/
-    compile "net.darkhax.tesla:Tesla:1.11-1.3.0.51"
+    //compile "EnderCore:EnderCore:1.10.2-0.4.1.64-beta"
+    //compile "EnderIO:EnderIO:1.10.2-3.1.156"
+    compile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
+    compile "com.teamwizardry.librarianlib:librarianlib-1.12:4.0-SNAPSHOT:deobf"
 
-}
-
-apply plugin: 'java'
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
 }
 
 processResources {
@@ -85,12 +88,12 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-
-        // replace VERSION and mcversion
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-
-    // copy everything else, thats not the mcmod.info
+        
+    // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
