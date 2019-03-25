@@ -1,6 +1,6 @@
 package eladkay.scanner;
 
-import eladkay.scanner.compat.MineTweaker;
+import eladkay.scanner.compat.CraftTweaker;
 import eladkay.scanner.init.ScannerCreativeTabs;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.proxy.CommonProxy;
@@ -71,7 +71,7 @@ public class ScannerMod {
             RegistrationHandler.register(item);
         }
         FMLInterModComms.sendMessage("waila", "register", "eladkay.scanner.compat.Waila.onWailaCall");
-        MineTweaker.init();
+        CraftTweaker.init();
         proxy.init();
         Config.initConfig(event.getSuggestedConfigurationFile());
         dimOverWorld = DimensionType.register("fakeoverworld", "", Config.dimid, WorldProviderOverworld.class, true);
