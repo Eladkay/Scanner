@@ -21,10 +21,10 @@ public class ScannerCT {
     }
 
     public static class Add implements IAction {
-        ItemStack stack;
-        int rarity;
-        int maxY;
-        int minY;
+        private ItemStack stack;
+        private int rarity;
+        private int maxY;
+        private int minY;
 
         public Add(ItemStack stack, int rarity, int minY, int maxY) {
             this.stack = stack;
