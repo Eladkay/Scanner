@@ -4,6 +4,7 @@ import com.feed_the_beast.ftblib.lib.math.MathUtils;
 import com.google.gson.Gson;
 import eladkay.scanner.Config;
 import eladkay.scanner.ScannerMod;
+import eladkay.scanner.init.ModBlocks;
 import eladkay.scanner.misc.BaseEnergyContainer;
 import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -115,7 +117,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     @Override
     public void update() {
         Block block = getWorld().getBlockState(pos).getBlock();
-        this.type = block == ScannerMod.biomeScannerBasic ? 0 : block == ScannerMod.biomeScannerAdv ? 1 : block == ScannerMod.biomeScannerElite ? 2 : 3;
+        this.type = block == ModBlocks.biomeScannerBasic ? 0 : block == ModBlocks.biomeScannerAdv ? 1 : block == ModBlocks.biomeScannerElite ? 2 : 3;
     }
 
     public int getDist(ChunkPos chunkPos) {
