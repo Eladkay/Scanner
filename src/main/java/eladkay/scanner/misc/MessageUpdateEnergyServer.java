@@ -6,8 +6,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import java.util.stream.Collectors;
-
 public class MessageUpdateEnergyServer extends MessageBase<MessageUpdateEnergyServer> {
     int x;
     int y;

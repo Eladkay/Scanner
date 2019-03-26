@@ -152,7 +152,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
             }
 
-            if (Config.genVanillaOres && getWorld().getBlockState(current).getBlock() == Blocks.STONE) {
+            if (Config.genExtraVanillaOres && getWorld().getBlockState(current).getBlock() == Blocks.STONE) {
                 if (current.getY() > 8) {
                     int i = ThreadLocalRandom.current().nextInt(25);
                     if (i == 0)
