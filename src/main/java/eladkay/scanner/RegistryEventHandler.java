@@ -40,10 +40,6 @@ public class RegistryEventHandler {
     }
 
     @SubscribeEvent
-    public static void registerTileEntities(ModelRegistryEvent event) {
-    }
-
-    @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
 
         for (Block block: ModBlocks.BLOCKS) {
