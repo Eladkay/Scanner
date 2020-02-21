@@ -179,7 +179,9 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             }
             Oregistry.getEntryList().stream().filter(entry -> current.getY() < entry.maxY && current.getY() > entry.minY).forEach(entry -> {
                 int i = ThreadLocalRandom.current().nextInt(entry.rarity);
-                if (i == 0) getWorld().setBlockState(current, entry.ore, 2);
+                if ((i == 0) && (getWorld().getBlockState(current) == entry.material)) {
+                    getWorld().setBlockState(current, entry.ore, 2);
+                }
             });
 
             //Movement needs to happen BELOW oregen else things get weird and desynced
