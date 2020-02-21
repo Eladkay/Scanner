@@ -72,14 +72,14 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
     public void onBlockActivated() {
         if (current.getY() < 0) {
-            current.setPos(getPos().getX() + 1, 0, getPos().getZ());
+            current.setPos(getPos().getX(), 0, getPos().getZ());
             changeState(true);
         }
     }
 
     public void activate() {
         changeState(true);
-        current.setPos(getPosStart().getX() + 1, 0, getPosStart().getZ());
+        current.setPos(getPosStart().getX(), 0, getPosStart().getZ());
     }
 
 
