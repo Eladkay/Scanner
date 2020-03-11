@@ -58,7 +58,7 @@ public class MessageUpdateMap extends MessageBase<MessageUpdateMap> {
         ChunkPos chunkPos = new ChunkPos(message.chunkX, message.chunkY);
         int powerCost = Config.minEnergyPerChunkBiomeScanner * Config.increase * bs.getDist(chunkPos);
         bs.container().extractEnergy(powerCost, false);
-        bs.mapping.put(chunkPos, player.getServerHandler().player.world.getBiome(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).getBiomeName());
+        bs.mapping.put(chunkPos, player.getServerHandler().player.world.getBiome(new BlockPos(message.chunkX * 16 + 8, 0, message.chunkY * 16 + 8)).biomeName);
         bs.markDirty();
     }
 }

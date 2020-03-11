@@ -72,14 +72,14 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
     public void onBlockActivated() {
         if (current.getY() < 0) {
-            current.setPos(getPos().getX() + 1, 0, getPos().getZ());
+            current.setPos(getPos().getX(), 0, getPos().getZ());
             changeState(true);
         }
     }
 
     public void activate() {
         changeState(true);
-        current.setPos(getPosStart().getX() + 1, 0, getPosStart().getZ());
+        current.setPos(getPosStart().getX(), 0, getPosStart().getZ());
     }
 
 
@@ -143,9 +143,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm)) && !(local.getBlock() instanceof BlockFluidBase) && !(local.getBlock() instanceof BlockLiquid)) {
                 getWorld().setBlockState(imm, remote, 2);
                 if (remoteTE != null) {
-                    NBTTagCompound tag = new NBTTagCompound();
-                    remoteTE.writeToNBT(tag);
-                    getWorld().getTileEntity(imm).writeToNBT(tag);
+                    NBTTagCompound tag = remoteTE.serializeNBT();
+                    getWorld().getTileEntity(imm).deserializeNBT(tag);
                 }
                 if (!remote.getBlock().isAir(remote, getWorld(), imm))
                     multiplier++;
@@ -179,8 +178,14 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             }
             Oregistry.getEntryList().stream().filter(entry -> current.getY() < entry.maxY && current.getY() > entry.minY).forEach(entry -> {
                 int i = ThreadLocalRandom.current().nextInt(entry.rarity);
-                if (i == 0) getWorld().setBlockState(current, entry.ore, 2);
+                if ((i == 0) && (getWorld().getBlockState(current) == entry.material)) {
+                    getWorld().setBlockState(current, entry.ore, 2);
+                }
             });
+
+            if(Config.voidOriginalBlock) {
+                remoteWorld.setBlockState(current, Blocks.AIR.getDefaultState());
+            }
 
             //Movement needs to happen BELOW oregen else things get weird and desynced
             if (rotation.x > 0) current = new MutableBlockPos(current.east());

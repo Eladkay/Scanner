@@ -35,12 +35,14 @@ public class Oregistry {
 
     public static class Entry {
         public IBlockState ore;
+        public IBlockState material;
         public int rarity;
         public int maxY;
         public int minY;
 
-        public Entry(IBlockState ore, int rarity, int maxY, int minY) {
+        public Entry(IBlockState ore, IBlockState material, int rarity, int maxY, int minY) {
             this.ore = ore;
+            this.material = material;
             this.rarity = rarity;
             this.maxY = maxY;
             this.minY = minY;
@@ -50,6 +52,7 @@ public class Oregistry {
         public String toString() {
             return "Entry{" +
                     "ore=" + ore +
+                    ", material=" + material +
                     ", rarity=" + rarity +
                     ", maxY=" + maxY +
                     ", minY=" + minY +

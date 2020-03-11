@@ -23,6 +23,9 @@ public class RegistryEventHandler {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().registerAll(ModBlocks.BLOCKS);
+        GameRegistry.registerTileEntity(TileEntityTerrainScanner.class, "terrainScanner");
+        GameRegistry.registerTileEntity(TileEntityScannerQueue.class, "q");
+        GameRegistry.registerTileEntity(TileEntityBiomeScanner.class, "biomeScanner");
     }
 
     @SubscribeEvent
@@ -33,15 +36,6 @@ public class RegistryEventHandler {
             event.getRegistry().register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
 
         }
-
-    }
-
-    @SubscribeEvent
-    public static void registerTileEntities(ModelRegistryEvent event) {
-
-        GameRegistry.registerTileEntity(TileEntityTerrainScanner.class, "terrainScanner");
-        GameRegistry.registerTileEntity(TileEntityScannerQueue.class, "q");
-        GameRegistry.registerTileEntity(TileEntityBiomeScanner.class, "biomeScanner");
 
     }
 

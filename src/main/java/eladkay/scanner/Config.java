@@ -18,6 +18,7 @@ public class Config {
     public static int maxEnergyBufferBiome;
     public static int increase;
     public static boolean genExtraVanillaOres;
+    public static boolean voidOriginalBlock;
     public static int maxSpeedup;
     public static int remoteBuildCost;
 
@@ -30,6 +31,7 @@ public class Config {
         dimid = config.get("Scanner", "dimid", 99, "The ID for the fake overworld dimension").getInt();
         showOutline = config.get("Scanner", "showOutline", true, "Should the Terrain Scanner show its area of effect outline with shiny particles").getBoolean();
         genExtraVanillaOres = config.get("Scanner", "genVanillaOres", false, "Should the terrain scanner automatically generate extra vanilla ores? MineTweakered ores will always be spawned.").getBoolean();
+        voidOriginalBlock = config.get("Scanner", "voidOriginalBlock", false, "Should the terrain scanner void the original block after it copies the block?").getBoolean();
 
         minEnergyPerChunkBiomeScanner = config.get("Scanner", "energyPerChunk", 10000, "The base amount of energy required for the Biome Scanner to scan one chunk.").getInt();
         maxEnergyBufferBiome = config.get("Scanner", "maxEnergyBufferBiome", 1000000, "The energy buffer of the Biome Scanner").getInt();

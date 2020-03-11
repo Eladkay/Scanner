@@ -16,18 +16,20 @@ import stanhebben.zenscript.annotations.ZenMethod;
 @ZenRegister
 public class ScannerCT {
     @ZenMethod
-    public static void addRecipe(IItemStack stack, int rarity, int minY, int maxY) {
-        CraftTweakerAPI.apply(new Add(CraftTweakerMC.getItemStack(stack), rarity, minY, maxY));
+    public static void addRecipe(IItemStack stack, IItemStack materialStack, int rarity, int minY, int maxY) {
+        CraftTweakerAPI.apply(new Add(CraftTweakerMC.getItemStack(stack), CraftTweakerMC.getItemStack(materialStack), rarity, minY, maxY));
     }
 
     public static class Add implements IAction {
         private ItemStack stack;
+        private ItemStack materialStack;
         private int rarity;
         private int maxY;
         private int minY;
 
-        public Add(ItemStack stack, int rarity, int minY, int maxY) {
+        public Add(ItemStack stack, ItemStack materialStack, int rarity, int minY, int maxY) {
             this.stack = stack;
+            this.materialStack = materialStack;
             this.rarity = rarity;
             this.minY = minY;
             this.maxY = maxY;
@@ -36,9 +38,12 @@ public class ScannerCT {
         @Override
         public void apply() {
             if (!(stack.getItem() instanceof ItemBlock)) return;
+            if (!(materialStack.getItem() instanceof ItemBlock)) return;
             Block block = ((ItemBlock) stack.getItem()).getBlock();
             IBlockState blockState = block.getStateFromMeta(stack.getItemDamage());
-            Oregistry.registerEntry(new Oregistry.Entry(blockState, rarity, maxY, minY));
+            Block materialBlock = ((ItemBlock) materialStack.getItem()).getBlock();
+            IBlockState materialState = materialBlock.getStateFromMeta(materialStack.getItemDamage());
+            Oregistry.registerEntry(new Oregistry.Entry(blockState, materialState, rarity, maxY, minY));
         }
 
         @Override
