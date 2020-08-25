@@ -188,6 +188,7 @@ public class GuiTerrainScanner extends GuiContainer {
         //drawMultiEnergyBar((this.width / 2) - 112, this.height / 2 - 15, mouseX, mouseY);
         /*drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         drawGuiContainerForegroundLayer(mouseX, mouseY);*/
+        super.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
         /*for (GuiButton aButtonList : this.buttonList) {
             aButtonList.drawButton(this.mc, mouseX, mouseY);

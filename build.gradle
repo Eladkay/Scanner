@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "1.6.4"
+version = "1.6.5"
 group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "scanner"
 
@@ -35,7 +35,7 @@ minecraft {
 
 repositories {
     maven { url "http://maven.mcmoddev.com" }
-    maven { url "http://tehnut.info/maven" }
+    maven { url "http://maven.tehnut.info" }
     maven { url "http://chickenbones.net/maven/" }
     maven {
         url = "http://maven.bluexin.be/repository/snapshots/"

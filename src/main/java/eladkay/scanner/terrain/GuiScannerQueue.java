@@ -114,6 +114,7 @@ public class GuiScannerQueue extends GuiContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         try {
+            super.drawDefaultBackground();
             super.drawScreen(mouseX, mouseY, partialTicks);
         } catch (Exception idky) {
             //
