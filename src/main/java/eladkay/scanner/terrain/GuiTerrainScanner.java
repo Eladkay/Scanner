@@ -155,29 +155,35 @@ public class GuiTerrainScanner extends GuiContainer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        if (scanner == null || toggleMode == null || showMap == null) return;
-        toggleMode.displayString = scanner.on ? "Turn off" : "Turn on";
-        boolean flag = false;
-        for (EnumFacing facing : EnumFacing.values())
-            if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate) {
+        try {
+            if (scanner == null || toggleMode == null || showMap == null) return;
+            toggleMode.displayString = scanner.on ? "Turn off" : "Turn on";
+            boolean flag = false;
+            for (EnumFacing facing : EnumFacing.values())
+                if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate) {
 
-                flag = true;
+                    flag = true;
 
+                }
+            showMap.visible = flag;
+            switch (scanner.rotation) {
+                case POSX_POSZ:
+                    rotate.displayString = "Build on +x, +z";
+                    break;
+                case POSX_NEGZ:
+                    rotate.displayString = "Build on +x, -z";
+                    break;
+                case NEGX_POSZ:
+                    rotate.displayString = "Build on -x, +z";
+                    break;
+                case NEGX_NEGZ:
+                    rotate.displayString = "Build on -x, -z";
+                    break;
             }
-        showMap.visible = flag;
-        switch (scanner.rotation) {
-            case POSX_POSZ:
-                rotate.displayString = "Build on +x, +z";
-                break;
-            case POSX_NEGZ:
-                rotate.displayString = "Build on +x, -z";
-                break;
-            case NEGX_POSZ:
-                rotate.displayString = "Build on -x, +z";
-                break;
-            case NEGX_NEGZ:
-                rotate.displayString = "Build on -x, -z";
-                break;
+            super.drawDefaultBackground();
+            super.drawScreen(mouseX, mouseY, partialTicks);
+        } catch (Exception idky) {
+            //
         }
         /*
         if (scanner.biomeScanner != null){
@@ -188,7 +194,7 @@ public class GuiTerrainScanner extends GuiContainer {
         //drawMultiEnergyBar((this.width / 2) - 112, this.height / 2 - 15, mouseX, mouseY);
         /*drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         drawGuiContainerForegroundLayer(mouseX, mouseY);*/
-        super.drawScreen(mouseX, mouseY, partialTicks);
+
         /*for (GuiButton aButtonList : this.buttonList) {
             aButtonList.drawButton(this.mc, mouseX, mouseY);
         }
