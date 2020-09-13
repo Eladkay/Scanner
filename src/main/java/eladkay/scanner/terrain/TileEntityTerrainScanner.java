@@ -1,9 +1,6 @@
 package eladkay.scanner.terrain;
 
-import com.feed_the_beast.ftblib.lib.math.BlockDimPos;
-import com.feed_the_beast.ftbutilities.data.ClaimedChunks;
 import eladkay.scanner.Config;
-import eladkay.scanner.ScannerMod;
 import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
@@ -21,7 +18,10 @@ import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import javax.annotation.Nonnull;
 
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static eladkay.scanner.terrain.TerrainScannerUtils.checkClaimed;
 
 public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
@@ -35,6 +35,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public int speedup = 1;
     public BlockPos posStart = null;
     public int maxY = 255;
+    public UUID placer;
 
     @Nonnull
     public BlockPos getPosStart() {
@@ -52,6 +53,11 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (nbt.getLong("posStart") != 0)
             posStart = BlockPos.fromLong(nbt.getLong("posStart"));
         maxY = nbt.getInteger("my");
+        try {
+            placer = UUID.fromString(nbt.getString("placer"));
+        } catch (Exception e) { //Old scanners that lack the tag
+            placer = null;
+        }
     }
 
     @Override
@@ -64,6 +70,8 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (posStart != null)
             nbt.setLong("posStart", posStart.toLong());
         nbt.setInteger("my", maxY);
+        if (placer != null)
+            nbt.setString("placer", placer.toString());
         return nbt;
     }
 
@@ -141,7 +149,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             IBlockState local = getWorld().getBlockState(current);
             TileEntity remoteTE = remoteWorld.getTileEntity(current);
             BlockPos imm = current.toImmutable();
-            if (checkClaimed(imm, getWorld().provider.getDimension()))
+            if (checkClaimed(imm, getWorld(), placer, world.getBlockState(imm)))
                 continue;
             if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm)) && !(local.getBlock() instanceof BlockFluidBase) && !(local.getBlock() instanceof BlockLiquid)) {
                 getWorld().setBlockState(imm, remote, 2);
@@ -237,14 +245,4 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         writeToNBT(tag);
         return tag;
     }
-
-    private boolean checkClaimed(BlockPos pos, int dim) {
-        if (!ScannerMod.ftbu) //If ftbu is not present, it's surely not claimed
-            return false;
-        if (pos.getY() > 1) //If it's claimed, should stop at y=1
-            return false;
-        BlockDimPos bdp = new BlockDimPos(pos.getX(), 1, pos.getZ(), dim);
-        return ClaimedChunks.instance.getChunkTeam(bdp.toChunkPos()) != null;
-    }
-
 }

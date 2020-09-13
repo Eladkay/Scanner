@@ -18,6 +18,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.util.UUID;
+
 import static eladkay.scanner.ScannerMod.TAB;
 
 public class BlockTerrainScanner extends Block implements ITileEntityProvider {
@@ -75,6 +78,14 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
             }
         }*/
         super.onBlockPlacedBy(worldIn, pos, state0, placer, stack);
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (placer instanceof EntityPlayer) {
+            ((TileEntityTerrainScanner)te).placer = placer.getUniqueID();
+        }
+        else {
+            ((TileEntityTerrainScanner)te).placer = new UUID(0,0);
+        }
+        te.markDirty();
     }
 
 
