@@ -28,9 +28,11 @@ import net.minecraft.world.gen.ChunkGeneratorHell;
 import net.minecraft.world.gen.ChunkGeneratorOverworld;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
@@ -49,11 +51,12 @@ public class ScannerMod {
     public static DimensionType dimOverWorld;
     public static DimensionType dimNether;
     public static DimensionType dimEnd;
+    public static boolean ftbu;
     @Mod.Instance(MODID)
     public static ScannerMod instance;
     public final static CreativeTabs TAB = new ScannerCreativeTabs(MODID);
     public static BlockAirey air;
-    public static final String VERSION = "1.6.5";
+    public static final String VERSION = "1.6.6";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -81,6 +84,11 @@ public class ScannerMod {
         dimEnd = DimensionType.register("fakeend", "", Config.dimid + 2, WorldProviderEnd.class, true);
         DimensionManager.registerDimension(Config.dimid + 2, dimEnd);
         NetworkHelper.init();
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        ftbu = Loader.isModLoaded("ftbutilities");
     }
 
     @Mod.EventHandler

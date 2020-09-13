@@ -16,9 +16,12 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-
 import javax.annotation.Nonnull;
+
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static eladkay.scanner.terrain.TerrainScannerUtils.checkClaimed;
 
 public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
@@ -32,6 +35,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public int speedup = 1;
     public BlockPos posStart = null;
     public int maxY = 255;
+    public UUID placer;
 
     @Nonnull
     public BlockPos getPosStart() {
@@ -49,6 +53,11 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (nbt.getLong("posStart") != 0)
             posStart = BlockPos.fromLong(nbt.getLong("posStart"));
         maxY = nbt.getInteger("my");
+        try {
+            placer = UUID.fromString(nbt.getString("placer"));
+        } catch (Exception e) { //Old scanners that lack the tag
+            placer = null;
+        }
     }
 
     @Override
@@ -61,13 +70,13 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (posStart != null)
             nbt.setLong("posStart", posStart.toLong());
         nbt.setInteger("my", maxY);
+        if (placer != null)
+            nbt.setString("placer", placer.toString());
         return nbt;
-
     }
 
     public TileEntityTerrainScanner() {
         super(MAX);
-
     }
 
     public void onBlockActivated() {
@@ -140,8 +149,11 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             IBlockState local = getWorld().getBlockState(current);
             TileEntity remoteTE = remoteWorld.getTileEntity(current);
             BlockPos imm = current.toImmutable();
+            if (checkClaimed(imm, getWorld(), placer, world.getBlockState(imm)))
+                continue;
             if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm)) && !(local.getBlock() instanceof BlockFluidBase) && !(local.getBlock() instanceof BlockLiquid)) {
                 getWorld().setBlockState(imm, remote, 2);
+
                 if (remoteTE != null) {
                     NBTTagCompound tag = remoteTE.serializeNBT();
                     getWorld().getTileEntity(imm).deserializeNBT(tag);
@@ -233,6 +245,4 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         writeToNBT(tag);
         return tag;
     }
-
-
 }
