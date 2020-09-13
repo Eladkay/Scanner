@@ -247,20 +247,4 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         return ClaimedChunks.instance.getChunkTeam(bdp.toChunkPos()) != null;
     }
 
-    /*private static void fireScannerPlaceBlockEvent(World world, BlockPos pos, BlockPos liquidPos, IBlockState state)
-    {
-        BlockEvent.PlaceEvent event = new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, state), Blocks.AIR.getDefaultState(), new EntityPlayer(world, new GameProfile(UUID.randomUUID(), "scanner")) {
-            @Override
-            public boolean isSpectator() {
-                return false;
-            }
-
-            @Override
-            public boolean isCreative() {
-                return false;
-            }
-        }, EnumHand.MAIN_HAND);
-        MinecraftForge.EVENT_BUS.post(event);
-    }*/
-
 }
