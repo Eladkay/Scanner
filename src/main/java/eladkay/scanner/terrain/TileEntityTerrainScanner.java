@@ -1,6 +1,9 @@
 package eladkay.scanner.terrain;
 
+import com.feed_the_beast.ftblib.lib.math.BlockDimPos;
+import com.feed_the_beast.ftbutilities.data.ClaimedChunks;
 import eladkay.scanner.Config;
+import eladkay.scanner.ScannerMod;
 import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
@@ -16,8 +19,8 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-
 import javax.annotation.Nonnull;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TileEntityTerrainScanner extends BaseTE implements ITickable {
@@ -62,12 +65,10 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             nbt.setLong("posStart", posStart.toLong());
         nbt.setInteger("my", maxY);
         return nbt;
-
     }
 
     public TileEntityTerrainScanner() {
         super(MAX);
-
     }
 
     public void onBlockActivated() {
@@ -140,8 +141,11 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             IBlockState local = getWorld().getBlockState(current);
             TileEntity remoteTE = remoteWorld.getTileEntity(current);
             BlockPos imm = current.toImmutable();
+            if (checkClaimed(imm, getWorld().provider.getDimension()))
+                continue;
             if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm)) && !(local.getBlock() instanceof BlockFluidBase) && !(local.getBlock() instanceof BlockLiquid)) {
                 getWorld().setBlockState(imm, remote, 2);
+
                 if (remoteTE != null) {
                     NBTTagCompound tag = remoteTE.serializeNBT();
                     getWorld().getTileEntity(imm).deserializeNBT(tag);
@@ -234,5 +238,29 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         return tag;
     }
 
+    private boolean checkClaimed(BlockPos pos, int dim) {
+        if (!ScannerMod.ftbu) //If ftbu is not present, it's surely not claimed
+            return false;
+        if (pos.getY() > 1) //If it's claimed, should stop at y=1
+            return false;
+        BlockDimPos bdp = new BlockDimPos(pos.getX(), 1, pos.getZ(), dim);
+        return ClaimedChunks.instance.getChunkTeam(bdp.toChunkPos()) != null;
+    }
+
+    /*private static void fireScannerPlaceBlockEvent(World world, BlockPos pos, BlockPos liquidPos, IBlockState state)
+    {
+        BlockEvent.PlaceEvent event = new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, state), Blocks.AIR.getDefaultState(), new EntityPlayer(world, new GameProfile(UUID.randomUUID(), "scanner")) {
+            @Override
+            public boolean isSpectator() {
+                return false;
+            }
+
+            @Override
+            public boolean isCreative() {
+                return false;
+            }
+        }, EnumHand.MAIN_HAND);
+        MinecraftForge.EVENT_BUS.post(event);
+    }*/
 
 }
