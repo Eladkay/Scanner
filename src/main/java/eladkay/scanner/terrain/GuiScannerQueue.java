@@ -2,6 +2,7 @@ package eladkay.scanner.terrain;
 
 import com.google.common.collect.Lists;
 import eladkay.scanner.Config;
+import eladkay.scanner.misc.NetworkHelper;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -20,10 +21,10 @@ public class GuiScannerQueue extends GuiContainer {
     private final TileEntityScannerQueue scanner;
     private GuiTextField coordinates;
     private GuiButton push;
-    private List<GuiButton> buttonsBuild = Lists.newArrayList(bufferBuild);
-    private List<GuiButton> buttonsRemove = Lists.newArrayList(bufferRemove);
-    private static GuiButton[] bufferBuild;
-    private static GuiButton[] bufferRemove;
+    private static final GuiButton[] bufferBuild;
+    private static final GuiButton[] bufferRemove;
+    private final List<GuiButton> buttonsBuild = Lists.newArrayList(bufferBuild);
+    private final List<GuiButton> buttonsRemove = Lists.newArrayList(bufferRemove);
 
     static {
         bufferBuild = new GuiButton[TileEntityScannerQueue.CAPACITY];
@@ -63,7 +64,7 @@ public class GuiScannerQueue extends GuiContainer {
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button == push) {
             try {
                 String[] split = coordinates.getText().replace("(", "").replace(")", "").replace(" ", "").split(",");
@@ -82,25 +83,12 @@ public class GuiScannerQueue extends GuiContainer {
             scanner.scanner.posStart = scanner.get(button.id - 105);
             scanner.scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
             scanner.scanner.on = false;
+
         } else if (button.id - 205 >= 0 && button.id - 205 <= TileEntityScannerQueue.CAPACITY) {
             scanner.remove(scanner.get(button.id - 205));
         }
-    }
-
-    private static final ResourceLocation ENERGY_BAR = new ResourceLocation("scanner:textures/gui/bar.png");
-
-    private static boolean isInRect(int x, int y, int xSize, int ySize, int mouseX, int mouseY) {
-        return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
-    }
-
-    public int getKx() {
-        return 0;
-        //return mc.displayWidth / 5 + 5;
-    }
-
-    public int getKy() {
-        return 0;
-        // return mc.displayHeight / 5 - 30;
+        scanner.scanner.markDirty(); // why wasn't this here???
+        NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
     }
 
     @Override
@@ -128,7 +116,7 @@ public class GuiScannerQueue extends GuiContainer {
             super.drawDefaultBackground();
             super.drawScreen(mouseX, mouseY, partialTicks);
         } catch (Exception idky) {
-            //
+            //:P
         }
         this.coordinates.drawTextBox();
     }
@@ -138,7 +126,7 @@ public class GuiScannerQueue extends GuiContainer {
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        drawCenteredString("Scanner Queue (Capacity: " + TileEntityScannerQueue.CAPACITY + ")", 90 + getKx(), 6 + getKy(), 4210752); //
+        drawCenteredString("Scanner Queue (Capacity: " + TileEntityScannerQueue.CAPACITY + ")", 90, 6, 4210752); //
 
         for (GuiButton btn : buttonsBuild) btn.visible = false;
         for (GuiButton btn : buttonsRemove) btn.visible = false;
@@ -156,23 +144,12 @@ public class GuiScannerQueue extends GuiContainer {
             btnRemove.x = (this.width / 2) + 35;
             btnRemove.y = this.height / 2 - 65 + i;
 
-            drawCenteredString("(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")", 90 + getKx(), 20 + getKy() + i, 4210752);
+            drawCenteredString("(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")", 90, 20 + i, 4210752);
             i += 10;
         }
-        /*if (scanner.scanner != null && scanner.flag)
-            drawCenteredString("Biome Scanner attached", 85 + getKx(), 140 + getKy(), 4210752);
-        else {
-            drawCenteredString("Attach Ultimate Biome Scanner", 85 + getKx(), 128 + getKy(), 4210752);
-            drawCenteredString("to Terrain Scanner to view map", 85 + getKx(), 138 + getKy(), 4210752);
-        }*/
         if (scanner.scanner != null)
-            drawCenteredString("Terrain Scanner attached", 85 + getKx(), 150 + getKy(), 4210752);
-        else drawCenteredString("Terrain Scanner not attached", 85 + getKx(), 150 + getKy(), 4210752);
-       /* boolean flag0 = false;
-        if (mc.player.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
-            this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);*/
-        /*if (Config.maxSpeedup > 0)
-            this.fontRendererObj.drawString("Speedup (blocks per tick): " + scanner.speedup, 20, 120, 4210752);*/
+            drawCenteredString("Terrain Scanner attached", 85, 150, 4210752);
+        else drawCenteredString("Terrain Scanner not attached", 85, 150, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {

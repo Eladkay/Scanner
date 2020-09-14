@@ -41,7 +41,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public static ChunkPos deserialize(String s) {
         String[] split = s.split("/");
-        return new ChunkPos(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
+        return new ChunkPos(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
     }
 
     BaseEnergyContainer container() {
@@ -53,7 +53,6 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
         for (EnumFacing facing : EnumFacing.values()) {
             TileEntity te = world.getTileEntity(scanner.getPos().offset(facing));
             if (te instanceof TileEntityBiomeScanner) return (TileEntityBiomeScanner) te;
-            //else System.out.println(te != null ? te.getClass() : "No te here!");
         }
         return null;
     }
@@ -65,14 +64,6 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public void onBlockActivated(EntityPlayer player) {
         ScannerMod.proxy.openGuiBiomeScanner(this);
-    }
-
-    public String toJson() {
-        Gson gson = new Gson();
-        HashMap<String, String> ret = new HashMap<>();
-        for (Map.Entry<ChunkPos, String> entry : mapping.entrySet())
-            ret.put(serialize(entry.getKey()), entry.getValue());
-        return gson.toJson(ret);
     }
 
     @Override

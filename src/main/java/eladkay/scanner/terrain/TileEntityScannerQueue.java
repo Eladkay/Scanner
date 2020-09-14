@@ -1,7 +1,5 @@
 package eladkay.scanner.terrain;
 
-import eladkay.scanner.ScannerMod;
-import eladkay.scanner.init.ModBlocks;
 import eladkay.scanner.misc.BaseTE;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -21,14 +19,12 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
     public Queue<BlockPos> queue = new ArrayDeque<>();
 
     transient TileEntityTerrainScanner scanner;
-    public boolean flag;
 
     @Nullable
     public static TileEntityScannerQueue getNearbyQueue(World world, TileEntityTerrainScanner scanner) {
         for (EnumFacing facing : EnumFacing.values()) {
             TileEntity te = world.getTileEntity(scanner.getPos().offset(facing));
             if (te instanceof TileEntityScannerQueue) return (TileEntityScannerQueue) te;
-            //else System.out.println(te != null ? te.getClass() : "No te here!");
         }
         return null;
     }
@@ -110,10 +106,5 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
     @Override
     public void update() {
         scanner = getNearbyQueue0(getWorld(), this, TileEntityTerrainScanner.class);
-        flag = false;
-        if (scanner != null) {
-            for (EnumFacing facing : EnumFacing.values())
-                flag |= getWorld().getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate;
-        }
     }
 }

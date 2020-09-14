@@ -83,8 +83,7 @@ public class BaseTE extends TileEntity implements IEnergyReceiver {
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbt = new NBTTagCompound();
         writeToNBT(nbt);
-        SPacketUpdateTileEntity packer = new SPacketUpdateTileEntity(getPos(), 0, nbt);
-        return packer;
+        return new SPacketUpdateTileEntity(getPos(), 0, nbt);
     }
 
     @Override

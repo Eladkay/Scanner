@@ -17,18 +17,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Things this should do:
- * Rotate chunk (i hate my life)
- * Map (check and i'm really proud of myself tbh)
- * Speedup (check!)
- * Stop/start (check!)
- */
-// todo Fix gui size in relation to JEI
 public class GuiTerrainScanner extends GuiContainer {
     private static final ResourceLocation BACKGROUND = new ResourceLocation("scanner:textures/gui/standard_background.png");
     private final TileEntityTerrainScanner scanner;
@@ -85,7 +76,7 @@ public class GuiTerrainScanner extends GuiContainer {
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button == toggleMode) {
             if (scanner.on) scanner.deactivate();
             else scanner.activate();
@@ -101,6 +92,7 @@ public class GuiTerrainScanner extends GuiContainer {
 
     private static final ResourceLocation ENERGY_BAR = new ResourceLocation("scanner:textures/gui/bar.png");
 
+    // todo, why am i not using this?
     public void drawMultiEnergyBar(int x, int y, int mouseX, int mouseY) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(ENERGY_BAR);
         int energyStored = scanner.getEnergyStored(null);
@@ -142,16 +134,6 @@ public class GuiTerrainScanner extends GuiContainer {
         return ((mouseX >= x && mouseX <= x + xSize) && (mouseY >= y && mouseY <= y + ySize));
     }
 
-    public int getKx() {
-        return 0;
-        //return mc.displayWidth / 5 + 5;
-    }
-
-    public int getKy() {
-        return 0;
-        // return mc.displayHeight / 5 - 30;
-    }
-
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -161,9 +143,7 @@ public class GuiTerrainScanner extends GuiContainer {
             boolean flag = false;
             for (EnumFacing facing : EnumFacing.values())
                 if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate) {
-
                     flag = true;
-
                 }
             showMap.visible = flag;
             switch (scanner.rotation) {
@@ -185,23 +165,6 @@ public class GuiTerrainScanner extends GuiContainer {
         } catch (Exception idky) {
             //
         }
-        /*
-        if (scanner.biomeScanner != null){
-                flag = true;
-        }
-        showMap.visible = flag;
-        */
-        //drawMultiEnergyBar((this.width / 2) - 112, this.height / 2 - 15, mouseX, mouseY);
-        /*drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-        drawGuiContainerForegroundLayer(mouseX, mouseY);*/
-
-        /*for (GuiButton aButtonList : this.buttonList) {
-            aButtonList.drawButton(this.mc, mouseX, mouseY);
-        }
-
-        for (GuiLabel aLabelList : this.labelList) {
-            aLabelList.drawLabel(this.mc, mouseX, mouseY);
-        }*/
     }
 
     public void drawCenteredString(String text, int x, int y, int color) {
@@ -210,60 +173,36 @@ public class GuiTerrainScanner extends GuiContainer {
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
-        if (mc.isSingleplayer()) drawCenteredString("Terrain Scanner", 90 + getKx(), 6 + getKy(), 4210752); //
+        if (mc.isSingleplayer()) drawCenteredString("Terrain Scanner", 90, 6, 4210752); //
         else {
-            drawCenteredString("Terrain Scanner", 90 + getKx(), 6 + getKy(), 4210752);
-            drawCenteredString("(Warning: May appear broken with", 90 + getKx(), 13 + getKy(), 4210752);
-            drawCenteredString("EnderIO conduits and capacitor banks)", 90 + getKx(), 20 + getKy(), 4210752);
+            drawCenteredString("Terrain Scanner", 90, 6, 4210752);
+            drawCenteredString("(Warning: May appear broken with", 90, 13, 4210752);
+            drawCenteredString("EnderIO conduits and capacitor banks)", 90, 20, 4210752);
         }
-        //this.fontRendererObj.drawString("Terrain Scanner", 45, 6, 4210752);
         if (!"(0, -1, 0)".equals("(" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")"))
-            drawCenteredString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90 + getKx(), 35 + getKy(), 4210752);
-        else drawCenteredString("Current block: Off", 90 + getKx(), 35 + getKy(), 4210752);
-        //this.fontRendererObj.drawString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 40, 20, 4210752);
-        drawCenteredString("End block: (" + scanner.getEnd().getX() + ", " + scanner.maxY + ", " + scanner.getEnd().getZ() + ")", 90 + getKx(), 45 + getKy(), 4210752);
-        //this.fontRendererObj.drawString("End: (" + scanner.getEnd().getX() + ", 256, " + scanner.getEnd().getZ() + ")", 40, 35, 4210752);
+            drawCenteredString("Current: (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90, 35, 4210752);
+        else drawCenteredString("Current block: Off", 90, 35, 4210752);
+        drawCenteredString("End block: (" + scanner.getEnd().getX() + ", " + scanner.maxY + ", " + scanner.getEnd().getZ() + ")", 90, 45, 4210752);
         if (scanner.posStart != null)
-            drawCenteredString("Remote start: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90 + getKx(), 55 + getKy(), 4210752);
+            drawCenteredString("Remote start: (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90, 55, 4210752);
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
             if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate)
                 flag = true;
         if (!flag) {
-            this.fontRenderer.drawString("Place ultimate biome scanner", 15 + getKx(), 65 + getKy(), 4210752);
-            this.fontRenderer.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
+            this.fontRenderer.drawString("Place ultimate biome scanner", 15, 65, 4210752);
+            this.fontRenderer.drawString("adjacent to show map", 30, 75, 4210752);
         }
-
-        /*
-        if (scanner.biomeScanner == null){
-                this.fontRenderer.drawString("Place ultimate biome scanner", 15 + getKx(), 65 + getKy(), 4210752);
-                this.fontRenderer.drawString("adjacent to show map", 30 + getKx(), 75 + getKy(), 4210752);
-        }
-        */
 
         if (scanner.queue != null)
-            this.fontRenderer.drawString("Scanner Queue attached", 30 + getKx(), 150 + getKy(), 4210752);
-       /* boolean flag0 = false;
-        if (mc.player.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)") && flag0)
-            this.fontRendererObj.drawString("Debug: (" + scanner.getPos().east().add(15, 255, 15).getX() + ", " + scanner.getPos().east().getY() + ", " + scanner.getPos().east().getZ() + ")", 20, 60, 4210752);*/
-        /*if (Config.maxSpeedup > 0)
-            this.fontRendererObj.drawString("Speedup (blocks per tick): " + scanner.speedup, 20, 120, 4210752);*/
+            this.fontRenderer.drawString("Scanner Queue attached", 30, 150, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        //GlStateManager.scale(2,2,1);
         this.mc.getTextureManager().bindTexture(BACKGROUND);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
-        //drawScaledCustomSizeModalRect(i, j, 6, 0, 159, 110, xSize, ySize, xSize, ySize);
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-        /*GlStateManager.pushMatrix();
-        GlStateManager.translate(i, j, 0);
-        GlStateManager.scale(2,2,1);
-        this.drawTexturedModalRect(-i, -j,  6, 0, 159, 110);
-        GlStateManager.popMatrix();*/
-
-
     }
 }

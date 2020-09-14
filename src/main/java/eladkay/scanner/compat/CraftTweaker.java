@@ -3,9 +3,10 @@ package eladkay.scanner.compat;
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
-import javax.annotation.Nonnull;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Loader;
+
+import javax.annotation.Nonnull;
 
 public class CraftTweaker {
     public static void init() {
