@@ -87,11 +87,11 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
             if (player != null)
                 tets.placerName = player.getName();
             else
-                tets.placerName = "Not Found";
+                tets.placerName = "";
         }
         else {
             tets.placer = new UUID(0,0);
-            tets.placerName = "Not Found";
+            tets.placerName = "";
         }
         te.markDirty();
     }

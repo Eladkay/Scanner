@@ -56,7 +56,8 @@ public class Waila {
             currenttip.add("Energy: " + energy + "/" + max);
             if (tileEntity instanceof TileEntityTerrainScanner) {
                 String owner = ((TileEntityTerrainScanner)tileEntity).placerName;
-                currenttip.add("Owner: " + owner);
+                if (!owner.equals(""))
+                    currenttip.add("Owner: " + owner);
             }
             return currenttip;
         }

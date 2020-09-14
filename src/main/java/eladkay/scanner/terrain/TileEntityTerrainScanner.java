@@ -61,7 +61,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             placerName = nbt.getString("placerName");
         } catch (Exception e) { //Old scanners that lack the tag
             placer = null;
-            placerName = "Not Found";
+            placerName = "";
         }
     }
 
