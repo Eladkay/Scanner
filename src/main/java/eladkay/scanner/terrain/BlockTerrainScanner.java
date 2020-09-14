@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.UUID;
 
@@ -79,11 +80,18 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
         }*/
         super.onBlockPlacedBy(worldIn, pos, state0, placer, stack);
         TileEntity te = worldIn.getTileEntity(pos);
+        TileEntityTerrainScanner tets = ((TileEntityTerrainScanner)te);
         if (placer instanceof EntityPlayer) {
-            ((TileEntityTerrainScanner)te).placer = placer.getUniqueID();
+            tets.placer = placer.getUniqueID();
+            EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(placer.getUniqueID());
+            if (player != null)
+                tets.placerName = player.getName();
+            else
+                tets.placerName = "Not Found";
         }
         else {
-            ((TileEntityTerrainScanner)te).placer = new UUID(0,0);
+            tets.placer = new UUID(0,0);
+            tets.placerName = "Not Found";
         }
         te.markDirty();
     }

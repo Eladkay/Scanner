@@ -38,6 +38,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public BlockPos posStart = null;
     public int maxY = 255;
     public UUID placer;
+    public String placerName;
 
     @Nonnull
     public BlockPos getPosStart() {
@@ -57,8 +58,10 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         maxY = nbt.getInteger("my");
         try {
             placer = UUID.fromString(nbt.getString("placer"));
+            placerName = nbt.getString("placerName");
         } catch (Exception e) { //Old scanners that lack the tag
             placer = null;
+            placerName = "Not Found";
         }
     }
 
@@ -72,8 +75,10 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (posStart != null)
             nbt.setLong("posStart", posStart.toLong());
         nbt.setInteger("my", maxY);
-        if (placer != null)
+        if (placer != null) {
             nbt.setString("placer", placer.toString());
+            nbt.setString("placerName", placerName);
+        }
         return nbt;
     }
 

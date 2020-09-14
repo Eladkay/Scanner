@@ -55,7 +55,8 @@ public class Waila {
             int max = accessor.getNBTData().getInteger("max");*/
             currenttip.add("Energy: " + energy + "/" + max);
             if (tileEntity instanceof TileEntityTerrainScanner) {
-                //todo
+                String owner = ((TileEntityTerrainScanner)tileEntity).placerName;
+                currenttip.add("Owner: " + owner);
             }
             return currenttip;
         }
