@@ -5,6 +5,7 @@ import eladkay.scanner.biome.TileEntityBiomeScanner;
 import eladkay.scanner.compat.Oregistry;
 import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.WtfException;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -15,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import javax.annotation.Nonnull;
 
@@ -36,6 +38,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     public BlockPos posStart = null;
     public int maxY = 255;
     public UUID placer;
+    public String placerName;
 
     @Nonnull
     public BlockPos getPosStart() {
@@ -55,8 +58,10 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         maxY = nbt.getInteger("my");
         try {
             placer = UUID.fromString(nbt.getString("placer"));
+            placerName = nbt.getString("placerName");
         } catch (Exception e) { //Old scanners that lack the tag
             placer = null;
+            placerName = "";
         }
     }
 
@@ -70,8 +75,10 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (posStart != null)
             nbt.setLong("posStart", posStart.toLong());
         nbt.setInteger("my", maxY);
-        if (placer != null)
+        if (placer != null) {
             nbt.setString("placer", placer.toString());
+            nbt.setString("placerName", placerName);
+        }
         return nbt;
     }
 
@@ -151,16 +158,15 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             BlockPos imm = current.toImmutable();
             if (checkClaimed(imm, getWorld(), placer, world.getBlockState(imm)))
                 continue;
-            if ((local.getBlock().isReplaceable(getWorld(), imm) || local.getBlock().isAir(local, getWorld(), imm)) && !(local.getBlock() instanceof BlockFluidBase) && !(local.getBlock() instanceof BlockLiquid)) {
+            boolean toGen = checkForBlock(local, imm);
+            if (toGen) {
                 getWorld().setBlockState(imm, remote, 2);
-
                 if (remoteTE != null) {
                     NBTTagCompound tag = remoteTE.serializeNBT();
                     getWorld().getTileEntity(imm).deserializeNBT(tag);
                 }
                 if (!remote.getBlock().isAir(remote, getWorld(), imm))
                     multiplier++;
-
             }
 
             if (Config.genExtraVanillaOres && getWorld().getBlockState(current).getBlock() == Blocks.STONE) {
@@ -195,7 +201,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                 }
             });
 
-            if(Config.voidOriginalBlock) {
+            if(Config.voidOriginalBlock && toGen) { //Only clears when it actually builds
                 remoteWorld.setBlockState(current, Blocks.AIR.getDefaultState());
             }
 
@@ -244,5 +250,19 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         NBTTagCompound tag = new NBTTagCompound();
         writeToNBT(tag);
         return tag;
+    }
+
+    private boolean checkForBlock(IBlockState local, BlockPos imm) { //True if the block will be generated
+        Block block = local.getBlock();
+        if (block.isReplaceable(getWorld(), imm) || block.isAir(local, getWorld(), imm)) { //Replaceable / air
+            if (!(block instanceof BlockFluidBase) && !(block instanceof BlockLiquid)) { //Not occupied by liquid
+                return true;
+            }
+            else if (Config.replaceNonSourceLiquid) { //Occupied by liquid, check for config, if config is on then replace non-source blocks
+                if (local.getValue(BlockFluidBase.LEVEL) < 15) //Non-source
+                    return true;
+            }
+        }
+        return false;
     }
 }
