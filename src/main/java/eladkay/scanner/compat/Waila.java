@@ -6,6 +6,9 @@ import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.terrain.BlockTerrainScanner;
 import java.util.List;
+import java.util.UUID;
+
+import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -16,6 +19,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class Waila {
 
@@ -50,6 +54,9 @@ public class Waila {
             /*int energy = accessor.getNBTData().getInteger("energy");
             int max = accessor.getNBTData().getInteger("max");*/
             currenttip.add("Energy: " + energy + "/" + max);
+            if (tileEntity instanceof TileEntityTerrainScanner) {
+                //todo
+            }
             return currenttip;
         }
 
