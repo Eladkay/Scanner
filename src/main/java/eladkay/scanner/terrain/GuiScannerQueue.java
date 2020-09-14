@@ -59,7 +59,7 @@ public class GuiScannerQueue extends GuiContainer {
 
     private boolean isPosValid(int x, int z) {
         BlockPos pos = scanner.getPos();
-        return Math.abs((pos.getX() - x)) + Math.abs(pos.getZ() - z) <= Config.maxQueueRange;
+        return Config.maxQueueRange == 0 || Math.abs((pos.getX() - x)) + Math.abs(pos.getZ() - z) <= Config.maxQueueRange;
     }
 
     @Override
