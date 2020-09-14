@@ -1,6 +1,7 @@
 package eladkay.scanner.terrain;
 
 import com.google.common.collect.Lists;
+import eladkay.scanner.Config;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -56,13 +57,23 @@ public class GuiScannerQueue extends GuiContainer {
         super.initGui();
     }
 
+    private boolean isPosValid(int x, int z) {
+        BlockPos pos = scanner.getPos();
+        return Math.abs((pos.getX() - x)) + Math.abs(pos.getZ() - z) <= Config.maxQueueRange;
+    }
+
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button == push) {
             try {
                 String[] split = coordinates.getText().replace("(", "").replace(")", "").replace(" ", "").split(",");
-                if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1])).toLong()))
-                    scanner.push(new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1])));
+                BlockPos pos = new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1]));
+                if (!isPosValid(pos.getX(), pos.getZ())) {
+                    //todo
+                    return;
+                }
+                if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(pos.toLong()))
+                    scanner.push(pos);
             } catch (Exception e) {
                 //ignored
             }
