@@ -30,19 +30,15 @@ public class RegistryEventHandler {
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-
         for (Block block : ModBlocks.BLOCKS) {
-
             event.getRegistry().register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
-
         }
-
     }
 
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
 
-        for (Block block: ModBlocks.BLOCKS) {
+        for (Block block : ModBlocks.BLOCKS) {
             ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
         }
 

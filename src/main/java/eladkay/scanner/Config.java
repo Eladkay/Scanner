@@ -41,7 +41,7 @@ public class Config {
         increase = config.get("Scanner", "increase", 8, "The biome scanner will take (base * this * distanceInChunks * speedupInBlocksPerTick) RF/Tesla per tick to run.").getInt();
         maxSpeedup = config.get("Scanner", "maxSpeedup", 8, "The maximum amount of blocks per tick that the terrain scanner can scan. Power usage is multiplied by the amount of speedup.").getInt();
         remoteBuildCost = config.get("Scanner", "remoteBuildCost", maxEnergyBufferTerrain, "How much building remotely (Biome+Terrain) will cost in addition to the regular cost").getInt();
-        maxQueueRange = config.get("Scanner", "maxQueueRange", 256, "The max range for remote building with the scanner queue.").getInt();
+        maxQueueRange = config.get("Scanner", "maxQueueRange", 0, "The max range for remote building with the scanner queue (default value 0 means no maximum).").getInt();
         config.save();
     }
 

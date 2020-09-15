@@ -28,9 +28,10 @@ public class TerrainScannerUtils {
         if (placer == null) //Old scanners, keep these working
             return false;
         int dim = world.provider.getDimension();
-        if (placer.equals(new UUID(0,0))) //New scanners without a real player, only builds if the chunk is not claimed
+        if (placer.equals(new UUID(0, 0))) //New scanners without a real player, only builds if the chunk is not claimed
             return ClaimedChunks.instance.getChunk(new BlockDimPos(pos.getX(), 1, pos.getZ(), dim).toChunkPos()) != null;
         EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(placer);
+        //noinspection ConstantConditions
         if (player == null) //Placer offline, only builds if the chunk is not claimed
             return ClaimedChunks.instance.getChunk(new BlockDimPos(pos.getX(), 1, pos.getZ(), dim).toChunkPos()) != null;
         return blockBlockEditing(player, pos, state, dim, world);

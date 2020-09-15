@@ -5,9 +5,6 @@ import eladkay.scanner.misc.BaseTE;
 import eladkay.scanner.misc.MessageUpdateEnergyServer;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.terrain.BlockTerrainScanner;
-import java.util.List;
-import java.util.UUID;
-
 import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -19,7 +16,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+
+import java.util.List;
 
 public class Waila {
 
@@ -51,11 +49,9 @@ public class Waila {
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(accessor.getPosition().getX(), accessor.getPosition().getY(), accessor.getPosition().getZ()));
             int energy = ((BaseTE) tileEntity).getEnergyStored(accessor.getSide());
             int max = ((BaseTE) tileEntity).getMaxEnergyStored(accessor.getSide());
-            /*int energy = accessor.getNBTData().getInteger("energy");
-            int max = accessor.getNBTData().getInteger("max");*/
             currenttip.add("Energy: " + energy + "/" + max);
             if (tileEntity instanceof TileEntityTerrainScanner) {
-                String owner = ((TileEntityTerrainScanner)tileEntity).placerName;
+                String owner = ((TileEntityTerrainScanner) tileEntity).placerName;
                 if (!"".equals(owner))
                     currenttip.add("Owner: " + owner);
             }
@@ -72,6 +68,8 @@ public class Waila {
             BaseTE scanner = (BaseTE) te;
             tag.setInteger("energy", scanner.getEnergyStored(null));
             tag.setInteger("max", scanner.getMaxEnergyStored(null));
+            if (scanner instanceof TileEntityTerrainScanner)
+                tag.setString("name", ((TileEntityTerrainScanner) scanner).placerName);
             return tag;
         }
 

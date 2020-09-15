@@ -14,7 +14,9 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import javax.annotation.Nonnull;
+
 import static eladkay.scanner.ScannerMod.TAB;
 
 public class BlockScannerQueue extends BlockDirectional implements ITileEntityProvider {
@@ -33,7 +35,8 @@ public class BlockScannerQueue extends BlockDirectional implements ITileEntityPr
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ScannerMod.proxy.openGuiScannerQueue(((TileEntityScannerQueue) worldIn.getTileEntity(pos)));
+        if (worldIn.getTileEntity(pos) != null)
+            ScannerMod.proxy.openGuiScannerQueue(((TileEntityScannerQueue) worldIn.getTileEntity(pos)));
         return true;
     }
 
