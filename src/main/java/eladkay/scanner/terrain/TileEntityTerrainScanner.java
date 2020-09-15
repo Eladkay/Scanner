@@ -16,10 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.BlockFluidBase;
-import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -32,7 +31,6 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
     TileEntityScannerQueue queue;
     boolean on;
     MutableBlockPos current = new MutableBlockPos(0, -1, 0);
-    //BlockPos pos = null;
     public EnumRotation rotation = EnumRotation.POSX_POSZ;
     public int speedup = 1;
     public BlockPos posStart = null;
@@ -86,13 +84,6 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         super(MAX);
     }
 
-    public void onBlockActivated() {
-        if (current.getY() < 0) {
-            current.setPos(getPos().getX(), 0, getPos().getZ());
-            changeState(true);
-        }
-    }
-
     public void activate() {
         changeState(true);
         current.setPos(getPosStart().getX(), 0, getPosStart().getZ());
@@ -110,16 +101,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
 
     void changeState(boolean state) {
         on = state;
-        /*getWorld().setBlockState(pos, getWorld().getBlockState(pos).withProperty(BlockTerrainScanner.ONOFF, state));
-        getWorld().setTileEntity(pos, this);*/
         markDirty();
-
-        /*try {
-            getWorld().markAndNotifyBlock(getPos(), getWorld().getChunkFromBlockCoords(getPos()), getWorld().getBlockState(getPos()), getWorld().getBlockState(getPos()).withProperty(BlockTerrainScanner.ONOFF, state), 4);
-            getWorld().notifyBlockUpdate(getPos(), getWorld().getBlockState(getPos()), getWorld().getBlockState(getPos()).withProperty(BlockTerrainScanner.ONOFF, state), 3);
-        } catch (IllegalArgumentException ignored) {
-        }
-        getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());*/
     }
 
     @Override
@@ -127,16 +109,14 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (getWorld().isRemote) return; //Dont do stuff client side else we get ghosts
         queue = TileEntityScannerQueue.getNearbyQueue(getWorld(), this);
         TileEntityBiomeScanner biomeScanner = TileEntityBiomeScanner
-            .getNearbyBiomeScanner(getWorld(), this);
+                .getNearbyBiomeScanner(getWorld(), this);
 
         if (getWorld().isBlockPowered(getPos())) on = true;
-        //System.out.println(queue);
         int multiplier = 0;
         for (int j = 0; j < speedup; j++) {
             if (!on)
                 return;
             if (container.getEnergyStored() < Config.energyPerBlockTerrainScanner) {
-                //changeState(false);
                 return;
             }
             WorldServer remoteWorld;
@@ -201,7 +181,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                 }
             });
 
-            if(Config.voidOriginalBlock && toGen) { //Only clears when it actually builds
+            if (Config.voidOriginalBlock && toGen) { //Only clears when it actually builds
                 remoteWorld.setBlockState(current, Blocks.AIR.getDefaultState());
             }
 
@@ -257,10 +237,9 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
         if (block.isReplaceable(getWorld(), imm) || block.isAir(local, getWorld(), imm)) { //Replaceable / air
             if (!(block instanceof BlockFluidBase) && !(block instanceof BlockLiquid)) { //Not occupied by liquid
                 return true;
-            }
-            else if (Config.replaceNonSourceLiquid) { //Occupied by liquid, check for config, if config is on then replace non-source blocks
-                if (local.getValue(BlockFluidBase.LEVEL) < 15) //Non-source
-                    return true;
+            } else if (Config.replaceNonSourceLiquid) { //Occupied by liquid, check for config, if config is on then replace non-source blocks
+                //Non-source
+                return (local.getValue(BlockFluidBase.LEVEL) < 15 || local.getValue(BlockLiquid.LEVEL) < 15);
             }
         }
         return false;

@@ -1,10 +1,11 @@
 package eladkay.scanner;
 
+import com.teamwizardry.librarianlib.core.common.RegistrationHandler;
 import eladkay.scanner.compat.CraftTweaker;
 import eladkay.scanner.init.ScannerCreativeTabs;
 import eladkay.scanner.misc.NetworkHelper;
 import eladkay.scanner.proxy.CommonProxy;
-import eladkay.scanner.terrain.*;
+import eladkay.scanner.terrain.TileEntityTerrainScanner;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -22,10 +23,10 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.ChunkGeneratorEnd;
 import net.minecraft.world.gen.ChunkGeneratorHell;
 import net.minecraft.world.gen.ChunkGeneratorOverworld;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -35,15 +36,11 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import com.teamwizardry.librarianlib.core.common.RegistrationHandler;
 
 @Mod(modid = ScannerMod.MODID, name = "Scanner", version = ScannerMod.VERSION)
 public class ScannerMod {
     public static final String MODID = "scanner";
     private static final boolean TESTING = false;
-    public static final Logger LOGGER = LogManager.getLogger(ScannerMod.MODID);
 
     @SidedProxy(serverSide = "eladkay.scanner.proxy.CommonProxy", clientSide = "eladkay.scanner.proxy.ClientProxy")
     public static CommonProxy proxy;
@@ -55,7 +52,6 @@ public class ScannerMod {
     @Mod.Instance(MODID)
     public static ScannerMod instance;
     public final static CreativeTabs TAB = new ScannerCreativeTabs(MODID);
-    public static BlockAirey air;
     public static final String VERSION = "1.6.7";
 
     @Mod.EventHandler
@@ -67,7 +63,7 @@ public class ScannerMod {
                 @Override
                 public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
                     playerIn.sendMessage(new TextComponentString(String.valueOf(
-                        FMLCommonHandler.instance().getMinecraftServerInstance())));
+                            FMLCommonHandler.instance().getMinecraftServerInstance())));
                     return super.onItemRightClick(worldIn, playerIn, hand);
                 }
             }.setRegistryName("scanner:testytest").setUnlocalizedName("scanner:testytest").setCreativeTab(TAB);
@@ -141,7 +137,7 @@ public class ScannerMod {
 
         @Override
         public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)|(IGCBOOM)");
+            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)|(IGCBOOM)|(Misterplus)");
         }
 
         @Override
@@ -177,7 +173,7 @@ public class ScannerMod {
 
         @Override
         public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)|(IGCBOOM)");
+            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)|(IGCBOOM)|(Misterplus)");
         }
 
         @Override

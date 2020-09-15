@@ -10,6 +10,7 @@ public class ScannerCreativeTabs extends CreativeTabs {
     public ScannerCreativeTabs(String id) {
         super(id);
     }
+
     @Override
     public ItemStack getTabIconItem() {
         return new ItemStack(Item.getItemFromBlock(terrainScanner));
