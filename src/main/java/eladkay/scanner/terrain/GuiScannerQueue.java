@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
@@ -126,7 +127,7 @@ public class GuiScannerQueue extends GuiContainer {
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        drawCenteredString("Scanner Queue (Capacity: " + TileEntityScannerQueue.CAPACITY + ")", 90, 6, 4210752); //
+        drawCenteredString(I18n.format("tile.scannerQueue.name") + " (" + I18n.format("capacity") + ": " + TileEntityScannerQueue.CAPACITY + ")", 90, 6, 4210752); //
 
         for (GuiButton btn : buttonsBuild) btn.visible = false;
         for (GuiButton btn : buttonsRemove) btn.visible = false;
@@ -148,8 +149,8 @@ public class GuiScannerQueue extends GuiContainer {
             i += 10;
         }
         if (scanner.scanner != null)
-            drawCenteredString("Terrain Scanner attached", 85, 150, 4210752);
-        else drawCenteredString("Terrain Scanner not attached", 85, 150, 4210752);
+            drawCenteredString(I18n.format("gui.tsAttached"), 85, 150, 4210752);
+        else drawCenteredString(I18n.format("gui.tsNotAttached"), 85, 150, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
