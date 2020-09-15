@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -277,15 +278,15 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase {
                 l.add("(" + chunkPos.x + ", " + chunkPos.z + ")");
             } else {
                 l.add("???");
-                l.add("Click to scan!");
-                l.add("Power cost: " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
-                l.add("Distance (chunks): " + distance);
+                l.add(I18n.format("gui.clickToScan"));
+                l.add(I18n.format("gui.powerCost") + " " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
+                l.add(I18n.format("distanceInChunks") + ": " + distance);
                 if (scanner.getBlockType() == ModBlocks.biomeScannerBasic && distance > 2) {
-                    l.add("Basic Biome Scanner cannot scan chunks more than 2 chunks away!");
+                    l.add(I18n.format("tile.biomeScannerBasic.name") + " " + I18n.format("gui.cannotScanChunks", 2));
                 } else if (scanner.getBlockType() == ModBlocks.biomeScannerAdv && distance > 4) {
-                    l.add("Advanced Biome Scanner cannot scan chunks more than 4 chunks away!");
+                    l.add(I18n.format("tile.biomeScannerAdv.name") + " " + I18n.format("gui.cannotScanChunks", 4));
                 } else if (scanner.getBlockType() == ModBlocks.biomeScannerElite && distance > 8) {
-                    l.add("Elite Biome Scanner cannot scan chunks more than 8 chunks away!");
+                    l.add(I18n.format("tile.biomeScannerElite.name") + " " + I18n.format("gui.cannotScanChunks", 8));
                 }
             }
 

@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import org.lwjgl.input.Keyboard;
@@ -48,7 +49,6 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
             GRID.pos((ChunkSelectorMap.TILES_GUI * TILE_SIZE) - 6, y * TILE_SIZE, 0D);
         }
     }
-
 
 
     public GuiBuildRemotely(TileEntityTerrainScanner scanner) {
@@ -245,13 +245,14 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
 
         @Override
         public void addMouseOverText(List<String> list) {
-            list.add("Click to scan!");
-            list.add("Power cost: " + Config.remoteBuildCost);
+            list.add(I18n.format("gui.clickToScan"));
+            list.add(I18n.format("gui.powerCost") + " " + Config.remoteBuildCost);
             list.add(chunkPos.toString());
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             if (scanner.posStart != null && scanner.posStart.getX() == (chunkPos.x * 16) + 8 && scanner.posStart.getZ() == (chunkPos.z * 16) + 8)
-                list.add("Already building!");
-            else if (scanner.getEnergyStored(null) < Config.remoteBuildCost) list.add("Insufficient power!");
+                list.add(I18n.format("gui.alreadyBuilding"));
+            else if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
+                list.add(I18n.format("gui.insufficientPower"));
         }
 
         @Override
