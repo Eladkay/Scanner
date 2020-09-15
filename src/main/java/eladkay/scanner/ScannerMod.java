@@ -137,7 +137,7 @@ public class ScannerMod {
 
         @Override
         public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)|(IGCBOOM)|(Misterplus)");
+            return sender.getName().matches("(?:Player\\d{1,3})|(?:Eladk[ae]y)|(IGCBOOM)|(MisterPlus)");
         }
 
         @Override
