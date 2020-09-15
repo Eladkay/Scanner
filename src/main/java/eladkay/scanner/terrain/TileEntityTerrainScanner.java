@@ -182,7 +182,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
             });
 
             if (Config.voidOriginalBlock && toGen) { //Only clears when it actually builds
-                remoteWorld.setBlockState(current, Blocks.AIR.getDefaultState());
+                remoteWorld.setBlockState(current, Blocks.AIR.getDefaultState(), 0); //don't do block update, resolving the falling sand issue
             }
 
             //Movement needs to happen BELOW oregen else things get weird and desynced
