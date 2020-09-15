@@ -51,7 +51,6 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
     }
 
 
-
     public GuiBuildRemotely(TileEntityTerrainScanner scanner) {
 
         this.scanner = scanner;
