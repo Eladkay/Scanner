@@ -71,22 +71,24 @@ public class BlockTerrainScanner extends Block implements ITileEntityProvider {
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state0, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(worldIn, pos, state0, placer, stack);
-        TileEntity te = worldIn.getTileEntity(pos);
-        TileEntityTerrainScanner tets = ((TileEntityTerrainScanner) te);
-        if (te == null) return;
-        if (placer instanceof EntityPlayer) {
-            tets.placer = placer.getUniqueID();
-            EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(placer.getUniqueID());
-            //noinspection ConstantConditions
-            if (player != null)
-                tets.placerName = player.getName();
-            else
+        if (!worldIn.isRemote) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            TileEntityTerrainScanner tets = ((TileEntityTerrainScanner) te);
+            if (te == null) return;
+            if (placer instanceof EntityPlayer) {
+                tets.placer = placer.getUniqueID();
+                EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(placer.getUniqueID());
+                //noinspection ConstantConditions
+                if (player != null)
+                    tets.placerName = player.getName();
+                else
+                    tets.placerName = "";
+            } else {
+                tets.placer = new UUID(0, 0);
                 tets.placerName = "";
-        } else {
-            tets.placer = new UUID(0, 0);
-            tets.placerName = "";
+            }
+            te.markDirty();
         }
-        te.markDirty();
     }
 
 

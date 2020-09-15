@@ -71,7 +71,7 @@ public class GuiScannerQueue extends GuiContainer {
                 String[] split = coordinates.getText().replace("(", "").replace(")", "").replace(" ", "").split(",");
                 BlockPos pos = new BlockPos(Integer.parseInt(split[0]), 0, Integer.parseInt(split[1]));
                 if (!isPosValid(pos.getX(), pos.getZ())) {
-                    //todo
+                    //todo: add out of range message
                     return;
                 }
                 if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(pos.toLong()))
