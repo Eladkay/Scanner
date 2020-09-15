@@ -239,7 +239,7 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickable {
                 return true;
             } else if (Config.replaceNonSourceLiquid) { //Occupied by liquid, check for config, if config is on then replace non-source blocks
                 //Non-source
-                return local.getValue(BlockFluidBase.LEVEL) < 15;
+                return (local.getValue(BlockFluidBase.LEVEL) < 15 || local.getValue(BlockLiquid.LEVEL) < 15);
             }
         }
         return false;
