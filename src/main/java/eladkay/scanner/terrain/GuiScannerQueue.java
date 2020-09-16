@@ -30,11 +30,11 @@ public class GuiScannerQueue extends GuiContainer {
     static {
         bufferBuild = new GuiButton[TileEntityScannerQueue.CAPACITY];
         int j = 105;
-        for (int i = 0; i < bufferBuild.length; i++) bufferBuild[i] = new GuiButton(j++, 0, 0, 50, 10, "Build");
+        for (int i = 0; i < bufferBuild.length; i++) bufferBuild[i] = new GuiButton(j++, 0, 0, 50, 10, I18n.format("gui.button.build"));
 
         bufferRemove = new GuiButton[TileEntityScannerQueue.CAPACITY];
         int k = 205;
-        for (int i = 0; i < bufferRemove.length; i++) bufferRemove[i] = new GuiButton(k++, 0, 0, 50, 10, "Remove");
+        for (int i = 0; i < bufferRemove.length; i++) bufferRemove[i] = new GuiButton(k++, 0, 0, 50, 10, I18n.format("gui.button.remove"));
     }
 
     public GuiScannerQueue(TileEntityScannerQueue scanner) {
@@ -52,7 +52,7 @@ public class GuiScannerQueue extends GuiContainer {
         coordinates = new GuiTextField(101, mc.fontRenderer, (this.width / 2) - 50, this.height / 2 + 15, 100, 20);
         coordinates.setText("");
         this.coordinates.setMaxStringLength(2000);
-        push = new GuiButton(102, (this.width / 2) - 50, this.height / 2 - 10, 100, 20, "Add");
+        push = new GuiButton(102, (this.width / 2) - 50, this.height / 2 - 10, 100, 20, I18n.format("gui.button.add"));
         buttonList.add(push);
         buttonList.addAll(buttonsBuild);
         buttonList.addAll(buttonsRemove);

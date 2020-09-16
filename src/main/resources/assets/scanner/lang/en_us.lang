@@ -25,6 +25,9 @@ gui.powerCost=Power cost:
 gui.alreadyBuilding=Already building!
 gui.insufficientPower=Insufficient power!
 gui.cannotScanChunks=cannot scan chunks more than %d chunks away!
+gui.button.add=Add
+gui.button.build=Build
+gui.button.remove=Remove
 
 capacity=Capacity
 distanceInChunks=Distance (Chunks)
