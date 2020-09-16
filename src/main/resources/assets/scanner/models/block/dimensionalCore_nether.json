@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "scanner:blocks/q_top",
+    "down": "scanner:blocks/dimensionalCore_nether",
+    "up": "scanner:blocks/dimensionalCore_netherTop",
+    "north": "scanner:blocks/dimensionalCore_nether",
+    "west": "scanner:blocks/dimensionalCore_nether",
+    "east": "scanner:blocks/dimensionalCore_nether",
+    "south": "scanner:blocks/dimensionalCore_nether"
+  }
+}

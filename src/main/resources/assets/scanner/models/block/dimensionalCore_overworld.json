@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "scanner:blocks/q_top",
+    "down": "scanner:blocks/dimensionalCore_overworld",
+    "up": "scanner:blocks/biomeScanner_top",
+    "north": "scanner:blocks/dimensionalCore_overworld",
+    "west": "scanner:blocks/dimensionalCore_overworld",
+    "east": "scanner:blocks/dimensionalCore_overworld",
+    "south": "scanner:blocks/dimensionalCore_overworld"
+  }
+}

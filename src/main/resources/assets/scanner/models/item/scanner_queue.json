@@ -1,7 +1,3 @@
 {
-  "parent": "block/cube_all",
-  "textures": {
-    "particle": "scanner:blocks/q",
-    "all": "scanner:blocks/q"
-  }
+  "parent": "scanner:block/q"
 }
