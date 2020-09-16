@@ -62,13 +62,13 @@ public class GuiTerrainScanner extends GuiContainer {
             public void setEntryValue(int id, String value) {
 
             }
-        }, 2, (this.width / 2) - 75, this.height / 2 + 10, I18n.format("speedInBlocksPerTick"), 1f, Float.parseFloat(Config.maxSpeedup + ""), scanner.speedup, new GuiSlider.FormatHelper() {
+        }, 2, (this.width / 2) - 75, this.height / 2 + 10, I18n.format("gui.scanner.speedInBlocksPerTick"), 1f, Float.parseFloat(Config.maxSpeedup + ""), scanner.speedup, new GuiSlider.FormatHelper() {
             @Override
             public String getText(int id, String name, float value) {
                 return name + ": " + (int) value;
             }
         });
-        showMap = new GuiButton(3, (this.width / 2) - 75, this.height / 2 - 15, 150, 20, I18n.format("gui.showMap")); //Build elsewhere (Requires adjacent ultimate biome scanner)
+        showMap = new GuiButton(3, (this.width / 2) - 75, this.height / 2 - 15, 150, 20, I18n.format("gui.scanner.showMap")); //Build elsewhere (Requires adjacent ultimate biome scanner)
         buttonList.add(toggleMode);
         buttonList.add(showMap);
         //buttonList.add(rotate); todo
@@ -124,7 +124,7 @@ public class GuiTerrainScanner extends GuiContainer {
                 } else {
                     color = TextFormatting.YELLOW;
                 }
-                list.add(color + "" + percentage + "%" + TextFormatting.GRAY + " " + I18n.format("gui.charged"));
+                list.add(color + "" + percentage + "%" + TextFormatting.GRAY + " " + I18n.format("gui.scanner.charged"));
             }
             GuiUtils.drawHoveringText(list, mouseX, mouseY, width, height, -1, mc.fontRenderer);
             GlStateManager.disableLighting();
@@ -140,7 +140,7 @@ public class GuiTerrainScanner extends GuiContainer {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         try {
             if (scanner == null || toggleMode == null || showMap == null) return;
-            toggleMode.displayString = scanner.on ? I18n.format("gui.turnOn") : I18n.format("gui.turnOff");
+            toggleMode.displayString = scanner.on ? I18n.format("gui.scanner.turnOn") : I18n.format("gui.scanner.turnOff");
             boolean flag = false;
             for (EnumFacing facing : EnumFacing.values())
                 if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate) {
@@ -177,26 +177,26 @@ public class GuiTerrainScanner extends GuiContainer {
         if (mc.isSingleplayer()) drawCenteredString(I18n.format("tile.terrainScanner.name"), 90, 6, 4210752); //
         else {
             drawCenteredString(I18n.format("tile.terrainScanner.name"), 90, 6, 4210752);
-            drawCenteredString(I18n.format("gui.enderIOWarningL1"), 90, 13, 4210752);
-            drawCenteredString(I18n.format("gui.enderIOWarningL2"), 90, 20, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.enderIOWarningL1"), 90, 13, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.enderIOWarningL2"), 90, 20, 4210752);
         }
         if (!"(0, -1, 0)".equals("(" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")"))
-            drawCenteredString(I18n.format("gui.current") + " (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90, 35, 4210752);
-        else drawCenteredString(I18n.format("gui.currentBlockOff"), 90, 35, 4210752);
-        drawCenteredString(I18n.format("gui.endBlock") + " (" + scanner.getEnd().getX() + ", " + scanner.maxY + ", " + scanner.getEnd().getZ() + ")", 90, 45, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.current") + " (" + scanner.current.getX() + ", " + scanner.current.getY() + ", " + scanner.current.getZ() + ")", 90, 35, 4210752);
+        else drawCenteredString(I18n.format("gui.scanner.currentBlockOff"), 90, 35, 4210752);
+        drawCenteredString(I18n.format("gui.scanner.endBlock") + " (" + scanner.getEnd().getX() + ", " + scanner.maxY + ", " + scanner.getEnd().getZ() + ")", 90, 45, 4210752);
         if (scanner.posStart != null)
-            drawCenteredString(I18n.format("gui.remoteStart") + " (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90, 55, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.remoteStart") + " (" + scanner.posStart.getX() + ", " + scanner.posStart.getZ() + ")", 90, 55, 4210752);
         boolean flag = false;
         for (EnumFacing facing : EnumFacing.values())
             if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate)
                 flag = true;
         if (!flag) {
-            drawCenteredString(I18n.format("gui.ultimateBSL1"), 90, 65, 4210752);
-            drawCenteredString(I18n.format("gui.ultimateBSL2"), 90, 75, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.ultimateBSL1"), 90, 65, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.ultimateBSL2"), 90, 75, 4210752);
         }
 
         if (scanner.queue != null)
-            drawCenteredString(I18n.format("gui.queueAttached"), 90, 150, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.queueAttached"), 90, 150, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {

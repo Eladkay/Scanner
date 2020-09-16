@@ -30,11 +30,11 @@ public class GuiScannerQueue extends GuiContainer {
     static {
         bufferBuild = new GuiButton[TileEntityScannerQueue.CAPACITY];
         int j = 105;
-        for (int i = 0; i < bufferBuild.length; i++) bufferBuild[i] = new GuiButton(j++, 0, 0, 50, 10, I18n.format("gui.button.build"));
+        for (int i = 0; i < bufferBuild.length; i++) bufferBuild[i] = new GuiButton(j++, 0, 0, 50, 10, I18n.format("gui.scanner.button.build"));
 
         bufferRemove = new GuiButton[TileEntityScannerQueue.CAPACITY];
         int k = 205;
-        for (int i = 0; i < bufferRemove.length; i++) bufferRemove[i] = new GuiButton(k++, 0, 0, 50, 10, I18n.format("gui.button.remove"));
+        for (int i = 0; i < bufferRemove.length; i++) bufferRemove[i] = new GuiButton(k++, 0, 0, 50, 10, I18n.format("gui.scanner.button.remove"));
     }
 
     public GuiScannerQueue(TileEntityScannerQueue scanner) {
@@ -52,7 +52,7 @@ public class GuiScannerQueue extends GuiContainer {
         coordinates = new GuiTextField(101, mc.fontRenderer, (this.width / 2) - 50, this.height / 2 + 15, 100, 20);
         coordinates.setText("");
         this.coordinates.setMaxStringLength(2000);
-        push = new GuiButton(102, (this.width / 2) - 50, this.height / 2 - 10, 100, 20, I18n.format("gui.button.add"));
+        push = new GuiButton(102, (this.width / 2) - 50, this.height / 2 - 10, 100, 20, I18n.format("gui.scanner.button.add"));
         buttonList.add(push);
         buttonList.addAll(buttonsBuild);
         buttonList.addAll(buttonsRemove);
@@ -127,7 +127,7 @@ public class GuiScannerQueue extends GuiContainer {
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        drawCenteredString(I18n.format("tile.scannerQueue.name") + " (" + I18n.format("capacity") + ": " + TileEntityScannerQueue.CAPACITY + ")", 90, 6, 4210752); //
+        drawCenteredString(I18n.format("tile.scannerQueue.name") + " (" + I18n.format("gui.scanner.capacity") + ": " + TileEntityScannerQueue.CAPACITY + ")", 90, 6, 4210752); //
 
         for (GuiButton btn : buttonsBuild) btn.visible = false;
         for (GuiButton btn : buttonsRemove) btn.visible = false;
@@ -149,8 +149,8 @@ public class GuiScannerQueue extends GuiContainer {
             i += 10;
         }
         if (scanner.scanner != null)
-            drawCenteredString(I18n.format("gui.tsAttached"), 85, 150, 4210752);
-        else drawCenteredString(I18n.format("gui.tsNotAttached"), 85, 150, 4210752);
+            drawCenteredString(I18n.format("gui.scanner.tsAttached"), 85, 150, 4210752);
+        else drawCenteredString(I18n.format("gui.scanner.tsNotAttached"), 85, 150, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {

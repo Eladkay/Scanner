@@ -245,14 +245,14 @@ public class GuiBuildRemotely extends GuiChunkSelectorBase {
 
         @Override
         public void addMouseOverText(List<String> list) {
-            list.add(I18n.format("gui.clickToScan"));
-            list.add(I18n.format("gui.powerCost") + " " + Config.remoteBuildCost);
+            list.add(I18n.format("gui.scanner.clickToScan"));
+            list.add(I18n.format("gui.scanner.powerCost") + " " + Config.remoteBuildCost);
             list.add(chunkPos.toString());
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(scanner.getPos().getX(), scanner.getPos().getY(), scanner.getPos().getZ()));
             if (scanner.posStart != null && scanner.posStart.getX() == (chunkPos.x * 16) + 8 && scanner.posStart.getZ() == (chunkPos.z * 16) + 8)
-                list.add(I18n.format("gui.alreadyBuilding"));
+                list.add(I18n.format("gui.scanner.alreadyBuilding"));
             else if (scanner.getEnergyStored(null) < Config.remoteBuildCost)
-                list.add(I18n.format("gui.insufficientPower"));
+                list.add(I18n.format("gui.scanner.insufficientPower"));
         }
 
         @Override

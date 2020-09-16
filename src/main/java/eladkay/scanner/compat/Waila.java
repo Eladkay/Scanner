@@ -10,6 +10,7 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -49,11 +50,11 @@ public class Waila {
             NetworkHelper.instance.sendToServer(new MessageUpdateEnergyServer(accessor.getPosition().getX(), accessor.getPosition().getY(), accessor.getPosition().getZ()));
             int energy = ((BaseTE) tileEntity).getEnergyStored(accessor.getSide());
             int max = ((BaseTE) tileEntity).getMaxEnergyStored(accessor.getSide());
-            currenttip.add("Energy: " + energy + "/" + max);
+            currenttip.add(I18n.format("waila.scanner.energy") + ": " + energy + "/" + max);
             if (tileEntity instanceof TileEntityTerrainScanner) {
                 String owner = ((TileEntityTerrainScanner) tileEntity).placerName;
                 if (!"".equals(owner))
-                    currenttip.add("Owner: " + owner);
+                    currenttip.add(I18n.format("waila.scanner.owner") + ": " + owner);
             }
             return currenttip;
         }

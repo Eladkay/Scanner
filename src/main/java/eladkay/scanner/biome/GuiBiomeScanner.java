@@ -277,15 +277,15 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase {
                 l.add("(" + chunkPos.x + ", " + chunkPos.z + ")");
             } else {
                 l.add("???");
-                l.add(I18n.format("gui.clickToScan"));
-                l.add(I18n.format("gui.powerCost") + " " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
-                l.add(I18n.format("distanceInChunks") + ": " + distance);
+                l.add(I18n.format("gui.scanner.clickToScan"));
+                l.add(I18n.format("gui.scanner.powerCost") + " " + Config.minEnergyPerChunkBiomeScanner * Config.increase * distance);
+                l.add(I18n.format("gui.scanner.distanceInChunks") + ": " + distance);
                 if (scanner.getBlockType() == ModBlocks.biomeScannerBasic && distance > 2) {
-                    l.add(I18n.format("tile.biomeScannerBasic.name") + " " + I18n.format("gui.cannotScanChunks", 2));
+                    l.add(I18n.format("tile.biomeScannerBasic.name") + " " + I18n.format("gui.scanner.cannotScanChunks", 2));
                 } else if (scanner.getBlockType() == ModBlocks.biomeScannerAdv && distance > 4) {
-                    l.add(I18n.format("tile.biomeScannerAdv.name") + " " + I18n.format("gui.cannotScanChunks", 4));
+                    l.add(I18n.format("tile.biomeScannerAdv.name") + " " + I18n.format("gui.scanner.cannotScanChunks", 4));
                 } else if (scanner.getBlockType() == ModBlocks.biomeScannerElite && distance > 8) {
-                    l.add(I18n.format("tile.biomeScannerElite.name") + " " + I18n.format("gui.cannotScanChunks", 8));
+                    l.add(I18n.format("tile.biomeScannerElite.name") + " " + I18n.format("gui.scanner.cannotScanChunks", 8));
                 }
             }
 
