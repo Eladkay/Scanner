@@ -96,6 +96,7 @@ public class TileEntityScannerQueue extends BaseTE implements ITickable, Iterabl
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         NBTTagList list = nbt.getTagList("queue", 4);
+        queue.clear();
         for (int i = 0; i < list.tagCount(); i++) queue.add(BlockPos.fromLong(((NBTTagLong) list.get(i)).getLong()));
     }
 

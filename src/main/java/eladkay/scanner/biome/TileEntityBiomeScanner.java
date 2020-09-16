@@ -91,6 +91,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
     public void readFromNBT(NBTTagCompound compound) {
         Gson gson = new Gson();
         HashMap<String, String> ret = gson.fromJson(compound.getString("json"), HashMap.class);
+        mapping.clear();
         for (Map.Entry<String, String> entry : ret.entrySet())
             mapping.put(deserialize(entry.getKey()), entry.getValue());
         type = compound.getInteger("type");

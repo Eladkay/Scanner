@@ -89,7 +89,7 @@ public class GuiScannerQueue extends GuiContainer {
         } else if (button.id - 205 >= 0 && button.id - 205 <= TileEntityScannerQueue.CAPACITY) {
             scanner.remove(scanner.get(button.id - 205));
         }
-        //todo: make sure serverside syncs and client side don't duplicate
+        NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
     }
 
     @Override
