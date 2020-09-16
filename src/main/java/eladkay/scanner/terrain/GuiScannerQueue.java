@@ -74,10 +74,8 @@ public class GuiScannerQueue extends GuiContainer {
                     //todo: add out of range message
                     return;
                 }
-                if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(pos.toLong())) {
+                if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(pos.toLong()))
                     scanner.push(pos);
-                    //todo: make sure serverside syncs
-                }
             } catch (Exception e) {
                 //ignored
             }
@@ -91,6 +89,7 @@ public class GuiScannerQueue extends GuiContainer {
         } else if (button.id - 205 >= 0 && button.id - 205 <= TileEntityScannerQueue.CAPACITY) {
             scanner.remove(scanner.get(button.id - 205));
         }
+        //todo: make sure serverside syncs and client side don't duplicate
     }
 
     @Override
