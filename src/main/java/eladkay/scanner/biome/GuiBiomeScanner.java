@@ -258,7 +258,6 @@ public class GuiBiomeScanner extends GuiChunkSelectorBase {
 
             World scannerWorld = scanner.getWorld();
 
-            scanner.container.extractEnergy(Config.minEnergyPerChunkBiomeScanner * Config.increase * distance, false);
             scanner.mapping.put(new ChunkPos(chunkPos.x, chunkPos.z), scannerWorld.getBiome(new BlockPos(chunkPos.x * 16, 64, chunkPos.z * 16)).getBiomeName());
             scanner.markDirty();
             NetworkHelper.instance.sendToServer(new MessageUpdateMap(scanner, chunkPos.x, chunkPos.z));
