@@ -74,8 +74,10 @@ public class GuiScannerQueue extends GuiContainer {
                     //todo: add out of range message
                     return;
                 }
-                if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(pos.toLong()))
+                if (!scanner.queue.stream().map(BlockPos::toLong).collect(Collectors.toList()).contains(pos.toLong())) {
                     scanner.push(pos);
+                    //todo: make sure serverside syncs
+                }
             } catch (Exception e) {
                 //ignored
             }
@@ -84,12 +86,11 @@ public class GuiScannerQueue extends GuiContainer {
             scanner.scanner.posStart = scanner.get(button.id - 105);
             scanner.scanner.current = new BlockPos.MutableBlockPos(0, -1, 0);
             scanner.scanner.on = false;
-
+            scanner.scanner.markDirty();
+            NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner.scanner));
         } else if (button.id - 205 >= 0 && button.id - 205 <= TileEntityScannerQueue.CAPACITY) {
             scanner.remove(scanner.get(button.id - 205));
         }
-        scanner.scanner.markDirty(); // why wasn't this here???
-        NetworkHelper.instance.sendToServer(new MessageUpdateScanner(scanner));
     }
 
     @Override
