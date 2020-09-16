@@ -113,7 +113,7 @@ public class TileEntityBiomeScanner extends BaseTE implements ITickable {
 
     public int getDist(ChunkPos chunkPos) {
         double d0 = MathUtils.chunk(this.pos.getX()) - chunkPos.x;
-        double d1 = MathUtils.chunk(this.pos.getZ()) / 16D - chunkPos.z;
+        double d1 = MathUtils.chunk(this.pos.getZ()) - chunkPos.z;
         return (int) MathHelper.sqrt(d0 * d0 + d1 * d1);
     }
 }
