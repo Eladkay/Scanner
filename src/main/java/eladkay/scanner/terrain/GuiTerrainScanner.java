@@ -191,12 +191,12 @@ public class GuiTerrainScanner extends GuiContainer {
             if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate)
                 flag = true;
         if (!flag) {
-            this.fontRenderer.drawString(I18n.format("gui.ultimateBSL1"), 15, 65, 4210752);
-            this.fontRenderer.drawString(I18n.format("gui.ultimateBSL2"), 30, 75, 4210752);
+            drawCenteredString(I18n.format("gui.ultimateBSL1"), 90, 65, 4210752);
+            drawCenteredString(I18n.format("gui.ultimateBSL2"), 90, 75, 4210752);
         }
 
         if (scanner.queue != null)
-            this.fontRenderer.drawString(I18n.format("gui.queueAttached"), 30, 150, 4210752);
+            drawCenteredString(I18n.format("gui.queueAttached"), 90, 150, 4210752);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
