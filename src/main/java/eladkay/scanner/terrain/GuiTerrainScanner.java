@@ -140,7 +140,7 @@ public class GuiTerrainScanner extends GuiContainer {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         try {
             if (scanner == null || toggleMode == null || showMap == null) return;
-            toggleMode.displayString = scanner.on ? I18n.format("gui.scanner.turnOn") : I18n.format("gui.scanner.turnOff");
+            toggleMode.displayString = scanner.on ? I18n.format("gui.scanner.turnOff") : I18n.format("gui.scanner.turnOn");
             boolean flag = false;
             for (EnumFacing facing : EnumFacing.values())
                 if (mc.world.getBlockState(scanner.getPos().offset(facing)).getBlock() == ModBlocks.biomeScannerUltimate) {
