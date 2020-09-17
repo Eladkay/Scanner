@@ -2,7 +2,7 @@
   "parent": "block/cube",
   "textures": {
     "particle": "scanner:blocks/q_top",
-    "down": "scanner:blocks/biomeScanner_bottom",
+    "down": "scanner:blocks/biome_scanner_bottom",
     "up": "scanner:blocks/q_top",
     "north": "scanner:blocks/q_side",
     "west": "scanner:blocks/q_side",
