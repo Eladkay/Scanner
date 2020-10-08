@@ -52,7 +52,7 @@ public class ScannerMod {
     @Mod.Instance(MODID)
     public static ScannerMod instance;
     public final static CreativeTabs TAB = new ScannerCreativeTabs(MODID);
-    public static final String VERSION = "1.6.10";
+    public static final String VERSION = "1.6.11";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
