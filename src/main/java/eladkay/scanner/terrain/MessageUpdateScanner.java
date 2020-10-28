@@ -50,6 +50,7 @@ public class MessageUpdateScanner extends MessageBase<MessageUpdateScanner> {
     @Override
     public void handleClientSide(MessageUpdateScanner message, EntityPlayer player) {
         TileEntity bs = ScannerMod.proxy.getWorld().getTileEntity(new BlockPos(message.x, message.y, message.z));
+        if (bs == null) return;
         bs.readFromNBT(message.data);
         bs.markDirty();
     }
@@ -57,6 +58,7 @@ public class MessageUpdateScanner extends MessageBase<MessageUpdateScanner> {
     @Override
     public void handleServerSide(MessageUpdateScanner message, MessageContext player) {
         TileEntity bs = player.getServerHandler().player.world.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        if (bs == null) return;
         bs.readFromNBT(message.data);
         bs.markDirty();
     }
