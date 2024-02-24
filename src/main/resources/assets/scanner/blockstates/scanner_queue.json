@@ -1,25 +1,19 @@
 {
   "variants": {
-    "normal": {
-      "model": "scanner:q"
-    },
-    "inventory": {
-      "model": "scanner:q"
-    },
     "facing=north": {
-      "model": "scanner:q",
-      "y": 180
+      "model": "scanner:block/scanner_queue"
     },
     "facing=south": {
-      "model": "scanner:q"
+      "model": "scanner:block/scanner_queue",
+      "y": 180
     },
     "facing=east": {
-      "model": "scanner:q",
-      "y": 270
+      "model": "scanner:block/scanner_queue",
+      "y": 90
     },
     "facing=west": {
-      "model": "scanner:q",
-      "y": 90
+      "model": "scanner:block/scanner_queue",
+      "y": 270
     }
 
   }

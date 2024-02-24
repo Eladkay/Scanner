@@ -1,23 +1,20 @@
 package eladkay.scanner.compat;
 
-import crafttweaker.CraftTweakerAPI;
-import crafttweaker.IAction;
-import crafttweaker.annotations.ZenRegister;
-import crafttweaker.api.item.IItemStack;
-import crafttweaker.api.minecraft.CraftTweakerMC;
+import com.blamejared.crafttweaker.api.CraftTweakerAPI;
+import com.blamejared.crafttweaker.api.actions.IAction;
+import com.blamejared.crafttweaker.api.annotations.ZenRegister;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import stanhebben.zenscript.annotations.ZenClass;
-import stanhebben.zenscript.annotations.ZenMethod;
+import org.openzen.zencode.java.ZenCodeType;
 
-@ZenClass("mods.scanner.Scanner")
+@ZenCodeType.Name("mods.scanner.Scanner")
 @ZenRegister
 public class ScannerCT {
-    @ZenMethod
-    public static void addRecipe(IItemStack stack, IItemStack materialStack, int rarity, int minY, int maxY) {
-        CraftTweakerAPI.apply(new Add(CraftTweakerMC.getItemStack(stack), CraftTweakerMC.getItemStack(materialStack), rarity, minY, maxY));
+    @ZenCodeType.Method
+    public static void addOre(ItemStack stack, ItemStack materialStack, int rarity, int minY, int maxY) {
+        CraftTweakerAPI.apply(new Add(stack, materialStack, rarity, minY, maxY));
     }
 
     public static class Add implements IAction {
@@ -37,12 +34,12 @@ public class ScannerCT {
 
         @Override
         public void apply() {
-            if (!(stack.getItem() instanceof ItemBlock)) return;
-            if (!(materialStack.getItem() instanceof ItemBlock)) return;
-            Block block = ((ItemBlock) stack.getItem()).getBlock();
-            IBlockState blockState = block.getStateFromMeta(stack.getItemDamage());
-            Block materialBlock = ((ItemBlock) materialStack.getItem()).getBlock();
-            IBlockState materialState = materialBlock.getStateFromMeta(materialStack.getItemDamage());
+            if (!(stack.getItem() instanceof BlockItem)) return;
+            if (!(materialStack.getItem() instanceof BlockItem)) return;
+            Block block = ((BlockItem) stack.getItem()).getBlock();
+            BlockState blockState = block.defaultBlockState();
+            Block materialBlock = ((BlockItem) materialStack.getItem()).getBlock();
+            BlockState materialState = materialBlock.defaultBlockState();
             Oregistry.registerEntry(new Oregistry.Entry(blockState, materialState, rarity, maxY, minY));
         }
 

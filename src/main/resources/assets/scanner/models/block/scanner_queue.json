@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "scanner:block/q_top",
+    "down": "scanner:block/biome_scanner_bottom",
+    "up": "scanner:block/queue_top",
+    "north": "scanner:block/queue_side",
+    "west": "scanner:block/queue_side",
+    "east": "scanner:block/queue_side",
+    "south": "scanner:block/queue_side"
+  }
+}

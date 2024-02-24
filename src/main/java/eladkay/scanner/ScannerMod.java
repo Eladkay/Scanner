@@ -1,135 +1,155 @@
 package eladkay.scanner;
 
-import com.teamwizardry.librarianlib.core.common.RegistrationHandler;
+import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Lifecycle;
 import eladkay.scanner.compat.CraftTweaker;
-import eladkay.scanner.init.ScannerCreativeTabs;
-import eladkay.scanner.misc.NetworkHelper;
-import eladkay.scanner.proxy.CommonProxy;
-import eladkay.scanner.terrain.TileEntityTerrainScanner;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import eladkay.scanner.init.*;
+import eladkay.scanner.networking.NetworkHelper;
+import eladkay.scanner.client.gui.GuiScannerQueue;
+import eladkay.scanner.client.gui.GuiTerrainScanner;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.Dimension;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.gen.ChunkGeneratorEnd;
-import net.minecraft.world.gen.ChunkGeneratorHell;
-import net.minecraft.world.gen.ChunkGeneratorOverworld;
-import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.border.IBorderListener;
+import net.minecraft.world.chunk.listener.IChunkStatusListener;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.DerivedWorldInfo;
+import net.minecraft.world.storage.IServerConfiguration;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ScannerMod.MODID, name = "Scanner", version = ScannerMod.VERSION)
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+@Mod(ScannerMod.MODID)
 public class ScannerMod {
     public static final String MODID = "scanner";
+    public static final Logger LOGGER = LogManager.getLogger();
     private static final boolean TESTING = false;
-
-    @SidedProxy(serverSide = "eladkay.scanner.proxy.CommonProxy", clientSide = "eladkay.scanner.proxy.ClientProxy")
-    public static CommonProxy proxy;
-
     public static DimensionType dimOverWorld;
     public static DimensionType dimNether;
     public static DimensionType dimEnd;
-    public static boolean ftbu;
-    @Mod.Instance(MODID)
-    public static ScannerMod instance;
-    public final static CreativeTabs TAB = new ScannerCreativeTabs(MODID);
-    public static final String VERSION = "1.6.12";
 
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        instance = this;
+    public ScannerMod() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
+        // Register the doClientStuff method for modloading
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
 
-        if (TESTING) {
-            Item item = new Item() {
-                @Override
-                public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
-                    playerIn.sendMessage(new TextComponentString(String.valueOf(
-                            FMLCommonHandler.instance().getMinecraftServerInstance())));
-                    return super.onItemRightClick(worldIn, playerIn, hand);
-                }
-            }.setRegistryName("scanner:testytest").setUnlocalizedName("scanner:testytest").setCreativeTab(TAB);
-            RegistrationHandler.register(item);
-        }
-        FMLInterModComms.sendMessage("waila", "register", "eladkay.scanner.compat.Waila.onWailaCall");
+        ModBlocks.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModTileEntities.TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModContainerTypes.CONTAINER_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        // Register ourselves for server and other game events we are interested in
+        MinecraftForge.EVENT_BUS.register(this);
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ScannerConfig.SPEC);
+    }
+
+    @SubscribeEvent
+    public void onCommonSetup(FMLCommonSetupEvent event) {
         CraftTweaker.init();
-        proxy.init();
-        Config.initConfig(event.getSuggestedConfigurationFile());
-        dimOverWorld = DimensionType.register("fakeoverworld", "", Config.dimid, WorldProviderOverworld.class, true);
-        DimensionManager.registerDimension(Config.dimid, dimOverWorld);
-        dimNether = DimensionType.register("fakenether", "", Config.dimid + 1, WorldProviderNether.class, true);
-        DimensionManager.registerDimension(Config.dimid + 1, dimNether);
-        dimEnd = DimensionType.register("fakeend", "", Config.dimid + 2, WorldProviderEnd.class, true);
-        DimensionManager.registerDimension(Config.dimid + 2, dimEnd);
         NetworkHelper.init();
     }
 
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        ftbu = Loader.isModLoaded("ftbutilities");
+    private void onClientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(
+                () -> {
+                    System.out.println("Client side work shit");
+                    ScreenManager.register(ModContainerTypes.SCANNER_QUEUE_MENU.get(), GuiScannerQueue::new);
+                    ScreenManager.register(ModContainerTypes.TERRAIN_SCANNER_MENU.get(), GuiTerrainScanner::new);
+                }
+        );
     }
 
-    @Mod.EventHandler
-    public void fmlLifeCycle(FMLServerStartingEvent event) {
+    @SubscribeEvent
+    public void onServerStarting(FMLServerStartingEvent event) {
+        final MinecraftServer server = event.getServer();
+        final Map<RegistryKey<World>, ServerWorld> worlds = server.forgeGetWorldMap();
+        if (!worlds.containsKey(ModDimensions.FAKE_OVERWORLD)) {
+            // Get some important fields
+            final IServerConfiguration serverConfig = server.getWorldData();
+            final DimensionGeneratorSettings dimensionSettings = serverConfig.worldGenSettings();
+            final DynamicRegistries registries = server.registryAccess();
+            final IChunkStatusListener chunkStatusListener = server.progressListenerFactory.create(11);
+
+            // Register world
+            if(!ScannerConfig.CONFIG.dimensionBlacklist.get().contains("minecraft:overworld")) {
+                worlds.put(ModDimensions.FAKE_OVERWORLD, generateScannerOverworld(server, serverConfig, dimensionSettings, registries, chunkStatusListener));
+                MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(worlds.get(ModDimensions.FAKE_OVERWORLD)));
+            }
+
+            Set<Map.Entry<RegistryKey<Dimension>, Dimension>> set = new HashSet<>(dimensionSettings.dimensions().entrySet());
+
+            for(Map.Entry<RegistryKey<Dimension>, Dimension> entry : set) {
+                RegistryKey<Dimension> registrykey = entry.getKey();
+                if(ScannerConfig.CONFIG.dimensionBlacklist.get().contains(registrykey.location().toString())) continue;
+                if (registrykey != Dimension.OVERWORLD && !registrykey.location().getNamespace().equals(ScannerMod.MODID)) {
+                    Pair<RegistryKey<World>, ServerWorld> pair = generateOther(entry, server, serverConfig, dimensionSettings, registries, chunkStatusListener);
+                    worlds.put(pair.getFirst(), pair.getSecond());
+                    MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(worlds.get(pair.getFirst())));
+                }
+            }
+
+            server.markWorldsDirty();
+        }
+    }
+
+    private ServerWorld generateScannerOverworld(MinecraftServer server, IServerConfiguration serverConfig, DimensionGeneratorSettings dimensionSettings, DynamicRegistries registries, IChunkStatusListener chunkStatusListener) {
+        final long seed = dimensionSettings.seed();
+        // Create chunk generator
+        final ChunkGenerator generator = DimensionGeneratorSettings.makeDefaultOverworld(registries.registryOrThrow(Registry.BIOME_REGISTRY), registries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY), seed);
+        // Create dimension
+        final Dimension dimension = new Dimension(() -> DimensionType.DEFAULT_OVERWORLD, generator);
+        // Register dimension
+        dimensionSettings.dimensions().register(ModDimensions.FAKE_OVERWORLD_DIMENSION, dimension, Lifecycle.experimental());
+        // Create world
+        final DerivedWorldInfo worldInfo = new DerivedWorldInfo(serverConfig, serverConfig.overworldData());
+        final ServerWorld world = new ServerWorld(server, server.executor, server.storageSource, worldInfo, ModDimensions.FAKE_OVERWORLD, dimension.type(), chunkStatusListener, dimension.generator(), dimensionSettings.isDebug(), BiomeManager.obfuscateSeed(seed), ImmutableList.of(), false);
+        return world;
+    }
+
+    private Pair<RegistryKey<World>, ServerWorld> generateOther(Map.Entry<RegistryKey<Dimension>, Dimension> entry, MinecraftServer server, IServerConfiguration serverConfig, DimensionGeneratorSettings dimensionSettings, DynamicRegistries registries, IChunkStatusListener chunkStatusListener) {
+        final long seed = dimensionSettings.seed();
+        RegistryKey<Dimension> registrykey = entry.getKey();
+        RegistryKey<World> worldKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(ScannerMod.MODID, registrykey.location().toString().replace(":", "_")));
+        RegistryKey<Dimension> dimensionKey = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(ScannerMod.MODID, registrykey.location().toString().replace(":", "_")));
+        DimensionType dimensionType = entry.getValue().type();
+
+        ChunkGenerator generator = entry.getValue().generator();
+        final Dimension dimension = new Dimension(() -> dimensionType, generator);
+        dimensionSettings.dimensions().register(dimensionKey, dimension, Lifecycle.experimental());
+
+        DerivedWorldInfo worldInfo = new DerivedWorldInfo(serverConfig, serverConfig.overworldData());
+        ServerWorld world = new ServerWorld(server, server.executor, server.storageSource, worldInfo, worldKey, dimensionType, chunkStatusListener, dimension.generator(), dimensionSettings.isDebug(), BiomeManager.obfuscateSeed(seed), ImmutableList.of(), false);
+        return new Pair<>(worldKey, world);
+    }
+
+    /*@SubscribeEvent
+    public static void onRegisterCommands(RegisterCommandsEvent event) {
         event.registerServerCommand(new SpeedTickCommand());
         event.registerServerCommand(new TpToDim99Command());
-    }
-
-    public static class WorldProviderOverworld extends WorldProvider {
-
-        @Override
-        public DimensionType getDimensionType() {
-            return dimOverWorld;
-        }
-
-        @Override
-        public IChunkGenerator createChunkGenerator() {
-            return new ChunkGeneratorOverworld(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), TileEntityTerrainScanner.PRESET);
-        }
-    }
-
-    public static class WorldProviderNether extends WorldProvider {
-
-        @Override
-        public DimensionType getDimensionType() {
-            return dimNether;
-        }
-
-        @Override
-        public IChunkGenerator createChunkGenerator() {
-            return new ChunkGeneratorHell(world, world.getWorldInfo().isMapFeaturesEnabled(), world.getSeed());
-        }
-    }
-
-    public static class WorldProviderEnd extends WorldProvider {
-
-        @Override
-        public DimensionType getDimensionType() {
-            return dimEnd;
-        }
-
-        @Override
-        public IChunkGenerator createChunkGenerator() {
-            return new ChunkGeneratorEnd(world, world.getWorldInfo().isMapFeaturesEnabled(), world.getSeed(), new BlockPos(0, 64, 0));
-        }
     }
 
     public static class SpeedTickCommand extends CommandBase {
@@ -185,5 +205,5 @@ public class ScannerMod {
                 getCommandSenderAsPlayer(sender).changeDimension(Integer.parseInt(args[0].replace("offwego", "")));
 
         }
-    }
+    }*/
 }

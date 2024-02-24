@@ -1,10 +1,10 @@
 {
   "variants": {
-    "state=true": {
-      "model": "scanner:terrain_scanner"
+    "powered=true": {
+      "model": "scanner:block/terrain_scanner"
     },
-    "state=false": {
-      "model": "scanner:terrain_scanner"
+    "powered=false": {
+      "model": "scanner:block/terrain_scanner"
     }
   }
 }

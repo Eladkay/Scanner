@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "drd",
+    "ese",
+    "dbd"
+  ],
+  "key":
+  {
+    "d":
+    {
+      "tag": "forge:ingots/iron"
+    },
+    "r":
+    {
+      "item": "minecraft:repeater"
+    },
+    "s":
+    {
+      "tag": "forge:storage_blocks/emerald"
+    },
+    "e":
+    {
+      "tag": "forge:gems/emerald"
+    },
+    "b":
+    {
+      "tag": "forge:dusts/redstone"
+    }
+  },
+  "result":
+  {
+    "item": "scanner:terrain_scanner",
+    "count": 1
+  }
+}
