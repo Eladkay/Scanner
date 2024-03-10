@@ -32,16 +32,14 @@ public class NetworkHelper {
 
     public static void broadcast(MinecraftServer server, MessageBase<?> message) {
         List<ServerPlayerEntity> players = server.getPlayerList().getPlayers();
-        for(int i = 0; i < players.size(); ++i) {
-            final ServerPlayerEntity player = players.get(i);
+        for(ServerPlayerEntity player : players) {
             INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
         }
     }
 
     public static void broadcastInLevel(ServerWorld level, MessageBase<?> message) {
         List<ServerPlayerEntity> players = level.getPlayers((player) -> true);
-        for(int i = 0; i < players.size(); ++i) {
-            final ServerPlayerEntity player = players.get(i);
+        for(ServerPlayerEntity player : players) {
             INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
         }
     }
