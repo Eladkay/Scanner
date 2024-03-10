@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,6 +54,6 @@ public class ScannerConfig {
         this.remoteBuildCost = builder.comment("How much building remotely (Biome+Terrain) will cost in addition to the regular cost").define("remoteBuildCost", 0);
         this.maxQueueRange = builder.comment("The maximum range for remote building with the scanner queue (default value 0 means no maximum).").define("maxQueueRange", 0);
         this.queueCapacity = builder.comment("The maximum capacity of positions that the scanner queue can handle.").define("queueCapacity", 5);
-        this.dimensionBlacklist = builder.comment("The dimensions to not create a fake dimension for. This means the scanner blocks won't work in these dimensions.").define("dimensionBlacklist", Arrays.asList("twilightforest:twilight_forest"));
+        this.dimensionBlacklist = builder.comment("The dimensions to not create a fake dimension for. This means the scanner blocks won't work in these dimensions.").define("dimensionBlacklist", Collections.emptyList());
     }
 }
