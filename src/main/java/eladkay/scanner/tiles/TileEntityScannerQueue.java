@@ -64,9 +64,7 @@ public class TileEntityScannerQueue extends BaseTE implements ITickableTileEntit
 
     @Nullable
     public BlockPos get(int index) {
-        int i = 0;
-        for (BlockPos pos : this) if (index == i++) return pos;
-        return null;
+        return queue.toArray(new BlockPos[]{})[index];
     }
 
     public void remove(BlockPos pos) {
