@@ -57,11 +57,8 @@ public class BlockBiomeScanner extends Block {
 
     @Override
     public ActionResultType use(BlockState pState, World pLevel, BlockPos pPos, PlayerEntity pPlayer, Hand pHand, BlockRayTraceResult pHit) {
-        System.out.println("0");
         if(!pLevel.isClientSide) return ActionResultType.PASS;
-        System.out.println("1");
         if (pLevel.getBlockEntity(pPos) != null) {
-            System.out.println("2");
             new GuiBiomeScanner((TileEntityBiomeScanner) pLevel.getBlockEntity(pPos)).openGui();
         }
         return ActionResultType.SUCCESS;

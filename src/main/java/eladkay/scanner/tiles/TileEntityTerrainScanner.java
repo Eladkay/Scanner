@@ -213,7 +213,6 @@ public class TileEntityTerrainScanner extends BaseTE implements ITickableTileEnt
             if (current.getZ() > end.getZ() && rotation.z > 0 || current.getZ() < end.getZ() && rotation.z < 0) {
                 current.set(getPosStart().getX(), current.getY() + 1, getPosStart().getZ());
             }
-            System.out.println(current.getY());
             if (current.getY() > maxY) {
                 if (queue != null && queue.peek() != null) {
                     BlockPos pos = queue.pop();

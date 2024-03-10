@@ -76,7 +76,6 @@ public class ScannerMod {
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(
                 () -> {
-                    System.out.println("Client side work shit");
                     ScreenManager.register(ModContainerTypes.SCANNER_QUEUE_MENU.get(), GuiScannerQueue::new);
                     ScreenManager.register(ModContainerTypes.TERRAIN_SCANNER_MENU.get(), GuiTerrainScanner::new);
                 }
