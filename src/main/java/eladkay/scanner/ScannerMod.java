@@ -53,7 +53,6 @@ public class ScannerMod {
 
     public ScannerMod() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
-        // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
 
         ModBlocks.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -61,7 +60,6 @@ public class ScannerMod {
         ModTileEntities.TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModContainerTypes.CONTAINER_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
-        // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ScannerConfig.SPEC);
@@ -87,25 +85,18 @@ public class ScannerMod {
         final MinecraftServer server = event.getServer();
         final Map<RegistryKey<World>, ServerWorld> worlds = server.forgeGetWorldMap();
         if (!worlds.containsKey(ModDimensions.FAKE_OVERWORLD)) {
-            // Get some important fields
             final IServerConfiguration serverConfig = server.getWorldData();
             final DimensionGeneratorSettings dimensionSettings = serverConfig.worldGenSettings();
             final DynamicRegistries registries = server.registryAccess();
             final IChunkStatusListener chunkStatusListener = server.progressListenerFactory.create(11);
-
-            // Register world
-            if(!ScannerConfig.CONFIG.dimensionBlacklist.get().contains("minecraft:overworld")) {
-                worlds.put(ModDimensions.FAKE_OVERWORLD, generateScannerOverworld(server, serverConfig, dimensionSettings, registries, chunkStatusListener));
-                MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(worlds.get(ModDimensions.FAKE_OVERWORLD)));
-            }
 
             Set<Map.Entry<RegistryKey<Dimension>, Dimension>> set = new HashSet<>(dimensionSettings.dimensions().entrySet());
 
             for(Map.Entry<RegistryKey<Dimension>, Dimension> entry : set) {
                 RegistryKey<Dimension> registrykey = entry.getKey();
                 if(ScannerConfig.CONFIG.dimensionBlacklist.get().contains(registrykey.location().toString())) continue;
-                if (registrykey != Dimension.OVERWORLD && !registrykey.location().getNamespace().equals(ScannerMod.MODID)) {
-                    Pair<RegistryKey<World>, ServerWorld> pair = generateOther(entry, server, serverConfig, dimensionSettings, registries, chunkStatusListener);
+                if (!registrykey.location().getNamespace().equals(ScannerMod.MODID)) {
+                    Pair<RegistryKey<World>, ServerWorld> pair = generateWorld(entry, server, serverConfig, dimensionSettings, registries, chunkStatusListener);
                     worlds.put(pair.getFirst(), pair.getSecond());
                     MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(worlds.get(pair.getFirst())));
                 }
@@ -115,21 +106,7 @@ public class ScannerMod {
         }
     }
 
-    private ServerWorld generateScannerOverworld(MinecraftServer server, IServerConfiguration serverConfig, DimensionGeneratorSettings dimensionSettings, DynamicRegistries registries, IChunkStatusListener chunkStatusListener) {
-        final long seed = dimensionSettings.seed();
-        // Create chunk generator
-        final ChunkGenerator generator = DimensionGeneratorSettings.makeDefaultOverworld(registries.registryOrThrow(Registry.BIOME_REGISTRY), registries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY), seed);
-        // Create dimension
-        final Dimension dimension = new Dimension(() -> DimensionType.DEFAULT_OVERWORLD, generator);
-        // Register dimension
-        dimensionSettings.dimensions().register(ModDimensions.FAKE_OVERWORLD_DIMENSION, dimension, Lifecycle.experimental());
-        // Create world
-        final DerivedWorldInfo worldInfo = new DerivedWorldInfo(serverConfig, serverConfig.overworldData());
-        final ServerWorld world = new ServerWorld(server, server.executor, server.storageSource, worldInfo, ModDimensions.FAKE_OVERWORLD, dimension.type(), chunkStatusListener, dimension.generator(), dimensionSettings.isDebug(), BiomeManager.obfuscateSeed(seed), ImmutableList.of(), false);
-        return world;
-    }
-
-    private Pair<RegistryKey<World>, ServerWorld> generateOther(Map.Entry<RegistryKey<Dimension>, Dimension> entry, MinecraftServer server, IServerConfiguration serverConfig, DimensionGeneratorSettings dimensionSettings, DynamicRegistries registries, IChunkStatusListener chunkStatusListener) {
+    private Pair<RegistryKey<World>, ServerWorld> generateWorld(Map.Entry<RegistryKey<Dimension>, Dimension> entry, MinecraftServer server, IServerConfiguration serverConfig, DimensionGeneratorSettings dimensionSettings, DynamicRegistries registries, IChunkStatusListener chunkStatusListener) {
         final long seed = dimensionSettings.seed();
         RegistryKey<Dimension> registrykey = entry.getKey();
         RegistryKey<World> worldKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(ScannerMod.MODID, registrykey.location().toString().replace(":", "_")));
