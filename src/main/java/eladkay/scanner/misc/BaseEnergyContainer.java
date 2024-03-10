@@ -1,29 +1,10 @@
 package eladkay.scanner.misc;
 
-
-import net.darkhax.tesla.api.ITeslaConsumer;
-import net.darkhax.tesla.api.ITeslaHolder;
-import net.darkhax.tesla.api.ITeslaProducer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.fml.common.Optional;
 
-@Optional.InterfaceList({
-        @Optional.Interface(iface = "net.darkhax.tesla.api.ITeslaHolder", modid = "tesla"),
-        @Optional.Interface(iface = "net.darkhax.tesla.api.ITeslaConsumer", modid = "tesla"),
-        @Optional.Interface(iface = "net.darkhax.tesla.api.ITeslaProducer", modid = "tesla")
-})
-public class BaseEnergyContainer extends EnergyStorage implements ITeslaHolder, ITeslaConsumer, ITeslaProducer, INBTSerializable<NBTTagCompound> {
-
-    @CapabilityInject(ITeslaConsumer.class)
-    public static Capability<?> CAPABILITY_CONSUMER = null;
-    @CapabilityInject(ITeslaProducer.class)
-    public static Capability<?> CAPABILITY_PRODUCER = null;
-    @CapabilityInject(ITeslaHolder.class)
-    public static Capability<?> CAPABILITY_HOLDER = null;
+public class BaseEnergyContainer extends EnergyStorage implements INBTSerializable<CompoundNBT> {
 
     public void setEnergyStored(long energyStored) {
         this.energy = (int) energyStored;
@@ -42,44 +23,20 @@ public class BaseEnergyContainer extends EnergyStorage implements ITeslaHolder, 
     }
 
     @Override
-    @Optional.Method(modid = "tesla")
-    public long givePower(long tesla, boolean simulate) {
-        return receiveEnergy((int) tesla & 0xEFFFFFFF, simulate);
-    }
-
-    @Override
-    @Optional.Method(modid = "tesla")
-    public long getStoredPower() {
-        return getEnergyStored();
-    }
-
-    @Override
-    @Optional.Method(modid = "tesla")
-    public long getCapacity() {
-        return getMaxEnergyStored();
-    }
-
-    @Override
-    @Optional.Method(modid = "tesla")
-    public long takePower(long tesla, boolean simulate) {
-        return extractEnergy((int) tesla & 0xEFFFFFFF, simulate);
-    }
-
-    @Override
-    public NBTTagCompound serializeNBT() {
-        NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("energy", energy);
-        compound.setInteger("capacity", capacity);
-        compound.setInteger("maxReceive", maxReceive);
-        compound.setInteger("maxExtract", maxExtract);
+    public CompoundNBT serializeNBT() {
+        CompoundNBT compound = new CompoundNBT();
+        compound.putInt("energy", energy);
+        compound.putInt("capacity", capacity);
+        compound.putInt("maxReceive", maxReceive);
+        compound.putInt("maxExtract", maxExtract);
         return compound;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
-        energy = nbt.getInteger("energy");
-        capacity = nbt.getInteger("capacity");
-        maxReceive = nbt.getInteger("maxReceive");
-        maxExtract = nbt.getInteger("maxExtract");
+    public void deserializeNBT(CompoundNBT nbt) {
+        energy = nbt.getInt("energy");
+        capacity = nbt.getInt("capacity");
+        maxReceive = nbt.getInt("maxReceive");
+        maxExtract = nbt.getInt("maxExtract");
     }
 }

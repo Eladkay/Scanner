@@ -1,9 +1,8 @@
 package eladkay.scanner.compat;
 
 import com.google.common.collect.Lists;
-import net.minecraft.block.state.IBlockState;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.common.Loader;
+import eladkay.scanner.ScannerMod;
+import net.minecraft.block.BlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,12 +14,12 @@ public class Oregistry {
 
     @Nullable
     public static Entry registerEntry(Entry entry) {
-        FMLLog.info("Registering Entry \"" + entry + "\".");
+        ScannerMod.LOGGER.info("Registering Entry \"" + entry + "\".");
 
         if (!entries.contains(entry)) {
             entries.add(entry);
         } else {
-            FMLLog.warning("Ore \"" + entry + "\" registered twice. Report this to the author of " + Loader.instance().activeModContainer().getModId() + ".");
+            ScannerMod.LOGGER.warn("Ore \"" + entry + "\" registered twice. Report this to the author of " + ScannerMod.MODID + ".");
             return null;
         }
 
@@ -34,13 +33,13 @@ public class Oregistry {
     }
 
     public static class Entry {
-        public IBlockState ore;
-        public IBlockState material;
+        public BlockState ore;
+        public BlockState material;
         public int rarity;
         public int maxY;
         public int minY;
 
-        public Entry(IBlockState ore, IBlockState material, int rarity, int maxY, int minY) {
+        public Entry(BlockState ore, BlockState material, int rarity, int maxY, int minY) {
             this.ore = ore;
             this.material = material;
             this.rarity = rarity;

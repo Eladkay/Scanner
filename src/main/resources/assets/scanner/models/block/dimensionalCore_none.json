@@ -1,7 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "particle": "scanner:blocks/dimensionalCore_none",
-    "all": "scanner:blocks/dimensionalCore_none"
-  }
-}

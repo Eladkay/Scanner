@@ -1,108 +1,157 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url = "https://files.minecraftforge.net/maven" }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
-}
-apply plugin: 'net.minecraftforge.gradle.forge'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-
-
-version = "1.6.12"
-group = "eladkay.scanner" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "scanner"
-
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
 }
 
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    version = "1.12.2-14.23.5.2808"
-    runDir = "run"
-    
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20171003"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    mappings channel: mapping_channel, version: mapping_version
+
+    copyIdeResources = true
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+        }
+
+        server {
+            args '--nogui'
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
 }
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    maven { url "http://maven.mcmoddev.com" }
-    maven { url "http://maven.tehnut.info" }
-    maven { url "http://chickenbones.net/maven/" }
     maven {
-        url = "http://maven.bluexin.be/repository/snapshots/"
+        url = 'https://maven.blamejared.com'
+        name = 'BlameJared Maven'
     }
+
     maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
+        url "https://maven.architectury.dev/"
     }
-    maven { // CraftTweaker
-        name 'jared maven'
-        url "http://maven.blamejared.com/"
-    }
-    maven { url = "http://maven.tterrag.com" }
-    maven { url "https://maven.latmod.com/" }
+
     maven {
-    // location of the maven that hosts JEI files
-    name = "Progwml6 maven"
-    url = "http://dvs1.progwml6.com/files/maven"
-   }
-   maven {
-    // location of a maven mirror for JEI files, as a fallback
-    name = "ModMaven"
-    url = "modmaven.k-4u.nl"
-   }
+        url "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.ftb.mods"
+        }
+    }
+
+    maven {
+        url "https://cursemaven.com"
+    }
+
+    maven { url "https://maven.tehnut.info" }
+
+    maven { url "https://maven.architectury.dev/" }
 }
 
 dependencies {
-    deobfProvided "mezz.jei:jei_1.12.2:4.15.0.268:api"
-    runtime "mezz.jei:jei_1.12.2:4.15.0.268"
-    //deobfCompile "com.feed_the_beast.mods:FTBLib:5.4.1.87"
-    compile files("libs/FTBLib-5.4.7.2.jar")
-    compile files("libs/FTBUtilities-5.4.1.130.jar")
-    deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
-    //compile 'LatMod:FTBLib:1.1x-3.6.5:api'
-    deobfCompile "cofh:RedstoneFlux:1.12-2.1.0.6:universal"
-    deobfCompile("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.13.514")
-    deobfCompile("com.blamejared:MTLib:3.0.4.8")
-    //compile "net.minecraftforge.lex:YUNoMakeGoodMap:1.10.2-6.1.0.22:universal"
-    //compile "EnderCore:EnderCore:1.10.2-0.4.1.64-beta"
-    //compile "EnderIO:EnderIO:1.10.2-3.1.156"
-    compile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
-    compile "com.teamwizardry.librarianlib:librarianlib-1.12:4.0-SNAPSHOT:deobf"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
+    // FTB Library - REQUIRED
+    compileOnly(fg.deobf("dev.ftb.mods:ftb-library-forge:${rootProject.ftb_library_version}"))
+    runtimeOnly(fg.deobf("dev.ftb.mods:ftb-library-forge:${rootProject.ftb_library_version}"))
+    // FTB Chunks - OPTIONAL
+    compileOnly(fg.deobf("dev.ftb.mods:ftb-chunks-forge:${rootProject.ftb_chunks_version}"))
+    runtimeOnly(fg.deobf("dev.ftb.mods:ftb-chunks-forge:${rootProject.ftb_chunks_version}"))
+    // FTB Teams - OPTIONAL
+    compileOnly(fg.deobf("dev.ftb.mods:ftb-teams-forge:${rootProject.ftb_teams_version}"))
+    runtimeOnly(fg.deobf("dev.ftb.mods:ftb-teams-forge:${rootProject.ftb_teams_version}"))
+    // CraftTweaker - OPTIONAL
+    compileOnly(fg.deobf("com.blamejared.crafttweaker:CraftTweaker-${minecraft_version}:${crafttweaker_version}"))
+    // Architectury - REQUIRED DEPENDENCY OF DEPENDENCY
+    runtimeOnly(fg.deobf("me.shedaniel:architectury-forge:${rootProject.architectury_version}"))
+    // Hwyla - OPTIONAL
+    compileOnly fg.deobf("curse.maven:hwyla-253449:3033593")
+    runtimeOnly(fg.deobf("curse.maven:hwyla-253449:3033593"))
+
+    runtimeOnly(fg.deobf("curse.maven:irongenerators-446489:3290772"))
 }
 
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+            forge_version: forge_version, forge_version_range: forge_version_range,
+            loader_version_range: loader_version_range,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors: mod_authors, mod_description: mod_description,
+            ftb_library_version: ftb_library_version, ftb_chunks_version: ftb_chunks_version,
+            ftb_teams_version: ftb_teams_version, crafttweaker_version: crafttweaker_version
+    ]
+    inputs.properties replaceProperties
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
     }
-        
-    // copy everything else except the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-    rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
-jar {
+tasks.named('jar', Jar).configure {
     manifest {
-        attributes 'FMLAT': 'scanner_at.cfg'
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1', // We are version 1 of ourselves
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
+
+    finalizedBy 'reobfJar'
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/mcmodsrepo"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }

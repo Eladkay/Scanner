@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "scanner:block/biome_scanner_advanced"
+    }
+  }
+}

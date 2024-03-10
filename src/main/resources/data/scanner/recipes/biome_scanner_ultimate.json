@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "dbd",
+    "ese",
+    "dbd"
+  ],
+  "key":
+  {
+    "e":
+    {
+      "tag": "forge:storage_blocks/emerald"
+    },
+    "d":
+    {
+      "tag": "forge:storage_blocks/diamond"
+    },
+    "b":
+    {
+      "tag": "forge:storage_blocks/diamond"
+    },
+    "s":
+    {
+      "item": "scanner:biome_scanner_elite"
+    }
+  },
+  "result":
+  {
+    "item": "scanner:biome_scanner_ultimate",
+    "count": 1
+  }
+}
