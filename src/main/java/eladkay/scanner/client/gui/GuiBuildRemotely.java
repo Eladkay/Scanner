@@ -47,15 +47,6 @@ public class GuiBuildRemotely extends BaseScreen {
         return this.setFullscreen();
     }
 
-    public void onClosed() {
-        /*FTBChunksClient.alwaysRenderChunksOnMap = false;
-        if (MapManager.inst != null) {
-            MapManager.inst.updateAllRegions(false);
-        }*/
-
-        super.onClosed();
-    }
-
     @Override
     public void addWidgets() {
         int sx = this.getX() + (this.width - 240) / 2;

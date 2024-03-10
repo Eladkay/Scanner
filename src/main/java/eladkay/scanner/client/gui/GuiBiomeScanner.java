@@ -55,15 +55,6 @@ public class GuiBiomeScanner extends BaseScreen {
         return this.setFullscreen();
     }
 
-    public void onClosed() {
-        /*FTBChunksClient.alwaysRenderChunksOnMap = false;
-        if (MapManager.inst != null) {
-            MapManager.inst.updateAllRegions(false);
-        }*/
-
-        super.onClosed();
-    }
-
     @Override
     public void addWidgets() {
         int sx = this.getX() + (this.width - 240) / 2;
@@ -130,20 +121,6 @@ public class GuiBiomeScanner extends BaseScreen {
 
             tessellator.end();
             buffer.begin(1, DefaultVertexFormats.POSITION_COLOR);
-            // This adds red lines which are unnecessary
-            /*Iterator var26 = this.chunkButtons.iterator();
-
-            while(var26.hasNext()) {
-                ChunkButton button = (ChunkButton)var26.next();
-                int cx = button.getX();
-                int cy = button.getY();
-                buffer.vertex((double)cx, (double)cy, 0.0).color(255, 0, 0, 100).endVertex();
-                buffer.vertex((double)(cx + 16), (double)(cy + 16), 0.0).color(255, 0, 0, 100).endVertex();
-                buffer.vertex((double)((float)cx + 8.0F), (double)cy, 0.0).color(255, 0, 0, 100).endVertex();
-                buffer.vertex((double)(cx + 16), (double)((float)cy + 8.0F), 0.0).color(255, 0, 0, 100).endVertex();
-                buffer.vertex((double)cx, (double)((float)cy + 8.0F), 0.0).color(255, 0, 0, 100).endVertex();
-                buffer.vertex((double)((float)cx + 8.0F), (double)(cy + 16), 0.0).color(255, 0, 0, 100).endVertex();
-            }*/
 
             tessellator.end();
         }
