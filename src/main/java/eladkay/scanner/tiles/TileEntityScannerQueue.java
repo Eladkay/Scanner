@@ -1,5 +1,6 @@
 package eladkay.scanner.tiles;
 
+import eladkay.scanner.ScannerConfig;
 import eladkay.scanner.client.container.ScannerQueueContainer;
 import eladkay.scanner.init.ModTileEntities;
 import net.minecraft.block.BlockState;
@@ -71,10 +72,9 @@ public class TileEntityScannerQueue extends BaseTE implements ITickableTileEntit
         queue.remove(pos);
     }
 
-    public static final int CAPACITY = 5;
 
     public void push(BlockPos pos) {
-        if (queue.size() >= CAPACITY) return;
+        if (queue.size() >= ScannerConfig.CONFIG.queueCapacity.get()) return;
         queue.add(pos);
     }
 

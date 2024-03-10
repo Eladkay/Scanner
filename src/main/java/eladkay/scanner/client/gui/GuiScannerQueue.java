@@ -59,7 +59,7 @@ public class GuiScannerQueue extends ContainerScreen<ScannerQueueContainer> {
             }
         }));
 
-        for (int i = 0; i < TileEntityScannerQueue.CAPACITY; i++) {
+        for (int i = 0; i < ScannerConfig.CONFIG.queueCapacity.get(); i++) {
             int finalI = i;
             Button buildButton = new Button((this.width / 2) - 83, this.height / 2 - 65 + (finalI * 10), 50, 10, new TranslationTextComponent("gui.scanner.button.build"), (button) -> {
                 if (scanner.scanner == null) return;
@@ -97,7 +97,7 @@ public class GuiScannerQueue extends ContainerScreen<ScannerQueueContainer> {
         int yTranslate = (this.height - this.imageHeight) / 2;
         pMatrixStack.translate(xTranslate, yTranslate, 0);
 
-        drawCenteredComponent(pMatrixStack, this.minecraft.font, new TranslationTextComponent("block.scanner.scanner_queue").append(" (").append(new TranslationTextComponent("gui.scanner.capacity")).append(": " + TileEntityScannerQueue.CAPACITY + ")"), 90, 6, 4210752); //
+        drawCenteredComponent(pMatrixStack, this.minecraft.font, new TranslationTextComponent("block.scanner.scanner_queue").append(" (").append(new TranslationTextComponent("gui.scanner.capacity")).append(": " + ScannerConfig.CONFIG.queueCapacity.get() + ")"), 90, 6, 4210752); //
 
         if(scanner == null) return;
 

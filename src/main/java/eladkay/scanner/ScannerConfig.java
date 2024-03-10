@@ -21,7 +21,6 @@ public class ScannerConfig {
 
     public final ForgeConfigSpec.ConfigValue<Integer> energyPerBlockTerrainScanner;
     public final ForgeConfigSpec.ConfigValue<Integer> maxEnergyBufferTerrain;
-    //public final int dimid;
     public final ForgeConfigSpec.ConfigValue<Boolean> showOutline;
 
     public final ForgeConfigSpec.ConfigValue<Integer> minEnergyPerChunkBiomeScanner;
@@ -34,6 +33,7 @@ public class ScannerConfig {
     public final ForgeConfigSpec.ConfigValue<Integer> remoteBuildCost;
     public final ForgeConfigSpec.ConfigValue<Boolean> replaceNonSourceLiquid;
     public final ForgeConfigSpec.ConfigValue<Integer> maxQueueRange;
+    public final ForgeConfigSpec.ConfigValue<Integer> queueCapacity;
     public final ForgeConfigSpec.ConfigValue<List<String>> dimensionBlacklist;
 
     public ScannerConfig(ForgeConfigSpec.Builder builder) {
@@ -51,7 +51,8 @@ public class ScannerConfig {
         this.maxSpeedup = builder.comment("The maximum amount of blocks per tick that the terrain scanner can scan. Power usage is multiplied by the amount of speedup.").define("maxSpeedup", 8);
         this.maxY = builder.comment("The maximum height a terrain scanner will build, starting in y=0.").define("maxY", 150);
         this.remoteBuildCost = builder.comment("How much building remotely (Biome+Terrain) will cost in addition to the regular cost").define("remoteBuildCost", 0);
-        this.maxQueueRange = builder.comment("The max range for remote building with the scanner queue (default value 0 means no maximum).").define("maxQueueRange", 0);
+        this.maxQueueRange = builder.comment("The maximum range for remote building with the scanner queue (default value 0 means no maximum).").define("maxQueueRange", 0);
+        this.queueCapacity = builder.comment("The maximum capacity of positions that the scanner queue can handle.").define("queueCapacity", 5);
         this.dimensionBlacklist = builder.comment("The dimensions to not create a fake dimension for. This means the scanner blocks won't work in these dimensions.").define("dimensionBlacklist", Arrays.asList("twilightforest:twilight_forest"));
     }
 }
